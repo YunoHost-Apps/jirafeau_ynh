@@ -1,0 +1,40 @@
+{
+    "name": "Jirafeau",
+    "id": "jirafeau",
+    "description": {
+        "en": "Upload a file in a simple way and give an unique link to it"
+    },
+    "developer": {
+        "name": "julien",
+        "email": "julien.malik@paraiso.me",
+        "url": "https://gitorious.org/jirafeau"
+    },
+    "multi_instance": "false",
+    "arguments": {
+        "install" : [
+            {
+                "name": "domain",
+                "ask": {
+                    "en": "Choose a domain for Jirafeau"
+                },
+                "example": "domain.org"
+            },
+            {
+                "name": "path",
+                "ask": {
+                    "en": "Choose a path for Jirafeau"
+                },
+                "example": "/jirafeau",
+                "default": "/jirafeau"
+            },
+            {
+                "name": "is_public",
+                "ask": {
+                    "en": "Is it a public Jirafeau site ?"
+                },
+                "choices": ["Yes", "No"],
+                "default": "Yes"
+            }
+        ]
+    }
+}
