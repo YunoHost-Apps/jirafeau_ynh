@@ -28,6 +28,20 @@
                 "default": "/jirafeau"
             },
             {
+                "name": "admin_user",
+                "ask": {
+                    "en": "Choose an admin user (will be able to access admin.php page)"
+                },
+                "example": "johndoe"
+            },
+            {
+                "name": "upload_password",
+                "ask": {
+                    "en": "Set the password granting upload permissions (leave empty to allow anybody to upload)"
+                },
+                "example": "supersecretpassword"
+            },
+            {
                 "name": "is_public",
                 "ask": {
                     "en": "Is it a public Jirafeau site ?"

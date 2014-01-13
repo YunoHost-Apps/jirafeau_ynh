@@ -35,7 +35,8 @@ $cfg['lang'] = 'auto';
 $cfg['style'] = 'modern';
 $cfg['rewrite'] = false;
 /* An empty admin password will disable the admin interface. */
-$cfg['admin_password'] = 'test';
+$cfg['admin_password'] = '';
+$cfg['admin_user'] = 'YNH_ADMIN_USER';
 /* preview: false (will download file) or true (will preview in browser if
  * possible) . */
 $cfg['preview'] = false;
@@ -53,7 +54,7 @@ $cfg['enable_crypt'] = false;
 /* Split lenght of link refenrece. */
 $cfg['link_name_lenght'] = 8;
 /* Upload password. Empty string disable the password. */
-$cfg['upload_password'] = '';
+$cfg['upload_password'] = 'YNH_UPLOAD_PASSWORD';
 
 if ((basename (__FILE__) != 'config.local.php')
     && file_exists (JIRAFEAU_ROOT.'lib/config.local.php'))

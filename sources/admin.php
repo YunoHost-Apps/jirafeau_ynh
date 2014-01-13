@@ -43,7 +43,14 @@ if (file_exists (JIRAFEAU_ROOT . 'install.php'))
     exit;
 }
 
+if (!$cfg['admin_user'] || $_SERVER['PHP_AUTH_USER'] != $cfg['admin_user'])
+{
+    header('Location: index.php');
+    exit;
+}
+
 /* Disable admin interface if we have a empty admin password. */
+/*
 if (!$cfg['admin_password'])
 {
     require (JIRAFEAU_ROOT . 'lib/template/header.php');
@@ -53,15 +60,21 @@ if (!$cfg['admin_password'])
     require (JIRAFEAU_ROOT.'lib/template/footer.php');
     exit;
 }
+*/
 
 /* Check session. */
+/*
 session_start();
+*/
 
 /* Unlog if asked. */
+/*
 if (isset ($_POST['action']) && (strcmp ($_POST['action'], 'logout') == 0))
     $_SESSION['admin_auth'] = false;
+*/
 
 /* Check password. */
+/*
 if (isset ($_POST['admin_password']))
 {
     if (strcmp ($cfg['admin_password'], $_POST['admin_password']) == 0)
@@ -76,7 +89,10 @@ if (isset ($_POST['admin_password']))
         exit;
     }
 }
+*/
+
 /* Ask for password. */
+/*
 elseif (!isset ($_SESSION['admin_auth']) || $_SESSION['admin_auth'] != true)
 {
     require (JIRAFEAU_ROOT . 'lib/template/header.php'); ?>
@@ -106,6 +122,7 @@ elseif (!isset ($_SESSION['admin_auth']) || $_SESSION['admin_auth'] != true)
     require (JIRAFEAU_ROOT.'lib/template/footer.php');
     exit;
 }
+*/
 
 /* Operations may take a long time.
  * Be sure PHP's safe mode is off.
