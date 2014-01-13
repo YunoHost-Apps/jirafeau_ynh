@@ -35,12 +35,21 @@ sudo chmod -R 700 $var_root
 # Modify Nginx configuration file and copy it to Nginx conf directory
 sed -i "s@YNH_WWW_PATH@$path@g" ../conf/nginx.conf
 sed -i "s@YNH_WWW_ALIAS@$final_path/@g" ../conf/nginx.conf
-sudo cp ../conf/nginx.conf /etc/nginx/conf.d/$domain.d/jirafeau.conf
+nginxconf=/etc/nginx/conf.d/$domain.d/jirafeau.conf
+sudo cp ../conf/nginx.conf $nginxconf
+sudo chown root: $nginxconf
+sudo chmod 600 $nginxconf
 
 sed -i "s@NAMETOCHANGE@jirafeau@g" ../conf/php-fpm.conf
-sudo cp ../conf/php-fpm.conf /etc/php5/fpm/pool.d/jirafeau.conf
-sudo cp ../conf/php-fpm.ini /etc/php5/fpm/conf.d/20-jirafeau.ini
+finalphpconf=/etc/php5/fpm/pool.d/jirafeau.conf
+sudo cp ../conf/php-fpm.conf $finalphpconf
+sudo chown root: $finalphpconf
+sudo chmod 644 $finalphpconf
 
+finalphpini=/etc/php5/fpm/conf.d/20-jirafeau.ini
+sudo cp ../conf/php-fpm.ini $finalphpini
+sudo chown root: $finalphpini
+sudo chmod 644 $finalphpini
 
 if [ $is_public = "Yes" ];
 then
