@@ -20,10 +20,14 @@ if [[ ! $? -eq 0 ]]; then
     exit 1
 fi
 
-final_path=/var/www/jirafeau
-var_root=/home/yunohost.app/jirafeau
+# Save specific settings
+sudo yunohost app setting jirafeau admin_user -v $admin_user
+sudo yunohost app setting jirafeau upload_password -v $upload_password
+sudo yunohost app setting jirafeau is_public -v $is_public
 
 # Copy files to the right place
+final_path=/var/www/jirafeau
+var_root=/home/yunohost.app/jirafeau
 sudo mkdir -p $final_path
 sudo cp -r ../sources/* $final_path
 sed -i "s@YNH_DOMAIN@$domain@g" ../conf/config.local.php
