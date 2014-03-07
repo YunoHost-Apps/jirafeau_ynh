@@ -13,8 +13,8 @@ if [[ ! $? -eq 0 ]]; then
     exit 1
 fi
 
-# Chack that admin user is an existing account
-sudo yunohost user list | python ../conf/user_list.py | grep "^$admin_user$"
+# Check that admin user is an existing account
+sudo yunohost user list | python ../conf/user_list.py | grep "^$admin_user$" >/dev/null
 if [[ ! $? -eq 0 ]]; then
     echo "Error : the chosen admin user does not exist"
     exit 1
