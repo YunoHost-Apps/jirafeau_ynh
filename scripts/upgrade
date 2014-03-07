@@ -2,6 +2,8 @@
 
 domain=$(sudo yunohost app setting jirafeau domain)
 path=$(sudo yunohost app setting jirafeau path)
+admin_user=$(sudo yunohost app setting jirafeau admin_user)
+upload_password=$(sudo yunohost app setting jirafeau upload_password)
 is_public=$(sudo yunohost app setting jirafeau is_public)
 
 # Remove trailing "/" for next commands
@@ -9,27 +11,52 @@ path=${path%/}
 
 # Copy files to the right place
 final_path=/var/www/jirafeau
+var_root=/home/yunohost.app/jirafeau
 sudo mkdir -p $final_path
-sudo cp -a ../sources/* $final_path
+sudo rm -rf $final_path/*
+sudo cp -r ../sources/* $final_path
+sed -i "s@YNH_DOMAIN@$domain@g" ../conf/config.local.php
+sed -i "s@YNH_WWW_PATH@$path@g" ../conf/config.local.php
+sed -i "s@YNH_VAR_ROOT@$var_root@g" ../conf/config.local.php
+sed -i "s@YNH_ADMIN_USER@$admin_user@g" ../conf/config.local.php
+sed -i "s@YNH_UPLOAD_PASSWORD@$upload_password@g" ../conf/config.local.php
+sudo cp ../conf/config.local.php $final_path/lib
+sudo rm $final_path/install.php
 
 # Files owned by root, www-data can just read
 sudo find $final_path -type f | xargs sudo chmod 644
 sudo find $final_path -type d | xargs sudo chmod 755
 sudo chown -R root: $final_path
 
-# except for data and tmp subdir, where www-data must have write permissions
-sudo chown www-data:root $final_path/{data,tmp}
-sudo chmod 700 $final_path/{data,tmp}
+sudo mkdir -p $var_root/{files,links,async,block}
+sudo chown -R www-data:root $var_root
+sudo chmod -R 700 $var_root
 
 # Modify Nginx configuration file and copy it to Nginx conf directory
 sed -i "s@YNH_WWW_PATH@$path@g" ../conf/nginx.conf
 sed -i "s@YNH_WWW_ALIAS@$final_path/@g" ../conf/nginx.conf
-sudo cp ../conf/nginx.conf /etc/nginx/conf.d/$domain.d/jirafeau.conf
+nginxconf=/etc/nginx/conf.d/$domain.d/jirafeau.conf
+sudo cp ../conf/nginx.conf $nginxconf
+sudo chown root: $nginxconf
+sudo chmod 600 $nginxconf
+
+sed -i "s@NAMETOCHANGE@jirafeau@g" ../conf/php-fpm.conf
+finalphpconf=/etc/php5/fpm/pool.d/jirafeau.conf
+sudo cp ../conf/php-fpm.conf $finalphpconf
+sudo chown root: $finalphpconf
+sudo chmod 644 $finalphpconf
+
+finalphpini=/etc/php5/fpm/conf.d/20-jirafeau.ini
+sudo cp ../conf/php-fpm.ini $finalphpini
+sudo chown root: $finalphpini
+sudo chmod 644 $finalphpini
 
 if [ $is_public = "Yes" ];
 then
-  sudo yunohost app setting jirafeau skipped_uris -v "/" 
+  sudo yunohost app setting jirafeau unprotected_uris -v "/" 
 fi
 
+sudo service php5-fpm restart
 sudo service nginx reload
 sudo yunohost app ssowatconf
+
