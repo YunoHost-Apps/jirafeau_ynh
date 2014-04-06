@@ -3,6 +3,7 @@
     "id": "jirafeau",
     "description": {
         "en": "Upload a file in a simple way and give an unique link to it"
+        "fr": "Upload un fichier simplement et partage-le avec un simple lien"
     },
     "developer": {
         "name": "julien",
