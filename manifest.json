@@ -2,8 +2,8 @@
     "name": "Jirafeau",
     "id": "jirafeau",
     "description": {
-        "en": "Upload a file in a simple way and give an unique link to it"
-        "fr": "Upload un fichier simplement et partage-le avec un simple lien"
+        "en": "Upload a file in a simple way and give a unique link to it",
+        "fr": "Upload un fichier simplement et partage-le avec un lien simple"
     },
     "developer": {
         "name": "julien",
@@ -16,14 +16,16 @@
             {
                 "name": "domain",
                 "ask": {
-                    "en": "Choose a domain for Jirafeau"
+                    "en": "Choose a domain for Jirafeau",
+                    "fr": "Choisissez un domaine pour Jirafeau"
                 },
                 "example": "domain.org"
             },
             {
                 "name": "path",
                 "ask": {
-                    "en": "Choose a path for Jirafeau"
+                    "en": "Choose a path for Jirafeau",
+                    "fr": "Choisissez un chemin pour Jirafeau"
                 },
                 "example": "/jirafeau",
                 "default": "/jirafeau"
@@ -31,21 +33,24 @@
             {
                 "name": "admin_user",
                 "ask": {
-                    "en": "Choose an admin user (will be able to access admin.php page)"
+                    "en": "Choose an admin user (will be able to access admin.php page)",
+                    "fr": "Choisissez l'administrateur (seul autorisé à accéder à la page admin.php)
                 },
                 "example": "johndoe"
             },
             {
                 "name": "upload_password",
                 "ask": {
-                    "en": "Set the password granting upload permissions (leave empty to allow anybody to upload)"
+                    "en": "Set the password granting upload permissions (leave empty to allow anybody to upload)",
+                    "fr": "Choisissez le password pour autoriser l'upload (laissez vide pour autorisé tout le monde)"
                 },
                 "example": "supersecretpassword"
             },
             {
                 "name": "is_public",
                 "ask": {
-                    "en": "Is it a public Jirafeau site ?"
+                    "en": "Is it a public Jirafeau site ?",
+                    "fr": "Est-ce un site public"
                 },
                 "choices": ["Yes", "No"],
                 "default": "Yes"
