@@ -34,7 +34,7 @@
                 "name": "admin_user",
                 "ask": {
                     "en": "Choose an admin user (will be able to access admin.php page)",
-                    "fr": "Choisissez l'administrateur (seul autorisé à accéder à la page admin.php)
+                    "fr": "Choisissez l'administrateur (seul autorisé à accéder à la page admin.php)"
                 },
                 "example": "johndoe"
             },
