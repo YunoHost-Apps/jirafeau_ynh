@@ -3,7 +3,7 @@
     "id": "jirafeau",
     "description": {
         "en": "Upload a file in a simple way and give a unique link to it",
-        "fr": "Upload un fichier simplement et partage-le avec un lien simple"
+        "fr": "Hébergez simplement un fichier et partagez-le avec un lien unique"
     },
     "developer": {
         "name": "julien",
@@ -42,7 +42,7 @@
                 "name": "upload_password",
                 "ask": {
                     "en": "Set the password granting upload permissions (leave empty to allow anybody to upload)",
-                    "fr": "Choisissez le password pour autoriser l'upload (laissez vide pour autorisé tout le monde)"
+                    "fr": "Choisissez le permettant l'accès à l'envoi de fichiers (laissez vide pour autoriser tout le monde)"
                 },
                 "example": "supersecretpassword"
             },
@@ -50,7 +50,7 @@
                 "name": "is_public",
                 "ask": {
                     "en": "Is it a public Jirafeau site ?",
-                    "fr": "Est-ce un site public"
+                    "fr": "Est-ce un site public ?"
                 },
                 "choices": ["Yes", "No"],
                 "default": "Yes"
