@@ -42,14 +42,14 @@
                 "name": "upload_password",
                 "ask": {
                     "en": "Set the password granting upload permissions (leave empty to allow anybody to upload)",
-                    "fr": "Choisissez le permettant l'accès à l'envoi de fichiers (laissez vide pour autoriser tout le monde)"
+                    "fr": "Définissez le mot de passe permettant l'accès à l'envoi de fichiers (laissez vide pour autoriser tout le monde)"
                 },
                 "example": "supersecretpassword"
             },
             {
                 "name": "is_public",
                 "ask": {
-                    "en": "Is it a public Jirafeau site ?",
+                    "en": "Is it a public Jirafeau site?",
                     "fr": "Est-ce un site public ?"
                 },
                 "choices": ["Yes", "No"],
