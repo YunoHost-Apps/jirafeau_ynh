@@ -51,7 +51,7 @@ sudo cp ../conf/php-fpm.ini $finalphpini
 sudo chown root: $finalphpini
 sudo chmod 644 $finalphpini
 
-if [ $is_public = "Yes" ];
+if [ "$is_public" = "Yes" ];
 then
   sudo yunohost app setting jirafeau unprotected_uris -v "/" 
 fi
