@@ -6,7 +6,6 @@ sudo rm -rf /home/yunohost.app/jirafeau
 sudo rm -rf /var/www/jirafeau
 sudo rm -f /etc/nginx/conf.d/$domain.d/jirafeau.conf
 sudo rm -f /etc/php5/fpm/pool.d/jirafeau.conf
-sudo rm -f /etc/php5/conf.d/20-jirafeau.ini
 
 sudo service php5-fpm restart
 sudo service nginx reload
