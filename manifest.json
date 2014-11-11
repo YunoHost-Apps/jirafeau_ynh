@@ -15,6 +15,7 @@
         "install" : [
             {
                 "name": "domain",
+                "type": "domain",
                 "ask": {
                     "en": "Choose a domain for Jirafeau",
                     "fr": "Choisissez un domaine pour Jirafeau"
@@ -32,6 +33,7 @@
             },
             {
                 "name": "admin_user",
+                "type": "user",
                 "ask": {
                     "en": "Choose an admin user (will be able to access admin.php page)",
                     "fr": "Choisissez l'administrateur (seul autorisé à accéder à la page admin.php)"
@@ -40,6 +42,7 @@
             },
             {
                 "name": "upload_password",
+                "optional": "True",
                 "ask": {
                     "en": "Set the password granting upload permissions (leave empty to allow anybody to upload)",
                     "fr": "Définissez le mot de passe permettant l'accès à l'envoi de fichiers (laissez vide pour autoriser tout le monde)"
