@@ -5,6 +5,7 @@
         "en": "Upload a file in a simple way and give a unique link to it",
         "fr": "Hébergez simplement un fichier et partagez-le avec un lien unique"
     },
+    "licence": "AGPL-3",
     "developer": {
         "name": "julien",
         "email": "julien.malik@paraiso.me",
