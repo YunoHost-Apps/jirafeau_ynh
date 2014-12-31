@@ -5,10 +5,10 @@
         "en": "Upload a file in a simple way and give a unique link to it",
         "fr": "Hébergez simplement un fichier et partagez-le avec un lien unique"
     },
-    "developer": {
+    "url": "https://gitorious.org/jirafeau",
+    "maintainer": {
         "name": "julien",
-        "email": "julien.malik@paraiso.me",
-        "url": "https://gitorious.org/jirafeau"
+        "email": "julien.malik@paraiso.me"
     },
     "multi_instance": "false",
     "arguments": {
@@ -24,6 +24,7 @@
             },
             {
                 "name": "path",
+                "type": "path",
                 "ask": {
                     "en": "Choose a path for Jirafeau",
                     "fr": "Choisissez un chemin pour Jirafeau"
@@ -42,6 +43,7 @@
             },
             {
                 "name": "upload_password",
+                "type": "password",
                 "optional": "true",
                 "ask": {
                     "en": "Set the password granting upload permissions (leave empty to allow anybody to upload)",
