@@ -13,6 +13,7 @@ if [[ ! $? -eq 0 ]]; then
     exit 1
 fi
 
+
 # Check that admin user is an existing account
 sudo yunohost user list --json | grep -q "\"username\": \"$admin_user\""
 if [[ ! $? -eq 0 ]]; then
