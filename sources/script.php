@@ -1,7 +1,7 @@
 <?php
 /*
  *  Jirafeau, your web file repository
- *  Copyright (C) 2012  Jerome Jutteau <j.jutteau@gmail.com>
+ *  Copyright (C) 2015  Jerome Jutteau <j.jutteau@gmail.com>
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Affero General Public License as
@@ -43,7 +43,7 @@ require (JIRAFEAU_ROOT . 'lib/lang.php');
 if ($_SERVER['REQUEST_METHOD'] == "GET" && count ($_GET) == 0)
 {
     require (JIRAFEAU_ROOT . 'lib/template/header.php');
-    check_errors ();
+    check_errors ($cfg);
     if (has_error ())
     {
         show_errors ();
@@ -82,6 +82,19 @@ if ($_SERVER['REQUEST_METHOD'] == "GET" && count ($_GET) == 0)
     echo '<p>';
     echo t('Example') . ": <a href=\"" . $web_root . "script.php?get_capacity=1\">" . $web_root . "script.php?get_capacity=1</a> ";
     echo '</p>';
+
+    echo '<h3>' . t('Maximal allowed size of an uploaded file') . ':</h3>';
+    echo '<p>';
+    echo t('Send a GET query to') . ': <i>' . $web_root . 'script.php</i><br />';
+    echo '<br />';
+    echo t('Parameters') . ':<br />';
+    echo "<b>get_maximal_upload_size=</b>1<i> (" . t('Required') . ")</i> <br />";
+    echo '</p>';
+    echo '<p>' . t('This will return brut text content.') . ' ' .
+            t('First line returns size (in MB).') . '<br /></p>';
+    echo '<p>';
+    echo t('Example') . ": <a href=\"" . $web_root . "script.php?get_maximal_upload_size=1\">" . $web_root . "script.php?get_maximal_upload_size=1</a> ";
+    echo '</p>';
     
     echo '<h3>' . t('Upload a file') . ':</h3>';
     echo '<p>';
@@ -89,9 +102,10 @@ if ($_SERVER['REQUEST_METHOD'] == "GET" && count ($_GET) == 0)
     echo '<br />';
     echo t('Parameters') . ':<br />';
     echo "<b>file=</b>C:\\your\\file\\path<i> (" . t('Required') . ")</i> <br />";
-    echo "<b>time=</b>[minute|hour|day|week|month|none]<i> (" . t('Optional') . ', '. t('default: none') . ")</i> <br />";
+    echo "<b>time=</b>[minute|hour|day|week|month|year|none]<i> (" . t('Optional') . ', '. t('default: none') . ")</i> <br />";
     echo "<b>password=</b>your_password<i> (" . t('Optional') . ")</i> <br />";
     echo "<b>one_time_download=</b>1<i> (" . t('Optional') . ")</i> <br />";
+    echo "<b>upload_password=</b>your_upload_password<i> (" . t('Optional') . ")</i> <br />";
     echo '</p>';
     echo '<p>' . t('This will return brut text content.') . ' ' .
          t('First line is the download reference and the second line the delete code.') . '<br /></p>';
@@ -143,7 +157,7 @@ if ($_SERVER['REQUEST_METHOD'] == "GET" && count ($_GET) == 0)
         echo "$name: <a href=\"" . $web_root . "script.php?lang=$lang\">" . $web_root . "script.php?lang=$lang</a> ";
     echo '</p>';
     
-    echo '<h3>' . t('Initalize a asynchronous transfert') . ':</h3>';
+    echo '<h3>' . t('Initalize an asynchronous transfert') . ':</h3>';
     echo '<p>';
     echo t('The goal is to permit to transfert big file, chunk by chunk.') . ' ';
     echo t('Chunks of data must be sent in order.');
@@ -154,9 +168,10 @@ if ($_SERVER['REQUEST_METHOD'] == "GET" && count ($_GET) == 0)
     echo t('Parameters') . ':<br />';
     echo "<b>filename=</b>file_name.ext<i> (" . t('Required') . ")</i> <br />";
     echo "<b>type=</b>MIME_TYPE<i> (" . t('Optional') . ")</i> <br />";
-    echo "<b>time=</b>[minute|hour|day|week|month|none]<i> (" . t('Optional') . ', '. t('default: none') . ")</i> <br />";
+    echo "<b>time=</b>[minute|hour|day|week|month|year|none]<i> (" . t('Optional') . ', '. t('default: none') . ")</i> <br />";
     echo "<b>password=</b>your_password<i> (" . t('Optional') . ")</i> <br />";
     echo "<b>one_time_download=</b>1<i> (" . t('Optional') . ")</i> <br />";
+    echo "<b>upload_password=</b>your_upload_password<i> (" . t('Optional') . ")</i> <br />";
     echo '</p>';
     echo '<p>' . t('This will return brut text content.') . ' ' .
          t('First line is the asynchronous transfert reference and the second line the code to use in the next operation.') . '<br /></p>';
@@ -184,66 +199,6 @@ if ($_SERVER['REQUEST_METHOD'] == "GET" && count ($_GET) == 0)
     echo '<p>' . t('This will return brut text content.') . ' ' .
          t('First line is the download reference and the second line the delete code.') . '<br /></p>';
 
-    if ($cfg['enable_blocks'])
-    {
-        echo '<h3>' . t('Create a data block') . ':</h3>';
-        echo '<p>';
-        echo t('This interface permits to create a block of data filled with zeros.') .
-            ' ' . t('You can read selected parts, write (using a code) and delete the block.') .
-            ' ' . t('Blocks may be removed after a month of non usage.');
-        echo '</p>';
-        echo '<p>';
-        echo t('Send a GET query to') . ': <i>' . $web_root . 'script.php?init_block</i><br />';
-        echo '<br />';
-        echo t('Parameters') . ':<br />';
-        echo "<b>size=</b>size_in_bytes<i> (" . t('Required') . ")</i> <br />";
-        echo '</p>';
-        echo '<p>' . t('This will return brut text content.') . ' ' .
-             t('First line is a block id the second line the edit/delete code.') . '<br /></p>';
-
-        echo '<h3>' . t('Get block size') . ':</h3>';
-        echo '<p>';
-        echo t('Send a GET query to') . ': <i>' . $web_root . 'script.php?get_block_size</i><br />';
-        echo '<br />';
-        echo t('Parameters') . ':<br />';
-        echo "<b>id=</b>block_id<i> (" . t('Required') . ")</i> <br />";
-        echo '</p>';
-        echo '<p>' . t('This will return asked data or "Error" string.') . '<br /></p>';
-
-        echo '<h3>' . t('Read data in a block') . ':</h3>';
-        echo '<p>';
-        echo t('Send a GET query to') . ': <i>' . $web_root . 'script.php?read_block</i><br />';
-        echo '<br />';
-        echo t('Parameters') . ':<br />';
-        echo "<b>id=</b>block_id<i> (" . t('Required') . ")</i> <br />";
-        echo "<b>start=</b>byte_position_starting_from_zero<i> (" . t('Required') . ")</i> <br />";
-        echo "<b>length=</b>length_to_read_in_bytes<i> (" . t('Required') . ")</i> <br />";
-        echo '</p>';
-        echo '<p>' . t('This will return asked data or "Error" string.') . '<br /></p>';
-
-        echo '<h3>' . t('Write data in a block') . ':</h3>';
-        echo '<p>';
-        echo t('Send a GET query to') . ': <i>' . $web_root . 'script.php?write_block</i><br />';
-        echo '<br />';
-        echo t('Parameters') . ':<br />';
-        echo "<b>id=</b>block_id<i> (" . t('Required') . ")</i> <br />";
-        echo "<b>code=</b>block_code<i> (" . t('Required') . ")</i> <br />";
-        echo "<b>start=</b>byte_position_starting_from_zero<i> (" . t('Required') . ")</i> <br />";
-        echo "<b>data=</b>data_to_write<i> (" . t('Required') . ")</i> <br />";
-        echo '</p>';
-        echo '<p>' . t('This will return "Ok" or "Error" string.') . '<br /></p>';
-
-        echo '<h3>' . t('Delete a block') . ':</h3>';
-        echo '<p>';
-        echo t('Send a GET query to') . ': <i>' . $web_root . 'script.php?delete_block</i><br />';
-        echo '<br />';
-        echo t('Parameters') . ':<br />';
-        echo "<b>id=</b>block_id<i> (" . t('Required') . ")</i> <br />";
-        echo "<b>code=</b>block_code<i> (" . t('Required') . ")</i> <br />";
-        echo '</p>';
-        echo '<p>' . t('This will return "Ok" or "Error" string.') . '<br /></p>';
-    }
-
     echo '</div><br />';
     require (JIRAFEAU_ROOT . 'lib/template/footer.php');
     exit;
@@ -252,7 +207,7 @@ if ($_SERVER['REQUEST_METHOD'] == "GET" && count ($_GET) == 0)
 /* Lets use interface now. */
 header('Content-Type: text; charset=utf-8');
 
-check_errors ();
+check_errors ($cfg);
 if (has_error ())
 {
     echo "Error";
@@ -263,7 +218,9 @@ if (has_error ())
 if (isset ($_FILES['file']) && is_writable (VAR_FILES)
     && is_writable (VAR_LINKS))
 {
-    if (strlen ($cfg['upload_password']) > 0 && (!isset ($_POST['upload_password']) || $_POST['upload_password'] != $cfg['upload_password']))
+    if (jirafeau_has_upload_password ($cfg) &&
+         (!isset ($_POST['upload_password']) ||
+          !jirafeau_challenge_upload_password ($cfg, $_POST['upload_password'])))
     {
         echo "Error";
         exit;
@@ -274,8 +231,11 @@ if (isset ($_FILES['file']) && is_writable (VAR_FILES)
         $key = $_POST['key'];
 
     $time = time ();
-    if (!isset ($_POST['time']))
-        $time = JIRAFEAU_INFINITY;
+    if (!isset ($_POST['time']) || !$cfg['availabilities'][$_POST['time']])
+    {
+        echo "Error";
+        exit;
+    }
     else
         switch ($_POST['time'])
         {
@@ -294,10 +254,22 @@ if (isset ($_FILES['file']) && is_writable (VAR_FILES)
             case 'month':
                 $time += JIRAFEAU_MONTH;
                 break;
-            default:
+            case 'year':
+                $time += JIRAFEAU_YEAR;
+                break;
+           default:
                 $time = JIRAFEAU_INFINITY;
                 break;
         }
+
+    // Check file size
+    if ($cfg['maximal_upload_size'] > 0 &&
+        $_FILES['file']['size'] > $cfg['maximal_upload_size'] * 1024 * 1024)
+    {
+        echo "Error";
+        exit;
+    }
+
     $res = jirafeau_upload ($_FILES['file'],
                             isset ($_POST['one_time_download']),
                             $key, $time, $_SERVER['REMOTE_ADDR'],
@@ -386,6 +358,10 @@ elseif (isset ($_GET['get_capacity']))
     echo min (jirafeau_ini_to_bytes (ini_get ('post_max_size')),
               jirafeau_ini_to_bytes (ini_get ('upload_max_filesize')));
 }
+elseif (isset ($_GET['get_maximal_upload_size']))
+{
+    echo $cfg['maximal_upload_size'];
+}
 elseif (isset ($_GET['get_version']))
 {
     echo JIRAFEAU_VERSION;
@@ -404,7 +380,7 @@ elseif (isset ($_GET['lang']))
 # Config
 proxy='' # ex: proxy='proxysever.test.com:3128' or set JIRAFEAU_PROXY global variable
 url='<?php echo $cfg['web_root'] . 'script.php'; ?>' # or set JIRAFEAU_URL ex: url='http://mysite/jirafeau/script.php'
-time='none' # minute, hour, day, week, month or none. Or set JIRAFEAU_TIME.
+time='none' # minute, hour, day, week, month, year or none. Or set JIRAFEAU_TIME.
 one_time='' # ex: one_time="1" or set JIRAFEAU_ONE_TIME.
 curl='' # curl path to download or set JIRAFEAU_CURL_PATH.
 # End of config
@@ -455,7 +431,7 @@ if [ -z "$2" ]; then
     echo "Global variables to export:"
     echo "    JIRAFEAU_PROXY : example: proxysever.test.com:3128"
     echo "    JIRAFEAU_URL : example: http://mysite/jirafeau/script.php"
-    echo "    JIRAFEAU_TIME : minute, hour, day, week, month or none"
+    echo "    JIRAFEAU_TIME : minute, hour, day, week, year, month or none"
     echo "    JIRAFEAU_ONE_TIME : set anything or set empty"
     echo "    JIRAFEAU_CURL : path to your curl binary"
 
@@ -529,7 +505,9 @@ fi
 /* Initialize an asynchronous upload. */
 elseif (isset ($_GET['init_async']))
 {
-    if (strlen ($cfg['upload_password']) > 0 && (!isset ($_POST['upload_password']) || $_POST['upload_password'] != $cfg['upload_password']))
+    if (jirafeau_has_upload_password ($cfg) &&
+         (!isset ($_POST['upload_password']) ||
+          !jirafeau_challenge_upload_password ($cfg, $_POST['upload_password'])))
     {
         echo "Error";
         exit;
@@ -546,12 +524,15 @@ elseif (isset ($_GET['init_async']))
         $type = $_POST['type'];
     
     $key = '';
-    if (isset ($_POST['password']))
-        $key = $_POST['password'];
+    if (isset ($_POST['key']))
+        $key = $_POST['key'];
 
     $time = time ();
-    if (!isset ($_POST['time']))
-        $time = JIRAFEAU_INFINITY;
+    if (!isset ($_POST['time']) || !$cfg['availabilities'][$_POST['time']])
+    {
+        echo "Error";
+        exit;
+    }
     else
         switch ($_POST['time'])
         {
@@ -569,6 +550,9 @@ elseif (isset ($_GET['init_async']))
                 break;
             case 'month':
                 $time += JIRAFEAU_MONTH;
+                break;
+            case 'year':
+                $time += JIRAFEAU_YEAR;
                 break;
             default:
                 $time = JIRAFEAU_INFINITY;
@@ -589,7 +573,12 @@ elseif (isset ($_GET['push_async']))
         || (!isset ($_POST['code'])))
         echo "Error";
     else
-        echo jirafeau_async_push ($_POST['ref'], $_FILES['data'], $_POST['code']);                                      
+    {
+        echo jirafeau_async_push ($_POST['ref'],
+                                  $_FILES['data'],
+                                  $_POST['code'],
+                                  $cfg['maximal_upload_size']);
+    }
 }
 /* Finalize an asynchronous upload. */
 elseif (isset ($_GET['end_async']))
@@ -600,59 +589,8 @@ elseif (isset ($_GET['end_async']))
     else
         echo jirafeau_async_end ($_POST['ref'], $_POST['code'], $cfg['enable_crypt'], $cfg['link_name_lenght']);
 }
-/* Initialize block. */
-elseif (isset ($_GET['init_block']) && $cfg['enable_blocks'])
-{
-    if (strlen ($cfg['upload_password']) > 0 && (!isset ($_POST['upload_password']) || $_POST['upload_password'] != $cfg['upload_password']))
-    {
-        echo "Error";
-        exit;
-    }
-
-    if (!isset ($_POST['size']))
-        echo "Error";
-    else
-        echo jirafeau_block_init ($_POST['size']);
-}
-/* Get block size. */
-elseif (isset ($_GET['get_block_size']) && $cfg['enable_blocks'])
-{
-    if (!isset ($_POST['id']))
-        echo "Error";
-    else
-        echo jirafeau_block_get_size ($_POST['id']);
-}
-/* Read data in block. */
-elseif (isset ($_GET['read_block']) && $cfg['enable_blocks'])
-{
-    if (!isset ($_POST['id'])
-        || !isset ($_POST['start'])
-        || !isset ($_POST['length']))
-        echo "Error";
-    else
-        jirafeau_block_read ($_POST['id'], $_POST['start'], $_POST['length']);
-}
-/* Write data in block. */
-elseif (isset ($_GET['write_block']) && $cfg['enable_blocks'])
-{
-    if (!isset ($_POST['id'])
-        || !isset ($_POST['start'])
-        || !isset ($_FILES['data'])
-        || !isset ($_POST['code']))
-        echo "Error";
-    else
-        echo jirafeau_block_write ($_POST['id'], $_POST['start'], $_FILES['data'], $_POST['code']);
-}
-/* Delete block. */
-elseif (isset ($_GET['delete_block']) && $cfg['enable_blocks'])
-{
-    if (!isset ($_POST['id'])
-        || !isset ($_POST['code']))
-        echo "Error";
-    else
-        echo jirafeau_block_delete ($_POST['id'], $_POST['code']);
-}
 else
     echo "Error";
 exit;
 ?>
+

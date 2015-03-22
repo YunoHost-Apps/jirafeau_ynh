@@ -26,7 +26,7 @@ require (JIRAFEAU_ROOT . 'lib/functions.php');
 require (JIRAFEAU_ROOT . 'lib/lang.php');
 require (JIRAFEAU_ROOT . 'lib/template/header.php');
 
-check_errors ();
+check_errors ($cfg);
 if (has_error ())
 {
     show_errors ();
@@ -35,19 +35,22 @@ if (has_error ())
 }
 
 /* Ask password if upload password is set. */
-if (strlen ($cfg['upload_password']) > 0)
+if (jirafeau_has_upload_password ($cfg))
 {
     session_start();
 
     /* Unlog if asked. */
     if (isset ($_POST['action']) && (strcmp ($_POST['action'], 'logout') == 0))
-        $_SESSION['upload_auth'] = false;
+        session_unset ();
 
     /* Auth. */
     if (isset ($_POST['upload_password']))
     {
-        if (strcmp ($cfg['upload_password'], $_POST['upload_password']) == 0)
+        if (jirafeau_challenge_upload_password ($cfg, $_POST['upload_password']))
+        {
             $_SESSION['upload_auth'] = true;
+            $_SESSION['user_upload_password'] = $_POST['upload_password'];
+        }
         else
         {
             $_SESSION['admin_auth'] = false;
@@ -91,18 +94,40 @@ if (strlen ($cfg['upload_password']) > 0)
 
 ?>
 <div id="upload_finished">
-    <p>
-    <?php echo t('File uploaded! Copy the following URL to get it') ?>:
+    <p><?php echo t('File uploaded !') ?></p>
     <br />
-    <a id="upload_link" href=""></a>
-    <br />
-    </p>
 
-    <p>
-    <?php echo t('Keep the following URL to delete it at any moment'); ?>:
+    <?php if ($cfg['download_page'] == true) { ?>
+    <div id="upload_finished_download_page">
+    <?php echo t('Download page') ?>
+    <p><a id="upload_link" href=""></a></p>
     <br />
-    <a id="delete_link" href=""></a>
-    </p>
+    </div>
+    <?php } ?>
+
+    <div id="upload_password_page">
+    <p><?php echo t('Download page') ?>:</p>
+    <p><a id="password_link" href=""></a></p>
+    <br />
+    </div>
+
+    <?php if ($cfg['preview'] == true) { ?>
+    <div id="upload_finished_preview">
+    <p><?php echo t('View link') ?>:</p>
+    <p><a id="preview_link" href=""></a></p>
+    <br />
+    </div>
+    <?php } ?>
+
+    <div id="upload_direct_download">
+    <p><?php echo t('Direct download link') ?>:</p>
+    <p><a id="direct_link" href=""></a></p>
+    <br />
+    </div>
+
+    <p><?php echo t('Delete link') ?>:</p>
+    <p><a id="delete_link" href=""></a></p>
+    <br />
     
     <p id="validity">
     <?php echo t('This file is valid until the following date'); ?>:
@@ -112,8 +137,14 @@ if (strlen ($cfg['upload_password']) > 0)
 
 <div id="uploading">
     <p>
-    <?php echo t ('Uploading ...'); ?><div id="uploaded_percentage"></div>
+    <?php echo t ('Uploading ...'); ?>
+    <div id="uploaded_percentage"></div>
+    <div id="uploaded_speed"></div>
+    <div id="uploaded_time"></div>
     </p>
+</div>
+
+<div id="error_pop" class="error">
 </div>
 
 <div id="upload">
@@ -123,12 +154,9 @@ if (strlen ($cfg['upload_password']) > 0)
     </legend>
     <p>
     <input type="file" id="file_select" size="30"
-    onchange="
-        document.getElementById('options').style.display = '';
-        document.getElementById('send').style.display = '';
-    "/>
+    onchange="control_selected_file_size(<?php echo $cfg['maximal_upload_size'] ?>, '<?php echo t ('File is too big') . ', ' . t ('File size is limited to') . " " . $cfg['maximal_upload_size'] . " MB"; ?>')"/>
     </p>
-    
+
     <div id="options">
         <table id="option_table">
         <tr>
@@ -142,18 +170,54 @@ if (strlen ($cfg['upload_password']) > 0)
         <tr>
         <td><label for="select_time"><?php echo t('Time limit') . ':'; ?></label></td>
         <td><select name="time" id="select_time">
+        <?php if ($cfg['availabilities']['none']) { ?>
         <option value="none"><?php echo t('None'); ?></option>
-        <option value = "minute"><?php echo t('One minute'); ?></option>
-        <option value = "hour"><?php echo t('One hour'); ?></option>
-        <option value = "day"><?php echo t('One day'); ?></option>
-        <option value = "week"><?php echo t('One week'); ?></option>
+        <?php } ?>
+        <?php if ($cfg['availabilities']['year']) { ?>
+        <option value = "year"><?php echo t('One year');?></option>
+        <?php } ?>
+        <?php if ($cfg['availabilities']['month']) { ?>
         <option value = "month"><?php echo t('One month');?></option>
+        <?php } ?>
+        <?php if ($cfg['availabilities']['week']) { ?>
+        <option value = "week"><?php echo t('One week'); ?></option>
+        <?php } ?>
+        <?php if ($cfg['availabilities']['day']) { ?>
+        <option value = "day"><?php echo t('One day'); ?></option>
+        <?php } ?>
+        <?php if ($cfg['availabilities']['hour']) { ?>
+        <option value = "hour"><?php echo t('One hour'); ?></option>
+        <?php } ?>
+        <?php if ($cfg['availabilities']['minute']) { ?>
+        <option value = "minute"><?php echo t('One minute'); ?></option>
+        <?php } ?>
         </select></td>
         </tr>
+
+        <?php
+        if ($cfg['maximal_upload_size'] > 0)
+        {
+        echo '<p class="config">' . t ('File size is limited to');
+        echo " " . $cfg['maximal_upload_size'] . " MB</p>";
+        }
+        ?>
+
 		<p id="max_file_size" class="config"></p>
     <p>
-
-    <input type="hidden" id="upload_password" name="upload_password" value="<?php echo $cfg['upload_password']?>"/>
+    <?php
+    if (jirafeau_has_upload_password ($cfg) && $_SESSION['upload_auth'])
+    {
+    ?>
+    <input type="hidden" id="upload_password" name="upload_password" value="<?php echo $_SESSION['user_upload_password'] ?>"/>
+    <?php
+    }
+    else
+    {
+    ?>
+    <input type="hidden" id="upload_password" name="upload_password" value=""/>
+    <?php
+    }
+    ?>
     <input type="submit" id="send" value="<?php echo t('Send'); ?>"
     onclick="
         document.getElementById('upload').style.display = 'none';
@@ -165,7 +229,7 @@ if (strlen ($cfg['upload_password']) > 0)
     </div> </fieldset>
 
     <?php
-    if (strlen ($cfg['upload_password']) > 0)
+    if (jirafeau_has_upload_password ($cfg))
     {
     ?>
     <form action = "<?php echo basename(__FILE__); ?>" method = "post">
@@ -179,6 +243,7 @@ if (strlen ($cfg['upload_password']) > 0)
 </div>
 
 <script lang="Javascript">
+    document.getElementById('error_pop').style.display = 'none';
     document.getElementById('uploading').style.display = 'none';
     document.getElementById('upload_finished').style.display = 'none';
     document.getElementById('options').style.display = 'none';

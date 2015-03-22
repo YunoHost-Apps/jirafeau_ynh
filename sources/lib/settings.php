@@ -24,7 +24,6 @@ define ('JIRAFEAU_VERSION', '1.0');
 define ('VAR_FILES', $cfg['var_root'] . 'files/');
 define ('VAR_LINKS', $cfg['var_root'] . 'links/');
 define ('VAR_ASYNC', $cfg['var_root'] . 'async/');
-define ('VAR_BLOCK', $cfg['var_root'] . 'block/');
 
 /* Useful constants. */
 if (!defined ('NL'))
@@ -36,5 +35,6 @@ define ('JIRAFEAU_HOUR', 3600); // JIRAFEAU_MINUTE * 60
 define ('JIRAFEAU_DAY', 86400); // JIRAFEAU_HOUR * 24
 define ('JIRAFEAU_WEEK', 604800); // JIRAFEAU_DAY * 7
 define ('JIRAFEAU_MONTH', 2419200); // JIRAFEAU_WEEK * 4
+define ('JIRAFEAU_YEAR', 29030400); // JIRAFEAU_MONTH * 12
 
 ?>

@@ -2,7 +2,7 @@
 /*
  *  Jirafeau, your web file repository
  *  Copyright (C) 2008  Julien "axolotl" BERNARD <axolotl@magieeternelle.org>
- *  Copyright (C) 2012  Jerome Jutteau <j.jutteau@gmail.com>
+ *  Copyright (C) 2015  Jerome Jutteau <j.jutteau@gmail.com>
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Affero General Public License as
@@ -88,6 +88,18 @@ jirafeau_gen_random ($l)
         $code .= dechex (rand (0, 15));
 
     return $code;
+}
+
+function is_ssl() {
+    if ( isset($_SERVER['HTTPS']) ) {
+        if ( 'on' == strtolower($_SERVER['HTTPS']) )
+            return true;
+        if ( '1' == $_SERVER['HTTPS'] )
+            return true;
+    } elseif ( isset($_SERVER['SERVER_PORT']) && ( '443' == $_SERVER['SERVER_PORT'] ) ) {
+        return true;
+    }
+    return false;
 }
 
 function
@@ -333,7 +345,9 @@ jirafeau_upload ($file, $one_time_download, $key, $time, $ip, $crypt, $link_name
     /* Crypt file if option is enabled. */
     $crypted = false;
     $crypt_key = '';
-    if ($crypt == true && extension_loaded('mcrypt'))
+    if ($crypt == true && !(extension_loaded('mcrypt') == true))
+        error_log ("PHP extension mcrypt not loaded, won't encrypt in Jirafeau");
+    if ($crypt == true && extension_loaded('mcrypt') == true)
     {
         $crypt_key = jirafeau_encrypt_file ($file['tmp_name'], $file['tmp_name']);
         if (strlen($crypt_key) > 0)
@@ -429,7 +443,7 @@ jirafeau_upload ($file, $one_time_download, $key, $time, $ip, $crypt, $link_name
 }
 
 /**
- * tells if a mime-type is viewable in a browser
+ * Tells if a mime-type is viewable in a browser
  * @param $mime the mime type
  * @returns a boolean telling if a mime type is viewable
  */
@@ -439,7 +453,7 @@ jirafeau_is_viewable ($mime)
     if (!empty ($mime))
     {
         /* Actually, verify if mime-type is an image or a text. */
-        $viewable = array ('image', 'text');
+        $viewable = array ('image', 'text', 'video', 'audio');
         $decomposed = explode ('/', $mime);
         return in_array ($decomposed[0], $viewable);
     }
@@ -491,10 +505,10 @@ show_errors ()
     }
 }
 
-function check_errors ()
+function check_errors ($cfg)
 {
     if (file_exists (JIRAFEAU_ROOT . 'install.php')
-        && !file_exists (JIRAFEAU_ROOT . 'lib/config.local.php'))
+        && !($cfg['installation_done'] === true))
     {
         header('Location: install.php'); 
         exit;
@@ -512,15 +526,6 @@ function check_errors ()
     
     if (!is_writable (VAR_ASYNC))
         add_error (t('The async directory is not writable!'), VAR_ASYNC);
-
-     if (!is_writable (VAR_BLOCK))
-        add_error (t('The block directory is not writable!'), VAR_BLOCK);
-
-   /* Check if the install.php script is still in the directory. */
-    if (file_exists (JIRAFEAU_ROOT . 'install.php'))
-        add_error (t('Installer script still present'),
-             t('Please make sure to delete the installer script ' .
-               '"install.php" before continuing.'));
 }
 
 /**
@@ -549,6 +554,8 @@ jirafeau_get_link ($hash)
     $out['link_code'] = trim ($c[9]);
     if (trim ($c[10]) == 'C')
 	    $out['crypted'] = true;
+    else
+	    $out['crypted'] = false;
     
     return $out;
 }
@@ -834,10 +841,11 @@ jirafeau_async_init ($filename, $type, $one_time, $key, $time, $ip)
   * @param $ref asynchronous upload reference
   * @param $file piece of data
   * @param $code client code for this operation
+  * @param $max_file_size maximum allowed file size
   * @return  a string containing a next code to use or the string "Error"
   */
 function
-jirafeau_async_push ($ref, $data, $code)
+jirafeau_async_push ($ref, $data, $code, $max_file_size)
 {
     /* Get async infos. */
     $a = jirafeau_get_async_ref ($ref);
@@ -851,9 +859,21 @@ jirafeau_async_push ($ref, $data, $code)
     
     $p = s2p ($ref);
 
+    /* File path. */
+    $r_path = $data['tmp_name'];
+    $w_path = VAR_ASYNC . $p . $ref . '_data';
+
+    /* Check that file size is not above upload limit. */
+    if ($max_file_size > 0 &&
+        filesize ($r_path) + filesize ($w_path) > $max_file_size * 1024 * 1024)
+    {
+        jirafeau_async_delete ($ref);
+        return "Error";
+    }
+
     /* Concatenate data. */
-    $r = fopen ($data['tmp_name'], 'r');
-    $w = fopen (VAR_ASYNC . $p . $ref . '_data', 'a');
+    $r = fopen ($r_path, 'r');
+    $w = fopen ($w_path, 'a');
     while (!feof ($r))
     {
         if (fwrite ($w, fread ($r, 1024)) === false)
@@ -866,7 +886,7 @@ jirafeau_async_push ($ref, $data, $code)
     }
     fclose ($r);
     fclose ($w);
-    unlink ($data['tmp_name']);
+    unlink ($r_path);
     
     /* Update async file. */
     $code = jirafeau_gen_random (4);
@@ -903,7 +923,7 @@ jirafeau_async_end ($ref, $code, $crypt, $link_name_length)
 
     $crypted = false;
     $crypt_key = '';
-    if ($crypt == true && extension_loaded('mcrypt'))
+    if ($crypt == true && extension_loaded('mcrypt') == true)
     {
         $crypt_key = jirafeau_encrypt_file ($p, $p);
         if (strlen($crypt_key) > 0)
@@ -952,346 +972,6 @@ jirafeau_async_end ($ref, $code, $crypt, $link_name_length)
     return $md5_link . NL . $delete_link_code . NL . urlencode($crypt_key);
 }
 
-/**
-  * Delete a block.
-  * @param $id identifier of the block.
-  */
-function
-jirafeau_block_delete_ ($id)
-{
-    $p = VAR_BLOCK . s2p ($id);
-    if (!file_exists ($p))
-        return;
-        
-    if (file_exists ($p . $id))
-	unlink ($p . $id);
-    if (file_exists ($p . $id . '_infos'))
-        unlink ($p . $id . '_infos');
-    $parse = $p;
-    $scan = array();
-    while (file_exists ($parse)
-           && ($scan = scandir ($parse))
-           && count ($scan) == 2 // '.' and '..' folders => empty.
-           && basename ($parse) != basename (VAR_BLOCK)) 
-    {
-        rmdir ($parse);
-        $parse = substr ($parse, 0, strlen($parse) - strlen(basename ($parse)) - 1);
-    }
-}
-
-/**
-  * Create a file filled with zeros.
-  * @param $size size of the file.
-  * @return  a string corresponding to an id or the string "Error"
-  */
-function
-jirafeau_block_init ($size)
-{
-    if (!ctype_digit ($size) || $size <= 0)
-        return "Error";
-
-    /* Create folder. */
-    $id;
-    do
-    {
-        $id = jirafeau_gen_random (32);
-        $p = VAR_BLOCK . s2p ($id);
-    } while (file_exists ($p));
-    @mkdir ($p, 0755, true);
-    if (!file_exists ($p))
-    {
-        echo "Error";
-        return;
-    }
-
-    /* Create block. */
-    $p .= $id;
-    $h = fopen ($p, 'w');
-    $fill = str_repeat ("\0", 1024);
-    for ($cnt = 0; $cnt < $size; $cnt += 1024)
-    {
-	if ($size - $cnt < 1024)
-            $fill = str_repeat ("\0", $size - $cnt);
-        if (fwrite ($h, $fill) === false)
-        {
-            fclose ($h);
-            jirafeau_block_delete_ ($id);
-            return "Error";
-        }
-    }
-    fclose ($h);
-
-    /* Generate a write/delete code. */
-    $code = jirafeau_gen_random (12);
-
-    /* Add block infos. */
-    if (file_put_contents ($p . '_infos', date ('U') . NL . $size . NL . $code) === FALSE)
-    {
-        jirafeau_block_delete_ ($id);
-        return "Error";
-    }
-
-    return $id . NL . $code;
-}
-
-/** Get block size in bytes.
-  * @param $id identifier of the block
-  * @return  block size in bytes
-  */
-function
-jirafeau_block_get_size ($id)
-{
-    $p = VAR_BLOCK . s2p ($id) . $id;
-    if (!file_exists ($p))
-        return "Error";
-
-    /* Check date. */
-    $f = file ($p . '_infos');
-    $date = trim ($f[0]);
-    $block_size = trim ($f[1]);
-    $stored_code = trim ($f[2]);
-    /* Update date. */
-    if (date ('U') - $date > JIRAFEAU_HOUR
-        && date ('U') - $date < JIRAFEAU_MONTH)
-    {
-        if (file_put_contents ($p . '_infos', date ('U') . NL . $block_size . NL . $stored_code) === FALSE)
-        {
-            jirafeau_block_delete_ ($id);
-            return "Error";
-        }
-    }
-    /* Remove data. */
-    elseif (date ('U') - $date >= JIRAFEAU_MONTH)
-    {
-        echo date ('U'). " $date ";
-        jirafeau_block_delete_ ($id);
-        return "Error";
-    }
-
-    return $block_size;
-}
-
-/**
-  * Read some data in a block.
-  * @param $id identifier of the block
-  * @param $start where to read data (starting from zero).
-  * @param $length length to read.
-  * @return  echo data
-  */
-function
-jirafeau_block_read ($id, $start, $length)
-{
-    if (!ctype_digit ($start) || $start < 0
-        || !ctype_digit ($length) || $length <= 0)
-    {
-        echo "Error";
-        return;
-    }
-
-    $p = VAR_BLOCK . s2p ($id) . $id;
-    if (!file_exists ($p))
-    {
-        echo "Error";
-        return;
-    }
-
-    /* Check date. */
-    $f = file ($p . '_infos');
-    $date = trim ($f[0]);
-    $block_size = trim ($f[1]);
-    $stored_code = trim ($f[2]);
-    /* Update date. */
-    if (date ('U') - $date > JIRAFEAU_HOUR
-        && date ('U') - $date < JIRAFEAU_MONTH)
-    {
-        if (file_put_contents ($p . '_infos', date ('U') . NL . $block_size . NL . $stored_code) === FALSE)
-        {
-            jirafeau_block_delete_ ($id);
-            echo "Error";
-            return;
-        }
-    }
-    /* Remove data. */
-    elseif (date ('U') - $date >= JIRAFEAU_MONTH)
-    {
-        echo date ('U'). " $date ";
-        jirafeau_block_delete_ ($id);
-        echo "Error";
-        return;
-    }
-
-    if ($start + $length > $block_size)
-    {
-        echo "Error";
-        return;
-    }
-
-    /* Read content. */
-    header ('Content-Length: ' . $length);
-    header ('Content-Disposition: attachment');
-
-    $r = fopen ($p, 'r');
-    if (fseek ($r, $start) != 0)
-    {
-        echo "Error";
-        return;
-    }
-    $c = 1024;
-    for ($cnt = 0; $cnt < $length && !feof ($r); $cnt += 1024)
-    {
-        if ($length - $cnt < 1024)
-            $c = $length - $cnt;
-        print fread ($r, $c);
-        ob_flush();
-    }
-    fclose ($r);
-}
-
-/**
-  * Write some data in a block.
-  * @param $id identifier of the block
-  * @param $start where to writing data (starting from zero).
-  * @param $data data to write.
-  * @param $code code to allow writing.
-  * @return  string "Ok" or string "Error".
-  */
-function
-jirafeau_block_write ($id, $start, $data, $code)
-{
-    if (!ctype_digit ($start) || $start < 0
-        || strlen ($code) == 0)
-        return "Error";
-
-    $p = VAR_BLOCK . s2p ($id) . $id;
-    if (!file_exists ($p))
-        return "Error";
-
-    /* Check date. */
-    $f = file ($p . '_infos');
-    $date = trim ($f[0]);
-    $block_size = trim ($f[1]);
-    $stored_code = trim ($f[2]);
-    /* Update date. */
-    if (date ('U') - $date > JIRAFEAU_HOUR
-        && date ('U') - $date < JIRAFEAU_MONTH)
-    {
-        if (file_put_contents ($p . '_infos', date ('U') . NL . $block_size . NL . $stored_code) === FALSE)
-        {
-            jirafeau_block_delete_ ($id);
-            return "Error";
-        }
-    }
-    /* Remove data. */
-    elseif (date ('U') - $date >= JIRAFEAU_MONTH)
-    {
-        jirafeau_block_delete_ ($id);
-        return "Error";
-    }
-
-    /* Check code. */
-    if ($stored_code != $code)
-    {
-        echo "Error";
-        return;
-    }
-
-    /* Check data. */
-    $size = $data['size'];
-    if ($size <= 0)
-        return "Error";
-    if ($start + $size > $block_size)
-        return "Error";
-    
-    /* Open data. */
-    $r = fopen ($data['tmp_name'], 'r');
-
-    /* Open Block. */
-    $w = fopen ($p, 'r+');
-    if (fseek ($w, $start) != 0)
-        return "Error";
-
-    /* Write content. */
-    $c = 1024;
-    for ($cnt = 0; $cnt <= $size && !feof ($w); $cnt += 1024)
-    {
-        if ($size - $cnt < 1024)
-            $c = $size - $cnt;
-        $d = fread ($r, $c);
-        fwrite ($w, $d);
-    }
-    fclose ($r);
-    fclose ($w);
-    unlink ($data['tmp_name']);
-    return "Ok";
-}
-
-/**
-  * Delete a block.
-  * @param $id identifier of the block.
-  * @param $code code to allow writing.
-  * @return  string "Ok" or string "Error".
-  */
-function
-jirafeau_block_delete ($id, $code)
-{
-    $p = VAR_BLOCK . s2p ($id) . $id;
-
-    if (!file_exists ($p))
-        return "Error";
-
-    $f = file ($p . '_infos');
-    $date = trim ($f[0]);
-    $block_size = trim ($f[1]);
-    $stored_code = trim ($f[2]);
-
-    if ($code != $stored_code)
-        return "Error";
-
-    jirafeau_block_delete_ ($id);
-    return "Ok";
-}
-
-/**
- * Clean old unused blocks.
- * @return number of cleaned blocks.
- */
-function
-jirafeau_admin_clean_block ()
-{
-    $count = 0;
-    /* Get all blocks. */
-    $stack = array (VAR_BLOCK);
-    while (($d = array_shift ($stack)) && $d != NULL)
-    {
-        $dir = scandir ($d);
-
-        foreach ($dir as $node)
-        {
-            if (strcmp ($node, '.') == 0 || strcmp ($node, '..') == 0)
-                continue;
-
-            if (is_dir ($d . $node))
-            {
-                /* Push new found directory. */
-                $stack[] = $d . $node . '/';
-            }
-            elseif (is_file ($d . $node) && preg_match ('/\_infos/i', "$node"))
-            {
-                /* Read block informations. */
-                $f = file ($d . $node);
-                $date = trim ($f[0]);
-                $block_size = trim ($f[1]);
-                if (date ('U') - $date >= JIRAFEAU_MONTH)
-                {
-                    jirafeau_block_delete_ (substr($node, 0, -6));
-                    $count++;
-                }
-            }
-        }
-    }
-    return $count;
-}
-
 function
 jirafeau_crypt_create_iv($base, $size)
 {
@@ -1312,7 +992,7 @@ function
 jirafeau_encrypt_file ($fp_src, $fp_dst)
 {
     $fs = filesize ($fp_src);
-    if ($fs === false || $fs == 0 || !extension_loaded('mcrypt'))
+    if ($fs === false || $fs == 0 || !(extension_loaded('mcrypt') == true))
         return '';
 
     /* Prepare module. */
@@ -1351,7 +1031,7 @@ function
 jirafeau_decrypt_file ($fp_src, $fp_dst, $k)
 {
     $fs = filesize ($fp_src);
-    if ($fs === false || $fs == 0 || !extension_loaded('mcrypt'))
+    if ($fs === false || $fs == 0 || !(extension_loaded('mcrypt') == true))
         return false;
 
     /* Init module */
@@ -1377,4 +1057,27 @@ jirafeau_decrypt_file ($fp_src, $fp_dst, $k)
     return true;
 }
 
-?>
+/**
+ * Check if Jirafeau is password protected for visitors.
+ * @return true if Jirafeau is password protected, false otherwise.
+ */
+function jirafeau_has_upload_password ($cfg)
+{
+    return count ($cfg['upload_password']) > 0;
+}
+
+/**
+ * Challenge password for a visitor.
+ * @param $password password to be challenged
+ * @return true if password is valid, false otherwise.
+ */
+function jirafeau_challenge_upload_password ($cfg, $password)
+{
+    if (!jirafeau_has_upload_password($cfg))
+        return false;
+    forEach ($cfg['upload_password'] as $p)
+        if ($password == $p)
+            return true;
+    return false;
+}
+

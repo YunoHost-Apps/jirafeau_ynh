@@ -23,6 +23,7 @@ define ('QUOTE', "'");
 define ('JIRAFEAU_CFG', JIRAFEAU_ROOT.'lib/config.local.php');
 define ('JIRAFEAU_VAR_RAND_LENGTH', 15);
 
+require (JIRAFEAU_ROOT . 'lib/functions.php');
 require (JIRAFEAU_ROOT . 'lib/lang.php');
 require (JIRAFEAU_ROOT . 'lib/config.original.php');
 
@@ -51,6 +52,9 @@ jirafeau_export_cfg ($cfg)
             fwrite ($handle, jirafeau_quoted ($item));
         else if (is_int ($item))
             fwrite ($handle, $item);
+        else if (is_array ($item))
+            fwrite ($handle, str_replace(array("\n", "\r"), "",
+                                         var_export ($item, true)));
         else
             fwrite ($handle, 'null');
         fwrite ($handle, ';'.NL);
@@ -97,7 +101,7 @@ jirafeau_check_var_dir ($path)
                                $path . '</code><br />' . $solution_str .
                                '<br />' . $mkdir_str2);
 
-    foreach (array ('files', 'links', 'async', 'block') as $subdir)
+    foreach (array ('files', 'links', 'async') as $subdir)
     {
         $subpath = $path.$subdir;
 
@@ -115,6 +119,12 @@ function
 jirafeau_add_ending_slash ($path)
 {
     return $path . ((substr ($path, -1) == '/') ? '' : '/');
+}
+
+if ($cfg['installation_done'] === true)
+{
+    header('Location: index.php');
+    exit;
 }
 
 if (!file_exists (JIRAFEAU_CFG))
@@ -349,6 +359,8 @@ case 4:
     }
     else
     {
+        $cfg['installation_done'] = true;
+        jirafeau_export_cfg ($cfg);
         echo '<div class="message"><p>' .
              t('Jirafeau is now fully operational') . ':' .
              '<br /><a href="' . $cfg['web_root'] . '">' .

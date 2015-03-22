@@ -1,7 +1,7 @@
 <?php
 /*
  *  Jirafeau, your web file repository
- *  Copyright (C) 2012  Jerome Jutteau <j.jutteau@gmail.com>
+ *  Copyright (C) 2015  Jerome Jutteau <j.jutteau@gmail.com>
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Affero General Public License as
@@ -32,26 +32,8 @@ if (file_exists (JIRAFEAU_ROOT . 'install.php')
     exit;
 }
 
-/* Check if the install.php script is still in the directory. */
-if (file_exists (JIRAFEAU_ROOT . 'install.php'))
-{
-    require (JIRAFEAU_ROOT . 'lib/template/header.php');
-    echo '<div class="error"><p>'.
-         t('Installer script still present') .
-         '</p></div>';
-    require (JIRAFEAU_ROOT.'lib/template/footer.php');
-    exit;
-}
-
-if (!$cfg['admin_user'] || $_SERVER['PHP_AUTH_USER'] != $cfg['admin_user'])
-{
-    header('Location: index.php');
-    exit;
-}
-
 /* Disable admin interface if we have a empty admin password. */
-/*
-if (!$cfg['admin_password'])
+if (empty($cfg['admin_password']) && empty($cfg['admin_http_auth_user']))
 {
     require (JIRAFEAU_ROOT . 'lib/template/header.php');
     echo '<div class="error"><p>'.
@@ -60,22 +42,16 @@ if (!$cfg['admin_password'])
     require (JIRAFEAU_ROOT.'lib/template/footer.php');
     exit;
 }
-*/
 
 /* Check session. */
-/*
 session_start();
-*/
 
 /* Unlog if asked. */
-/*
 if (isset ($_POST['action']) && (strcmp ($_POST['action'], 'logout') == 0))
     $_SESSION['admin_auth'] = false;
-*/
 
-/* Check password. */
-/*
-if (isset ($_POST['admin_password']))
+/* Check classic admin password authentification. */
+if (isset ($_POST['admin_password']) && empty($cfg['admin_http_auth_user']))
 {
     if (strcmp ($cfg['admin_password'], $_POST['admin_password']) == 0)
         $_SESSION['admin_auth'] = true;
@@ -89,11 +65,9 @@ if (isset ($_POST['admin_password']))
         exit;
     }
 }
-*/
-
-/* Ask for password. */
-/*
-elseif (!isset ($_SESSION['admin_auth']) || $_SESSION['admin_auth'] != true)
+/* Ask for classic admin password authentification. */
+elseif ((!isset ($_SESSION['admin_auth']) || $_SESSION['admin_auth'] != true)
+        && empty($cfg['admin_http_auth_user']))
 {
     require (JIRAFEAU_ROOT . 'lib/template/header.php'); ?>
     <form action = "<?php echo basename(__FILE__); ?>" method = "post">
@@ -122,7 +96,25 @@ elseif (!isset ($_SESSION['admin_auth']) || $_SESSION['admin_auth'] != true)
     require (JIRAFEAU_ROOT.'lib/template/footer.php');
     exit;
 }
-*/
+/* Check authenticated user if HTTP authentification is enable. */
+elseif ((!isset ($_SESSION['admin_auth']) || $_SESSION['admin_auth'] != true)
+        && !empty($cfg['admin_http_auth_user']))
+{
+    if ($cfg['admin_http_auth_user'] == $_SERVER['PHP_AUTH_USER'])
+        $_SESSION['admin_auth'] = true;
+}
+
+/* Be sure that no one can access further without admin_auth. */
+if (!isset ($_SESSION['admin_auth']) || $_SESSION['admin_auth'] != true)
+{
+         $_SESSION['admin_auth'] = false;
+        require (JIRAFEAU_ROOT . 'lib/template/header.php');
+        echo '<div class="error"><p>'.
+         t('Sorry, you are not authenticated on admin interface.') .
+         '</p></div>';
+        require (JIRAFEAU_ROOT.'lib/template/footer.php');
+        exit;
+}
 
 /* Operations may take a long time.
  * Be sure PHP's safe mode is off.
@@ -131,12 +123,12 @@ elseif (!isset ($_SESSION['admin_auth']) || $_SESSION['admin_auth'] != true)
 /* Remove errors. */
 @error_reporting(0);
 
-/* Admin interface. */
-require (JIRAFEAU_ROOT . 'lib/template/header.php');
-?><h2><?php echo t('Admin interface'); ?></h2><?php
-
-/* Show admin interface. */
+/* Show admin interface if not downloading a file. */
+if (!(isset ($_POST['action']) && strcmp ($_POST['action'], 'download') == 0))
 {
+        require (JIRAFEAU_ROOT . 'lib/template/header.php');
+        ?><h2><?php echo t('Admin interface'); ?></h2><?php
+
         ?><div id = "install">
         <fieldset><legend><?php echo t('Actions');?></legend>
         <table>
@@ -164,26 +156,6 @@ require (JIRAFEAU_ROOT . 'lib/template/header.php');
             </td>
         </tr>
         </form>
-	<?php
-        if ($cfg['enable_blocks'])
-        {
-        ?>
-        <form action = "<?php echo basename(__FILE__); ?>" method = "post">
-        <tr>
-            <input type = "hidden" name = "action" value = "clean_block"/>
-            <td class = "info">
-                <?php echo t('Clean unused blocks'); ?>
-            </td>
-            <td></td>
-            <td>
-                <input type = "submit" value = "<?php echo t('Clean'); ?>" />
-            </td>
-        </tr>
-        </form>
-        <?php
-        }
-        ?>
-
         <form action = "<?php echo basename(__FILE__); ?>" method = "post">
         <tr>
             <input type = "hidden" name = "action" value = "list"/>
@@ -265,14 +237,6 @@ if (isset ($_POST['action']))
         echo t('Number of cleaned files') . ' : ' . $total;
         echo '</p></div>';
     }
-    elseif (strcmp ($_POST['action'], 'clean_block') == 0)
-    {
-        $total = jirafeau_admin_clean_block ();
-        echo '<div class="message">' . NL;
-        echo '<p>';
-        echo t('Number of cleaned files') . ' : ' . $total;
-        echo '</p></div>';
-    }
     elseif (strcmp ($_POST['action'], 'list') == 0)
     {
         jirafeau_admin_list ("", "", "");
@@ -313,6 +277,7 @@ if (isset ($_POST['action']))
                 $l['file_name'] . '"');
         if (file_exists(VAR_FILES . $p . $l['md5']))
             readfile (VAR_FILES . $p . $l['md5']);
+        exit;
     }
 }
 
