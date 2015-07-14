@@ -51,7 +51,7 @@ $cfg['link_name_length'] = 8;
  * $cfg['upload_password'] = array('psw1', 'psw2'); // Two passwords
  * ... and so on
  */
-$cfg['upload_password'] = array('YNH_UPLOAD_PASSWORD');
+$cfg['upload_password'] = array(YNH_UPLOAD_PASSWORD);
 /* An empty admin password will disable the classic admin password
  * authentication.
  */

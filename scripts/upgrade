@@ -9,6 +9,13 @@ is_public=$(sudo yunohost app setting jirafeau is_public)
 # Remove trailing "/" for next commands
 path=${path%/}
 
+# Set upload password, allowing an empty one
+if [[ -z "$upload_password" ]]; then
+    sed -i "s@YNH_UPLOAD_PASSWORD@@g" ../conf/config.local.php
+else
+    sed -i "s@YNH_UPLOAD_PASSWORD@'$upload_password'@g" ../conf/config.local.php
+fi
+
 # Copy files to the right place
 final_path=/var/www/jirafeau
 var_root=/home/yunohost.app/jirafeau
@@ -19,7 +26,6 @@ sed -i "s@YNH_DOMAIN@$domain@g" ../conf/config.local.php
 sed -i "s@YNH_WWW_PATH@$path@g" ../conf/config.local.php
 sed -i "s@YNH_VAR_ROOT@$var_root@g" ../conf/config.local.php
 sed -i "s@YNH_ADMIN_USER@$admin_user@g" ../conf/config.local.php
-sed -i "s@YNH_UPLOAD_PASSWORD@$upload_password@g" ../conf/config.local.php
 sudo cp ../conf/config.local.php $final_path/lib
 sudo rm $final_path/install.php
 
