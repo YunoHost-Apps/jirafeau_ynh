@@ -33,7 +33,7 @@ if [[ -z "$upload_password" ]]; then
     sudo yunohost app setting jirafeau upload_password -v ''
 else
     sed -i "s@YNH_UPLOAD_PASSWORD@'$upload_password'@g" ../conf/config.local.php
-    sudo yunohost app setting jirafeau upload_password -v $upload_password
+    sudo yunohost app setting jirafeau upload_password -v "$upload_password"
 fi
 
 # Copy files to the right place
