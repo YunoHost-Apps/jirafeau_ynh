@@ -5,7 +5,8 @@
         "en": "Upload a file in a simple way and give a unique link to it",
         "fr": "Hébergez simplement un fichier et partagez-le avec un lien unique"
     },
-    "url": "https://gitorious.org/jirafeau",
+    "url": "https://gitlab.com/mojo42/Jirafeau",
+    "license": "free",
     "maintainer": {
         "name": "julien",
         "email": "julien.malik@paraiso.me"
