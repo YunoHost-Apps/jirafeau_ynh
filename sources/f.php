@@ -50,6 +50,13 @@ if (!preg_match ('/[0-9a-zA-Z_-]+$/', $link_name))
 $link = jirafeau_get_link ($link_name);
 if (count ($link) == 0)
 {
+    /* Try alias. */
+    $alias = jirafeau_get_alias (md5 ($link_name));
+    if (count ($alias) > 0)
+        $link = jirafeau_get_link ($alias["destination"]);
+}
+if (count ($link) == 0)
+{
     require (JIRAFEAU_ROOT.'lib/template/header.php');
     echo '<div class="error"><p>' . t('Sorry, the requested file is not found') .
     '</p></div>';
@@ -125,7 +132,7 @@ if (!empty ($link['key']))
              '<form action = "';
         echo $cfg['web_root'] . '/f.php';
         echo '" ' .
-             'method = "post" id = "submit">'; ?>
+             'method = "post" id = "submit_post">'; ?>
              <input type = "hidden" name = "jirafeau" value = "<?php echo JIRAFEAU_VERSION ?>"/><?php
         echo '<fieldset>' .
              '<legend>' . t('Password protection') .
@@ -135,20 +142,27 @@ if (!empty ($link['key']))
              '</td></tr>' .
              '<tr><td>' .
              t('By using our services, you accept our'). ' <a href="' . $cfg['web_root'] . '/tos.php' . '">' . t('Term Of Service') . '</a>' .
-             '</td></tr>' .
-             '<tr><td>';
-            ?><input type="submit" id = "submit_download"  value="<?php echo t('Download'); ?>"
-            onclick="document.getElementById('submit').action='
+             '</td></tr>';
+
+        if ($link['onetime'] == 'O')
+        {
+            echo '<tr><td id="self_destruct">' .
+                 t('Warning, this file will self-destruct after being read') .
+                 '</td></tr>';
+        }
+
+        ?><tr><td><input type="submit" id = "submit_download"  value="<?php echo t('Download'); ?>"
+        onclick="document.getElementById('submit_post').action='
 <?php
         echo $cfg['web_root'] . '/f.php?h=' . $link_name . '&amp;d=1';
         if (!empty($crypt_key))
             echo '&amp;k=' . urlencode($crypt_key);
 ?>';
         document.getElementById('submit_download').submit ();"/><?php
-        if ($cfg['download_page'] && $cfg['preview'] && jirafeau_is_viewable($link['mime_type']))
+        if ($cfg['preview'] && jirafeau_is_viewable($link['mime_type']))
         {
             ?><input type="submit" id = "submit_preview"  value="<?php echo t('Preview'); ?>"
-            onclick="document.getElementById('submit').action='
+            onclick="document.getElementById('submit_post').action='
             <?php
             echo $cfg['web_root'] . '/f.php?h=' . $link_name . '&amp;p=1';
             if (!empty($crypt_key))
@@ -166,7 +180,7 @@ if (!empty ($link['key']))
             $password_challenged = true;
 	else
         {
-            header ("Access denied");
+            sleep (2);
             require (JIRAFEAU_ROOT.'lib/template/header.php');
             echo '<div class="error"><p>' . t('Access denied') .
             '</p></div>';
@@ -176,40 +190,50 @@ if (!empty ($link['key']))
     }
 }
 
-if ($cfg['download_page'] && !$password_challenged && !$do_download && !$do_preview)
+if (!$password_challenged && !$do_download && !$do_preview)
 {
         require (JIRAFEAU_ROOT.'lib/template/header.php');
         echo '<div>' .
              '<form action = "';
         echo $cfg['web_root'] . '/f.php';
         echo '" ' .
-             'method = "post" id = "submit">'; ?>
+             'method = "post" id = "submit_post">'; ?>
              <input type = "hidden" name = "jirafeau" value = "<?php echo JIRAFEAU_VERSION ?>"/><?php
-        echo '<fieldset><legend>' . $link['file_name'] . '</legend><table>' .
+        echo '<fieldset><legend>' . htmlspecialchars($link['file_name']) . '</legend><table>' .
              '<tr><td>' .
-             t('You are about to download') . ' "' . $link['file_name'] . '" (' . jirafeau_human_size($link['file_size']) . ')' .
+             t('You are about to download') . ' "' . htmlspecialchars($link['file_name']) . '" (' . jirafeau_human_size($link['file_size']) . ')' .
              '</td></tr>' .
              '<tr><td>' .
-             t('By using our services, you accept our'). ' <a href="' . $cfg['web_root'] . '/tos.php' . '">' . t('Term Of Service') . '</a>';
-            ?></td></tr><tr><td><input type="submit" id = "submit_download"  value="<?php echo t('Download'); ?>"
-            onclick="document.getElementById('submit').action='
+             t('By using our services, you accept our'). ' <a href="' . $cfg['web_root'] . '/tos.php' . '">' . t('Term Of Service') . '</a>' .
+             '</td></tr>';
+
+        if ($link['onetime'] == 'O')
+        {
+            echo '<tr><td id="self_destruct">' .
+                 t('Warning, this file will self-destruct after being read') .
+                 '</td></tr>';
+        }
+
+        ?>
+        <tr><td><input type="submit" id = "submit_download"  value="<?php echo t('Download'); ?>"
+        onclick="document.getElementById('submit_post').action='
 <?php
         echo $cfg['web_root'] . '/f.php?h=' . $link_name . '&amp;d=1';
         if (!empty($crypt_key))
             echo '&amp;k=' . urlencode($crypt_key);
 ?>';
-        document.getElementById('submit_download').submit ();"/><?php
+        document.getElementById('submit_post').submit ();"/><?php
 
-        if ($cfg['download_page'] && $cfg['preview'] && jirafeau_is_viewable($link['mime_type']))
+        if ($cfg['preview'] && jirafeau_is_viewable($link['mime_type']))
         {
             ?><input type="submit" id = "submit_preview"  value="<?php echo t('Preview'); ?>"
-            onclick="document.getElementById('submit').action='
+            onclick="document.getElementById('submit_post').action='
 <?php
         echo $cfg['web_root'] . '/f.php?h=' . $link_name . '&amp;p=1';
         if (!empty($crypt_key))
             echo '&amp;k=' . urlencode($crypt_key);
 ?>';
-        document.getElementById('submit_preview').submit ();"/><?php
+        document.getElementById('submit_post').submit ();"/><?php
         }
         echo '</td></tr>';
         echo '</table></fieldset></form></div>';
@@ -220,9 +244,11 @@ if ($cfg['download_page'] && !$password_challenged && !$do_download && !$do_prev
 header ('HTTP/1.0 200 OK');
 header ('Content-Length: ' . $link['file_size']);
 if (!jirafeau_is_viewable ($link['mime_type']) || !$cfg['preview'] || $do_download)
-    header ('Content-Disposition: attachment; filename="' .
-        $link['file_name'] . '"');
+    header ('Content-Disposition: attachment; filename="' . $link['file_name'] . '"');
+else
+    header ('Content-Disposition: filename="' . $link['file_name'] . '"');
 header ('Content-Type: ' . $link['mime_type']);
+header ('Content-MD5: ' . hex_to_base64($link['md5']));
 
 /* Read encrypted file. */
 if ($link['crypted'])

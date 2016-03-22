@@ -16,7 +16,7 @@
  *  GNU Affero General Public License for more details.
  *
  *  You should have received a copy of the GNU Affero General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 /*
@@ -26,19 +26,21 @@
 
 $dark = '#8B4513';
 
-header("Content-type: text/css");
+header('Content-type: text/css');
 
 ?>
 
 /* ==========================================================================
-   Sommaire
+   Summary
 
    1 = Basic Style
    2 = Copyright
    3 = Options
    4 = Upload
    5 = Terms of service
-   6 = Admin
+   6 = Install
+   7 = Admin
+   8 = Download page
    
    ========================================================================== */
 
@@ -92,12 +94,14 @@ legend {
   text-align: center;
 }
 
-table a { color: #000;}
+table a {
+  color: #000;
+}
 
-  table a:hover,
-  table a:focus {
-    text-decoration: none;
-  }
+table a:hover,
+table a:focus {
+  text-decoration: none;
+}
 
 input[type="submit"] {
   background: #0D9CB2;
@@ -216,13 +220,27 @@ input[type="submit"]:focus {
 #upload_finished,
 #uploading,
 .message,
+.info,
 .error {
   text-align: center;
   color: #795548;
   padding-left: 3em;
 }
 
-#upload_finished a,
+#upload_finished > p:nth-child(1) {
+  color: #0D9CB2;
+  font-weight: bold;
+}
+
+#upload_finished div p:nth-child(1) {
+  font-weight: bold;
+}
+
+#upload_finished a {
+  text-decoration: none;
+  color: #795548;
+}
+
 #uploading a {
   font-weight: bold;
   text-decoration: none;
@@ -248,11 +266,15 @@ input[type="submit"]:focus {
   font-weight: bold;
 }
 
+#upload_image_email {
+  padding-left: 20px;
+  margin-left: 10px;
+  background: url(email.png) no-repeat;
+}
+
 /* ==========================================================================
    5 = Terms of service
    ========================================================================== */
-
-
 
 textarea[readonly="readonly"] {
   border: 0;
@@ -284,7 +306,7 @@ textarea[readonly="readonly"] + p + p a:focus {
 }
 
 /* ==========================================================================
-   6 = Admin
+   6 = Install
    ========================================================================== */
 
 #install fieldset,
@@ -298,13 +320,11 @@ textarea[readonly="readonly"] + p + p a:focus {
 #install + fieldset table {
   width: 100%;
   border-collapse: collapse;
-  border-bottom: 2px solid #FFF;
 }
 
 #install td,
 #install + fieldset td {
   padding: 0.5em 1em;
-  border: 2px solid #FFF;
   border-bottom: 0;
 }
 
@@ -350,4 +370,88 @@ textarea[readonly="readonly"] + p + p a:focus {
 #install + fieldset td:first-child input[type="submit"]:hover,
 #install + fieldset td:first-child input[type="submit"]:focus {
   text-decoration: underline;
+}
+
+/* ==========================================================================
+   7 = Admin
+   ========================================================================== */
+
+#admin fieldset,
+#admin + fieldset {
+  width: auto;
+  max-width: 50em;
+  border: 7px dashed #bcaaa4;
+}
+
+#admin table,
+#admin + fieldset table {
+  width: 100%;
+  border-collapse: collapse;
+  border-bottom: 2px solid #FFF;
+}
+
+#admin td,
+#admin + fieldset td {
+  padding: 0.5em 1em;
+  border: 2px solid #FFF;
+  border-bottom: 0;
+}
+
+#admin td:empty {
+  width: 13.1em;
+}
+
+#admin table form:nth-child(odd),
+#admin + fieldset tr:nth-child(odd) {
+  background: #bcaaa4;
+}
+
+#admin fieldset > form {
+  margin-top: 2em;
+  text-align: center;
+}
+
+#admin form {
+  display: table;
+  width: 100%;
+}
+
+#admin td:last-child { text-align: left; }
+
+#admin .info { width: 19em; }
+
+#admin input[type="submit"] {
+  min-width: 10.5em;
+}
+
+#admin + fieldset table {
+  font-size: 0.9em;
+}
+
+#admin + fieldset td:first-child input[type="submit"] {
+  background: none;
+  padding: 0;
+  color: #000;
+  font-weight: bold;
+  border-bottom: 0;
+}
+
+#admin + fieldset td:first-child input[type="submit"]:hover,
+#admin + fieldset td:first-child input[type="submit"]:focus {
+  text-decoration: underline;
+}
+
+/* ==========================================================================
+   8 = Download page
+   ========================================================================== */
+
+#self_destruct {
+  font-weight: bold;
+  color: red;
+  background-image: url('pixel_bomb.png');
+  background-size: 40px 40px;
+  background-repeat: no-repeat;
+  padding-left: 40px;
+  padding-top: 10px;
+  padding-bottom: 10px;
 }

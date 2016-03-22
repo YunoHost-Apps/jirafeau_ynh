@@ -14,7 +14,7 @@
  *  GNU Affero General Public License for more details.
  *
  *  You should have received a copy of the GNU Affero General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 /*
@@ -50,156 +50,15 @@ if ($_SERVER['REQUEST_METHOD'] == "GET" && count ($_GET) == 0)
         require (JIRAFEAU_ROOT . 'lib/template/footer.php');
         exit;
     }
-    echo '<div class="info">';
-    echo '<h2>' . t('Welcome to Jirafeau\'s query interface') . '</h2>';
-    echo '<p>';
-    echo t('This interface permits to script your uploads and downloads.') .
-            ' ' . t('The instructions above show how to query this interface.');
-    echo '</p>';
-    
-    echo '<h3>' . t('Get Jirafeau\'s version') . ':</h3>';
-    echo '<p>';
-    echo t('Send a GET query to') . ': <i>' . $web_root . 'script.php</i><br />';
-    echo '<br />';
-    echo t('Parameters') . ':<br />';
-    echo "<b>get_version=</b>1<i> (" . t('Required') . ")</i> <br />";
-    echo '</p>';
-    echo '<p>' . t('This will return brut text content.') . ' ' .
-            t('First line is the version number.') . '<br /></p>';
-    echo '<p>';
-    echo t('Example') . ": <a href=\"" . $web_root . "script.php?get_version=1\">" . $web_root . "script.php?get_version=1</a> ";
-    echo '</p>';
-
-    echo '<h3>' . t('Get server capacity') . ':</h3>';
-    echo '<p>';
-    echo t('Send a GET query to') . ': <i>' . $web_root . 'script.php</i><br />';
-    echo '<br />';
-    echo t('Parameters') . ':<br />';
-    echo "<b>get_capacity=</b>1<i> (" . t('Required') . ")</i> <br />";
-    echo '</p>';
-    echo '<p>' . t('This will return brut text content.') . ' ' .
-            t('First line is the server capacity (in Bytes).') . '<br /></p>';
-    echo '<p>';
-    echo t('Example') . ": <a href=\"" . $web_root . "script.php?get_capacity=1\">" . $web_root . "script.php?get_capacity=1</a> ";
-    echo '</p>';
-
-    echo '<h3>' . t('Maximal allowed size of an uploaded file') . ':</h3>';
-    echo '<p>';
-    echo t('Send a GET query to') . ': <i>' . $web_root . 'script.php</i><br />';
-    echo '<br />';
-    echo t('Parameters') . ':<br />';
-    echo "<b>get_maximal_upload_size=</b>1<i> (" . t('Required') . ")</i> <br />";
-    echo '</p>';
-    echo '<p>' . t('This will return brut text content.') . ' ' .
-            t('First line returns size (in MB).') . '<br /></p>';
-    echo '<p>';
-    echo t('Example') . ": <a href=\"" . $web_root . "script.php?get_maximal_upload_size=1\">" . $web_root . "script.php?get_maximal_upload_size=1</a> ";
-    echo '</p>';
-    
-    echo '<h3>' . t('Upload a file') . ':</h3>';
-    echo '<p>';
-    echo t('Send a POST query to') . ': <i>' . $web_root . 'script.php</i><br />';
-    echo '<br />';
-    echo t('Parameters') . ':<br />';
-    echo "<b>file=</b>C:\\your\\file\\path<i> (" . t('Required') . ")</i> <br />";
-    echo "<b>time=</b>[minute|hour|day|week|month|year|none]<i> (" . t('Optional') . ', '. t('default: none') . ")</i> <br />";
-    echo "<b>password=</b>your_password<i> (" . t('Optional') . ")</i> <br />";
-    echo "<b>one_time_download=</b>1<i> (" . t('Optional') . ")</i> <br />";
-    echo "<b>upload_password=</b>your_upload_password<i> (" . t('Optional') . ")</i> <br />";
-    echo '</p>';
-    echo '<p>' . t('This will return brut text content.') . ' ' .
-         t('First line is the download reference and the second line the delete code.') . '<br /></p>';
-    
-    echo '<h3>' . t('Get a file') . ':</h3>';
-    echo '<p>';
-    echo t('Send a GET query to') . ': <i>' . $web_root . 'script.php</i><br />';
-    echo '<br />';
-    echo t('Parameters') . ':<br />';
-    echo "<b>h=</b>your_download_reference<i> (" . t('Required') . ")</i> <br />";
-    echo '</p>';
-    echo '<p>';
-    echo t('If a password has been set, send a POST request with it.');
-    echo '<br />';
-    echo t('Parameters') . ':<br />';
-    echo "<b>password=</b>your_password<i> (" . t('Optional') . ")</i> <br />";
-    echo '</p>';
-    echo '<p>';
-    echo t('Example') . ": <a href=\"" . $web_root . "script.php?h=30ngy0hsDcpfrF8zR7x9iU\">" . $web_root . "script.php?h=30ngy0hsDcpfrF8zR7x9iU</a> ";
-    echo '</p>';
-    
-    echo '<h3>' . t('Delete a file') . ':</h3>';
-    echo '<p>';
-    echo t('Send a GET query to') . ': <i>' . $web_root . 'script.php</i><br />';
-    echo '<br />';
-    echo t('Parameters') . ':<br />';
-    echo "<b>h=</b>your_download_reference<i> (" . t('Required') . ")</i> <br />";
-    echo "<b>d=</b>yout_delete_code<i> (" . t('Required') . ")</i> <br />";
-    echo '</p>';
-    echo '<p>' . t('This will return "Ok" if succeeded, "Error" otherwhise.') . '<br /></p>';
-    echo '<p>';
-    echo t('Example') . ": <a href=\"" . $web_root . "script.php?h=30ngy0hsDcpfrF8zR7x9iU&amp;d=0d210a952\">" . $web_root . "script.php?h=30ngy0hsDcpfrF8zR7x9iU&amp;d=0d210a952</a> ";
-    echo '</p>';
-    
-    echo '<h3>' . t('Get a generated script') . ':</h3>';
-    echo '<p>';
-    echo t('Send a GET query to') . ': <i>' . $web_root . 'script.php</i><br />';
-    echo '<br />';
-    echo t('Parameters') . ':<br />';
-    echo "<b>lang=</b>[";
-    foreach ($script_langages as $lang => $name)
-        echo $lang;
-    echo "]<i> (" . t('Required') . ")</i> <br />";
-    echo '</p>';
-    echo '<p>' . t('This will return brut text content of the code.') . '<br /></p>';
-    echo '<p>';
-    echo t('Example') . ": <br />";
-    foreach ($script_langages as $lang => $name)
-        echo "$name: <a href=\"" . $web_root . "script.php?lang=$lang\">" . $web_root . "script.php?lang=$lang</a> ";
-    echo '</p>';
-    
-    echo '<h3>' . t('Initalize an asynchronous transfer') . ':</h3>';
-    echo '<p>';
-    echo t('The goal is to permit to transfer big file, chunk by chunk.') . ' ';
-    echo t('Chunks of data must be sent in order.');
-    echo '</p>';
-    echo '<p>';
-    echo t('Send a GET query to') . ': <i>' . $web_root . 'script.php?init_async</i><br />';
-    echo '<br />';
-    echo t('Parameters') . ':<br />';
-    echo "<b>filename=</b>file_name.ext<i> (" . t('Required') . ")</i> <br />";
-    echo "<b>type=</b>MIME_TYPE<i> (" . t('Optional') . ")</i> <br />";
-    echo "<b>time=</b>[minute|hour|day|week|month|year|none]<i> (" . t('Optional') . ', '. t('default: none') . ")</i> <br />";
-    echo "<b>password=</b>your_password<i> (" . t('Optional') . ")</i> <br />";
-    echo "<b>one_time_download=</b>1<i> (" . t('Optional') . ")</i> <br />";
-    echo "<b>upload_password=</b>your_upload_password<i> (" . t('Optional') . ")</i> <br />";
-    echo '</p>';
-    echo '<p>' . t('This will return brut text content.') . ' ' .
-         t('First line is the asynchronous transfer reference and the second line the code to use in the next operation.') . '<br /></p>';
-
-    echo '<h3>' . t('Push data during asynchronous transfer') . ':</h3>';
-    echo '<p>';
-    echo t('Send a GET query to') . ': <i>' . $web_root . 'script.php?push_async</i><br />';
-    echo '<br />';
-    echo t('Parameters') . ':<br />';
-    echo "<b>ref=</b>async_reference<i> (" . t('Required') . ")</i> <br />";
-    echo "<b>data=</b>data_chunk<i> (" . t('Required') . ")</i> <br />";
-    echo "<b>code=</b>last_provided_code<i> (" . t('Required') . ")</i> <br />";
-    echo '</p>';
-    echo '<p>' . t('This will return brut text content.') . ' ' .
-         t('Returns the next code to use.') . '<br /></p>';
-
-    echo '<h3>' . t('Finalize asynchronous transfer') . ':</h3>';
-    echo '<p>';
-    echo t('Send a GET query to') . ': <i>' . $web_root . 'script.php?end_async</i><br />';
-    echo '<br />';
-    echo t('Parameters') . ':<br />';
-    echo "<b>ref=</b>async_reference<i> (" . t('Required') . ")</i> <br />";
-    echo "<b>code=</b>last_provided_code<i> (" . t('Required') . ")</i> <br />";
-    echo '</p>';
-    echo '<p>' . t('This will return brut text content.') . ' ' .
-         t('First line is the download reference and the second line the delete code.') . '<br /></p>';
-
-    echo '</div><br />';
+    ?>
+    <div class="info">
+    <h2>Scripting interface</h2>
+    <p>This interface permits to script your uploads and downloads.</p>
+    <p>See <a href="https://gitlab.com/mojo42/Jirafeau/blob/master/script.php">source code</a> of this interface to get available calls :)</p>
+    <p>Alternatively, go to <a href="<?php echo $cfg['web_root'] . 'script.php?lang=bash'; ?>">this page</a> to download a bash script.</p>
+    </div>
+    <br />
+    <?php
     require (JIRAFEAU_ROOT . 'lib/template/footer.php');
     exit;
 }
@@ -210,7 +69,7 @@ header('Content-Type: text; charset=utf-8');
 check_errors ($cfg);
 if (has_error ())
 {
-    echo "Error";
+    echo 'Error 1';
     exit;
 }
 
@@ -218,11 +77,17 @@ if (has_error ())
 if (isset ($_FILES['file']) && is_writable (VAR_FILES)
     && is_writable (VAR_LINKS))
 {
+    if (!jirafeau_challenge_upload_ip ($cfg, get_ip_address($cfg)))
+    {
+        echo 'Error 2';
+        exit;
+    }
+
     if (jirafeau_has_upload_password ($cfg) &&
          (!isset ($_POST['upload_password']) ||
           !jirafeau_challenge_upload_password ($cfg, $_POST['upload_password'])))
     {
-        echo "Error";
+        echo 'Error 3';
         exit;
     }
 
@@ -233,7 +98,7 @@ if (isset ($_FILES['file']) && is_writable (VAR_FILES)
     $time = time ();
     if (!isset ($_POST['time']) || !$cfg['availabilities'][$_POST['time']])
     {
-        echo "Error";
+        echo 'Error 4: The parameter time is invalid.';
         exit;
     }
     else
@@ -266,18 +131,18 @@ if (isset ($_FILES['file']) && is_writable (VAR_FILES)
     if ($cfg['maximal_upload_size'] > 0 &&
         $_FILES['file']['size'] > $cfg['maximal_upload_size'] * 1024 * 1024)
     {
-        echo "Error";
+        echo 'Error 5: Your file exceeds the maximum authorized file size.';
         exit;
     }
 
     $res = jirafeau_upload ($_FILES['file'],
                             isset ($_POST['one_time_download']),
-                            $key, $time, $_SERVER['REMOTE_ADDR'],
+                            $key, $time, get_ip_address($cfg),
                             $cfg['enable_crypt'], $cfg['link_name_length']);
-    
+
     if (empty($res) || $res['error']['has_error'])
     {
-        echo "Error";
+        echo 'Error 6 ' . $res['error']['why'];
         exit;
     }
     /* Print direct link. */
@@ -298,17 +163,17 @@ elseif (isset ($_GET['h']))
     $d = '';
     if (isset ($_GET['d']))
         $d = $_GET['d'];
-    
+
     if (!preg_match ('/[0-9a-zA-Z_-]+$/', $link_name))
     {
-        echo "Error";
+        echo 'Error 7';
         exit;
     }
-    
+
     $link = jirafeau_get_link ($link_name);
     if (count ($link) == 0)
     {
-        echo "Error";
+        echo 'Error 8';
         exit;
     }
     if (strlen ($d) > 0 && $d == $link['link_code'])
@@ -320,18 +185,19 @@ elseif (isset ($_GET['h']))
     if ($link['time'] != JIRAFEAU_INFINITY && time () > $link['time'])
     {
         jirafeau_delete_link ($link_name);
-        echo "Error";
+        echo 'Error 9';
         exit;
     }
     if (strlen ($link['key']) > 0 && md5 ($key) != $link['key'])
     {
-        echo "Error";
+        sleep (2);
+        echo 'Error 10';
         exit;
     }
     $p = s2p ($link['md5']);
     if (!file_exists (VAR_FILES . $p . $link['md5']))
     {
-        echo "Error";
+        echo 'Error 11';
         exit;
     }
 
@@ -374,7 +240,7 @@ elseif (isset ($_GET['lang']))
 ?>
 #!/bin/bash
 
-# This script has been auto-generated by Jirafeau but you can still edit 
+# This script has been auto-generated by Jirafeau but you can still edit
 # options below.
 
 # Config
@@ -465,8 +331,9 @@ if [ "$1" == "send" ]; then
                   -F "file=@$2" \
                   $url)
 
-    if [[ "$res" == "Error" ]]; then
+    if [[ "$res" == Error* ]]; then
         echo "Error while uploading."
+        echo $res
         exit
     fi
 
@@ -483,7 +350,11 @@ if [ "$1" == "send" ]; then
         fi
         cnt=$(( cnt + 1 ))
         done)
+    echo "Download link:"
     echo "${url}?h=$code"
+    echo "Direct download link:"
+    echo "${url}?h=$code&d=1"
+    echo "Delete link:"
     echo "${url}?h=$code&d=$del_code"
 elif [ "$1" == "get" ]; then
     if [ -z "$password" ]; then
@@ -498,31 +369,113 @@ fi
     }
     else
     {
-        echo "Error";
+        echo 'Error 12';
         exit;
     }
 }
-/* Initialize an asynchronous upload. */
-elseif (isset ($_GET['init_async']))
+/* Create alias. */
+elseif (isset ($_GET['alias_create']))
 {
+    $ip = get_ip_address($cfg);
+    if (!jirafeau_challenge_upload_ip ($cfg, $ip))
+    {
+        echo 'Error 13';
+        exit;
+    }
+
     if (jirafeau_has_upload_password ($cfg) &&
          (!isset ($_POST['upload_password']) ||
           !jirafeau_challenge_upload_password ($cfg, $_POST['upload_password'])))
     {
-        echo "Error";
+        echo 'Error 14';
+        exit;
+    }
+
+    if (!isset ($_POST['alias']) ||
+        !isset ($_POST['destination']) ||
+        !isset ($_POST['password']))
+    {
+        echo 'Error 15';
+        exit;
+    }
+
+    echo jirafeau_alias_create ($_POST['alias'],
+                                $_POST['destination'],
+                                $_POST['password'],
+                                $ip);
+}
+/* Get alias. */
+elseif (isset ($_GET['alias_get']))
+{
+    if (!isset ($_POST['alias']))
+    {
+        echo 'Error 16';
+        exit;
+    }
+
+    echo jirafeau_alias_get ($_POST['alias']);
+}
+/* Update alias. */
+elseif (isset ($_GET['alias_update']))
+{
+    if (!isset ($_POST['alias']) ||
+        !isset ($_POST['destination']) ||
+        !isset ($_POST['password']))
+    {
+        echo 'Error 17';
+        exit;
+    }
+
+    $new_password = '';
+    if (isset ($_POST['new_password']))
+        $new_password = $_POST['new_password'];
+
+    echo jirafeau_alias_update ($_POST['alias'],
+                                $_POST['destination'],
+                                $_POST['password'],
+                                $new_password,
+                                get_ip_address($cfg));
+}
+/* Delete alias. */
+elseif (isset ($_GET['alias_delete']))
+{
+    if (!isset ($_POST['alias']) ||
+        !isset ($_POST['password']))
+    {
+        echo 'Error 18';
+        exit;
+    }
+
+    echo jirafeau_alias_delete ($_POST['alias'],
+                                $_POST['password']);
+}
+/* Initialize an asynchronous upload. */
+elseif (isset ($_GET['init_async']))
+{
+    if (!jirafeau_challenge_upload_ip ($cfg, get_ip_address($cfg)))
+    {
+        echo 'Error 19';
+        exit;
+    }
+
+    if (jirafeau_has_upload_password ($cfg) &&
+         (!isset ($_POST['upload_password']) ||
+          !jirafeau_challenge_upload_password ($cfg, $_POST['upload_password'])))
+    {
+        echo 'Error 20';
         exit;
     }
 
     if (!isset ($_POST['filename']))
     {
-        echo "Error";
+        echo 'Error 21';
         exit;
     }
 
     $type = '';
     if (isset ($_POST['type']))
         $type = $_POST['type'];
-    
+
     $key = '';
     if (isset ($_POST['key']))
         $key = $_POST['key'];
@@ -530,7 +483,7 @@ elseif (isset ($_GET['init_async']))
     $time = time ();
     if (!isset ($_POST['time']) || !$cfg['availabilities'][$_POST['time']])
     {
-        echo "Error";
+        echo 'Error 22';
         exit;
     }
     else
@@ -563,7 +516,7 @@ elseif (isset ($_GET['init_async']))
                               isset ($_POST['one_time_download']),
                               $key,
                               $time,
-                              $_SERVER['REMOTE_ADDR']);
+                              get_ip_address($cfg));
 }
 /* Continue an asynchronous upload. */
 elseif (isset ($_GET['push_async']))
@@ -571,7 +524,7 @@ elseif (isset ($_GET['push_async']))
     if ((!isset ($_POST['ref']))
         || (!isset ($_FILES['data']))
         || (!isset ($_POST['code'])))
-        echo "Error";
+        echo 'Error 23';
     else
     {
         echo jirafeau_async_push ($_POST['ref'],
@@ -585,12 +538,11 @@ elseif (isset ($_GET['end_async']))
 {
     if (!isset ($_POST['ref'])
         || !isset ($_POST['code']))
-        echo "Error";
+        echo 'Error 24';
     else
         echo jirafeau_async_end ($_POST['ref'], $_POST['code'], $cfg['enable_crypt'], $cfg['link_name_length']);
 }
 else
-    echo "Error";
+    echo 'Error 25';
 exit;
 ?>
-

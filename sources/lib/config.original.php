@@ -15,7 +15,7 @@
  *  GNU Affero General Public License for more details.
  *
  *  You should have received a copy of the GNU Affero General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
  
 /*
@@ -35,10 +35,8 @@ $cfg['var_root'] = '';
 $cfg['lang'] = 'auto';
 /* Select your style :) See media folder */
 $cfg['style'] = 'courgette';
-/* Propose a preview link if file type is previewable is set to true. */
+/* Propose a preview link if file type is previewable. */
 $cfg['preview'] = true;
-/* Download page: propose a link to a download page is set to true. */
-$cfg['download_page'] = true;
 /* Encryption feature. disable it by default.
  * By enabling it, file-level deduplication won't work.
  */
@@ -52,6 +50,13 @@ $cfg['link_name_length'] = 8;
  * ... and so on
  */
 $cfg['upload_password'] = array();
+/* List of IP allowed to upload a file.
+ * If list is empty, then there is no upload restriction based on IP
+ * Elements of the list can be a single IP (e.g. "123.45.67.89") or
+ * an IP range (e.g. "123.45.0.0/16").
+ * Note that CIDR notation is available for IPv4 only for the moment.
+ */
+$cfg['upload_ip'] = array();
 /* An empty admin password will disable the classic admin password
  * authentication.
  */
@@ -84,6 +89,13 @@ $cfg['availabilities'] = array ('minute' => true,
  * 0 mean unlimited upload size.
  */
 $cfg['maximal_upload_size'] = 0;
+/* If your Jirafeau is behind some reverse proxies, you can set there IPs
+ * so Jirafeau get visitor's IP from HTTP_X_FORWARDED_FOR instead of
+ * REMOTE_ADDR.
+ * for example:
+ * $cfg['proxy_ip'] = array('12.34.56.78');
+ */
+$cfg['proxy_ip'] = array();
 /* Installation is done ? */
 $cfg['installation_done'] = false;
 

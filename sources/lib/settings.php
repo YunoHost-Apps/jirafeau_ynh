@@ -14,16 +14,18 @@
  *  GNU Affero General Public License for more details.
  *
  *  You should have received a copy of the GNU Affero General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+
 /* Jirafeau constants */
 define ('JIRAFEAU_PACKAGE', 'Jirafeau');
-define ('JIRAFEAU_VERSION', '1.0');
+define ('JIRAFEAU_VERSION', '1.1');
 
 /* Directories. */
 define ('VAR_FILES', $cfg['var_root'] . 'files/');
 define ('VAR_LINKS', $cfg['var_root'] . 'links/');
 define ('VAR_ASYNC', $cfg['var_root'] . 'async/');
+define ('VAR_ALIAS', $cfg['var_root'] . 'alias/');
 
 /* Useful constants. */
 if (!defined ('NL'))

@@ -16,7 +16,7 @@
  *  GNU Affero General Public License for more details.
  *
  *  You should have received a copy of the GNU Affero General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 define ('JIRAFEAU_ROOT', dirname (__FILE__) . '/');
 
@@ -24,13 +24,22 @@ require (JIRAFEAU_ROOT . 'lib/config.original.php');
 require (JIRAFEAU_ROOT . 'lib/settings.php');
 require (JIRAFEAU_ROOT . 'lib/functions.php');
 require (JIRAFEAU_ROOT . 'lib/lang.php');
-require (JIRAFEAU_ROOT . 'lib/template/header.php');
 
 check_errors ($cfg);
 if (has_error ())
 {
     show_errors ();
     require (JIRAFEAU_ROOT . 'lib/template/footer.php');
+    exit;
+}
+
+require (JIRAFEAU_ROOT . 'lib/template/header.php');
+
+/* Check if user is allowed to upload. */
+if (!jirafeau_challenge_upload_ip ($cfg, get_ip_address($cfg)))
+{
+    echo '<div class="error"><p>' . t('Access denied') . '</p></div>';
+    require (JIRAFEAU_ROOT.'lib/template/footer.php');
     exit;
 }
 
@@ -95,44 +104,36 @@ if (jirafeau_has_upload_password ($cfg))
 ?>
 <div id="upload_finished">
     <p><?php echo t('File uploaded !') ?></p>
-    <br />
 
-    <?php if ($cfg['download_page'] == true) { ?>
     <div id="upload_finished_download_page">
-    <?php echo t('Download page') ?>
+    <p>
+          <?php echo t('Download page') ?> 
+          <a id="upload_link_email" href=""><img id="upload_image_email"/></a>
+    </p>
     <p><a id="upload_link" href=""></a></p>
-    <br />
-    </div>
-    <?php } ?>
-
-    <div id="upload_password_page">
-    <p><?php echo t('Download page') ?>:</p>
-    <p><a id="password_link" href=""></a></p>
-    <br />
     </div>
 
     <?php if ($cfg['preview'] == true) { ?>
     <div id="upload_finished_preview">
     <p><?php echo t('View link') ?>:</p>
     <p><a id="preview_link" href=""></a></p>
-    <br />
     </div>
     <?php } ?>
 
     <div id="upload_direct_download">
     <p><?php echo t('Direct download link') ?>:</p>
     <p><a id="direct_link" href=""></a></p>
-    <br />
     </div>
 
+    <div>
     <p><?php echo t('Delete link') ?>:</p>
     <p><a id="delete_link" href=""></a></p>
-    <br />
-    
-    <p id="validity">
-    <?php echo t('This file is valid until the following date'); ?>:
-    <br /><strong><div id="date"></div></strong>
-    </p>
+    </div>
+
+    <div id="validity">
+    <p><?php echo t('This file is valid until the following date'); ?>:</p>
+    <p id="date"></p>
+    </div>
 </div>
 
 <div id="uploading">
@@ -242,7 +243,7 @@ if (jirafeau_has_upload_password ($cfg))
 
 </div>
 
-<script lang="Javascript">
+<script type="text/javascript" lang="Javascript">
     document.getElementById('error_pop').style.display = 'none';
     document.getElementById('uploading').style.display = 'none';
     document.getElementById('upload_finished').style.display = 'none';

@@ -14,7 +14,7 @@
  *  GNU Affero General Public License for more details.
  *
  *  You should have received a copy of the GNU Affero General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 /*
@@ -24,9 +24,11 @@
 
 $dark = '#8B4513';
 
-header("Content-type: text/css");
+header('Content-type: text/css');
 
 ?>
+
+@charset "UTF-8";
 
 body {
   text-align: center;
@@ -175,4 +177,63 @@ h1 a {
 
 #install .navleft {
   float: left;
+}
+
+#admin {
+  width: 40em;
+  margin: 5ex auto;
+}
+
+#admin table {
+  width: 100%;
+}
+
+#admin label {
+  font-style: italic;
+}
+
+#admin .info {
+  text-align: justify;
+  padding-bottom: 1ex;
+}
+
+#admin .label {
+  text-align: justify;
+  vertical-align: top;
+}
+
+#admin .field {
+  text-align: right;
+  vertical-align: bottom;
+}
+
+#admin .nav {
+  padding-top: 2em;
+}
+
+#admin .next {
+  text-align: right;
+}
+
+#admin .previous {
+  text-align: left;
+}
+
+#admin .navright { 
+  float: right;
+}
+
+#admin .navleft {
+  float: left;
+}
+
+#self_destruct {
+  font-weight: bold;
+  color: red;
+}
+
+#upload_image_email {
+  padding-left: 20px;
+  margin-left: 10px;
+  background: url(email.png) no-repeat;
 }
