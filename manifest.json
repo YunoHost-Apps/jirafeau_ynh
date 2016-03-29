@@ -1,6 +1,7 @@
 {
     "name": "Jirafeau",
     "id": "jirafeau",
+    "packaging_format": 1,
     "description": {
         "en": "Upload a file in a simple way and give a unique link to it",
         "fr": "Hébergez simplement un fichier et partagez-le avec un lien unique"
