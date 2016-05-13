@@ -1,11 +1,23 @@
 #!/bin/bash
 
-domain=$(sudo yunohost app setting jirafeau domain)
+# This is a multi-instance app, meaning it can be installed several times independently
+# The id of the app as stated in the manifest is available as $YNH_APP_ID
+# The instance number is available as $YNH_APP_INSTANCE_NUMBER (equals "1", "2", ...)
+# The app instance name is available as $YNH_APP_INSTANCE_NAME
+#    - the first time the app is installed, YNH_APP_INSTANCE_NAME = ynhexample
+#    - the second time the app is installed, YNH_APP_INSTANCE_NAME = ynhexample__2
+#    - ynhexample__{N} for the subsequent installations, with N=3,4, ...
+# The app instance name is probably what you are interested the most, since this is
+# guaranteed to be unique. This is a good unique identifier to define installation path,
+# db names, ...
+app=$YNH_APP_INSTANCE_NAME
 
-sudo rm -rf /home/yunohost.app/jirafeau
-sudo rm -rf /var/www/jirafeau
-sudo rm -f /etc/nginx/conf.d/$domain.d/jirafeau.conf
-sudo rm -f /etc/php5/fpm/pool.d/jirafeau.conf
+domain=$(sudo yunohost app setting $app domain)
+
+sudo rm -rf /home/yunohost.app/$app
+sudo rm -rf /var/www/$app
+sudo rm -f /etc/nginx/conf.d/$domain.d/$app.conf
+sudo rm -f /etc/php5/fpm/pool.d/$app.conf
 
 sudo service php5-fpm restart
 sudo service nginx reload

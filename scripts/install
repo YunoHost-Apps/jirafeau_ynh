@@ -1,14 +1,29 @@
 #!/bin/bash
 
+# causes the shell to exit if any subcommand or pipeline returns a non-zero status
+set -e
+
+# This is a multi-instance app, meaning it can be installed several times independently
+# The id of the app as stated in the manifest is available as $YNH_APP_ID
+# The instance number is available as $YNH_APP_INSTANCE_NUMBER (equals "1", "2", ...)
+# The app instance name is available as $YNH_APP_INSTANCE_NAME
+#    - the first time the app is installed, YNH_APP_INSTANCE_NAME = ynhexample
+#    - the second time the app is installed, YNH_APP_INSTANCE_NAME = ynhexample__2
+#    - ynhexample__{N} for the subsequent installations, with N=3,4, ...
+# The app instance name is probably what you are interested the most, since this is
+# guaranteed to be unique. This is a good unique identifier to define installation path,
+# db names, ...
+app=$YNH_APP_INSTANCE_NAME
+
 # Retrieve arguments
-domain=$1
-path=$2
-admin_user=$3
-upload_password=$4
-is_public=$5
+domain=$YNH_APP_ARG_DOMAIN
+path=$YNH_APP_ARG_PATH
+admin_user=$YNH_APP_ARG_ADMIN_USER
+upload_password=$YNH_APP_ARG_UPLOAD_PASSWORD
+is_public=$YNH_APP_ARG_IS_PUBLIC
 
 # Check domain/path availability
-sudo yunohost app checkurl $domain$path -a jirafeau
+sudo yunohost app checkurl $domain$path -a $app
 if [[ ! $? -eq 0 ]]; then
     exit 1
 fi
@@ -24,21 +39,21 @@ if [[ ! $? -eq 0 ]]; then
 fi
 
 # Save specific settings
-sudo yunohost app setting jirafeau admin_user -v $admin_user
-sudo yunohost app setting jirafeau is_public -v $is_public
+sudo yunohost app setting $app admin_user -v $admin_user
+sudo yunohost app setting $app is_public -v $is_public
 
 # Set and save upload password, allowing an empty one
 if [[ -z "$upload_password" ]]; then
     sed -i "s@YNH_UPLOAD_PASSWORD@@g" ../conf/config.local.php
-    sudo yunohost app setting jirafeau upload_password -v ''
+    sudo yunohost app setting $app upload_password -v ''
 else
     sed -i "s@YNH_UPLOAD_PASSWORD@'$upload_password'@g" ../conf/config.local.php
-    sudo yunohost app setting jirafeau upload_password -v "$upload_password"
+    sudo yunohost app setting $app upload_password -v "$upload_password"
 fi
 
 # Copy files to the right place
-final_path=/var/www/jirafeau
-var_root=/home/yunohost.app/jirafeau
+final_path=/var/www/$app
+var_root=/home/yunohost.app/$app
 sudo mkdir -p $final_path
 sudo cp -r ../sources/* $final_path
 sed -i "s@YNH_DOMAIN@$domain@g" ../conf/config.local.php
@@ -65,20 +80,20 @@ if [[ "$path" == "" ]]; then
 else
 	sed -i "s@YNH_WWW_LOCATION@$path@g" ../conf/nginx.conf
 fi
-nginxconf=/etc/nginx/conf.d/$domain.d/jirafeau.conf
+nginxconf=/etc/nginx/conf.d/$domain.d/$app.conf
 sudo cp ../conf/nginx.conf $nginxconf
 sudo chown root: $nginxconf
 sudo chmod 600 $nginxconf
 
-sed -i "s@NAMETOCHANGE@jirafeau@g" ../conf/php-fpm.conf
-finalphpconf=/etc/php5/fpm/pool.d/jirafeau.conf
+sed -i "s@NAMETOCHANGE@$app@g" ../conf/php-fpm.conf
+finalphpconf=/etc/php5/fpm/pool.d/$app.conf
 sudo cp ../conf/php-fpm.conf $finalphpconf
 sudo chown root: $finalphpconf
 sudo chmod 644 $finalphpconf
 
 if [ "$is_public" = "Yes" ];
 then
-  sudo yunohost app setting jirafeau unprotected_uris -v "/" 
+  sudo yunohost app setting $app unprotected_uris -v "/" 
 fi
 
 sudo service php5-fpm restart

@@ -1,10 +1,26 @@
 #!/bin/bash
 
-domain=$(sudo yunohost app setting jirafeau domain)
-path=$(sudo yunohost app setting jirafeau path)
-admin_user=$(sudo yunohost app setting jirafeau admin_user)
-upload_password=$(sudo yunohost app setting jirafeau upload_password)
-is_public=$(sudo yunohost app setting jirafeau is_public)
+# causes the shell to exit if any subcommand or pipeline returns a non-zero status
+set -e
+
+# This is a multi-instance app, meaning it can be installed several times independently
+# The id of the app as stated in the manifest is available as $YNH_APP_ID
+# The instance number is available as $YNH_APP_INSTANCE_NUMBER (equals "1", "2", ...)
+# The app instance name is available as $YNH_APP_INSTANCE_NAME
+#    - the first time the app is installed, YNH_APP_INSTANCE_NAME = ynhexample
+#    - the second time the app is installed, YNH_APP_INSTANCE_NAME = ynhexample__2
+#    - ynhexample__{N} for the subsequent installations, with N=3,4, ...
+# The app instance name is probably what you are interested the most, since this is
+# guaranteed to be unique. This is a good unique identifier to define installation path,
+# db names, ...
+app=$YNH_APP_INSTANCE_NAME
+
+# Retrieve arguments
+domain=$YNH_APP_ARG_DOMAIN
+path=$YNH_APP_ARG_PATH
+admin_user=$YNH_APP_ARG_ADMIN_USER
+upload_password=$YNH_APP_ARG_UPLOAD_PASSWORD
+is_public=$YNH_APP_ARG_IS_PUBLIC
 
 # Remove trailing "/" for next commands
 path=${path%/}
@@ -17,8 +33,8 @@ else
 fi
 
 # Copy files to the right place
-final_path=/var/www/jirafeau
-var_root=/home/yunohost.app/jirafeau
+final_path=/var/www/$app
+var_root=/home/yunohost.app/$app
 sudo mkdir -p $final_path
 sudo rm -rf $final_path/*
 sudo cp -r ../sources/* $final_path
@@ -46,20 +62,20 @@ else
 fi
 sed -i "s@YNH_WWW_PATH@$path@g" ../conf/nginx.conf
 sed -i "s@YNH_WWW_ALIAS@$final_path/@g" ../conf/nginx.conf
-nginxconf=/etc/nginx/conf.d/$domain.d/jirafeau.conf
+nginxconf=/etc/nginx/conf.d/$domain.d/$app.conf
 sudo cp ../conf/nginx.conf $nginxconf
 sudo chown root: $nginxconf
 sudo chmod 600 $nginxconf
 
-sed -i "s@NAMETOCHANGE@jirafeau@g" ../conf/php-fpm.conf
-finalphpconf=/etc/php5/fpm/pool.d/jirafeau.conf
+sed -i "s@NAMETOCHANGE@$app@g" ../conf/php-fpm.conf
+finalphpconf=/etc/php5/fpm/pool.d/$app.conf
 sudo cp ../conf/php-fpm.conf $finalphpconf
 sudo chown root: $finalphpconf
 sudo chmod 644 $finalphpconf
 
 if [ "$is_public" = "Yes" ];
 then
-  sudo yunohost app setting jirafeau unprotected_uris -v "/" 
+  sudo yunohost app setting $app unprotected_uris -v "/" 
 fi
 
 sudo service php5-fpm restart
