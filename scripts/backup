@@ -1,0 +1,34 @@
+#!/bin/bash
+
+# causes the shell to exit if any subcommand or pipeline returns a non-zero status
+set -e
+
+# Source YNH helpers
+. /usr/share/yunohost/helpers
+
+# This is a multi-instance app, meaning it can be installed several times independently
+# The id of the app as stated in the manifest is available as $YNH_APP_ID
+# The instance number is available as $YNH_APP_INSTANCE_NUMBER (equals "1", "2", ...)
+# The app instance name is available as $YNH_APP_INSTANCE_NAME
+#    - the first time the app is installed, YNH_APP_INSTANCE_NAME = ynhexample
+#    - the second time the app is installed, YNH_APP_INSTANCE_NAME = ynhexample__2
+#    - ynhexample__{N} for the subsequent installations, with N=3,4, ...
+# The app instance name is probably what you are interested the most, since this is
+# guaranteed to be unique. This is a good unique identifier to define installation path,
+# db names, ...
+app=$YNH_APP_INSTANCE_NAME
+
+# Retrieve arguments
+domain=$(sudo yunohost app setting $app domain)
+
+# Backup directory location for the app from where the script is executed and 
+# which will be compressed afterward
+backup_dir=$YNH_APP_BACKUP_DIR
+
+# Backup sources & data
+ynh_backup "/home/yunohost.app/$app" "data"
+ynh_backup "/var/www/$app" "sources"
+
+# Copy configuration files
+ynh_backup "/etc/nginx/conf.d/$domain.d/$app.conf" "conf/nginx.conf"
+ynh_backup "/etc/php5/fpm/pool.d/$app.conf" "conf/php-fpm.conf"
