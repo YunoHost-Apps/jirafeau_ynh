@@ -116,35 +116,6 @@ ynh_compare_checksum_config () {
 	fi
 }
 
-ynh_systemd_config () {
-	finalsystemdconf="/etc/systemd/system/$app.service"
-	ynh_compare_checksum_config "$finalsystemdconf" 1
-	sudo cp ../conf/systemd.service "$finalsystemdconf"
-
-	# To avoid a break by set -u, use a void substitution ${var:-}. If the variable is not set, it's simply set with an empty variable.
-	# Substitute in a nginx config file only if the variable is not empty
-	if test -n "${final_path:-}"; then
-		ynh_replace_string "__FINALPATH__" "$final_path" "$finalsystemdconf"
-	fi
-	if test -n "${app:-}"; then
-		ynh_replace_string "__APP__" "$app" "$finalsystemdconf"
-	fi
-	ynh_store_checksum_config "$finalsystemdconf"
-
-	sudo chown root: "$finalsystemdconf"
-	sudo systemctl enable $app
-	sudo systemctl daemon-reload
-}
-
-ynh_remove_systemd_config () {
-	finalsystemdconf="/etc/systemd/system/$app.service"
-	if [ -e "$finalsystemdconf" ]; then
-		sudo systemctl stop $app
-		sudo systemctl disable $app
-		ynh_secure_remove "$finalsystemdconf"
-	fi
-}
-
 #=================================================
 #=================================================
 
@@ -165,26 +136,12 @@ CHECK_FINALPATH () {	# Vérifie que le dossier de destination n'est pas déjà u
 # DISPLAYING
 #=================================================
 
-NO_PRINT () {	# Supprime l'affichage dans stdout pour la commande en argument.
-	set +x
-	$@
-	set -x
-}
-
 WARNING () {	# Écrit sur le canal d'erreur pour passer en warning.
 	$@ >&2
 }
 
-SUPPRESS_WARNING () {	# Force l'écriture sur la sortie standard
-	$@ 2>&1
-}
-
 QUIET () {	# Redirige la sortie standard dans /dev/null
 	$@ > /dev/null
-}
-
-ALL_QUIET () {	# Redirige la sortie standard et d'erreur dans /dev/null
-	$@ > /dev/null 2>&1
 }
 
 #=================================================
@@ -239,101 +196,6 @@ CHECK_SIZE () {	# Vérifie avant chaque backup que l'espace est suffisant
 }
 
 #=================================================
-# PACKAGE CHECK BYPASSING...
-#=================================================
-
-IS_PACKAGE_CHECK () {	# Détermine une exécution en conteneur (Non testé)
-	return $(uname -n | grep -c 'pchecker_lxc')
-}
-
-#=================================================
-# NODEJS
-#=================================================
-
-sudo_path () {
-	sudo env "PATH=$PATH" $@
-}
-
-# INFOS
-# nvm utilise la variable PATH pour stocker le path de la version de node à utiliser.
-# C'est ainsi qu'il change de version
-# En attendant une généralisation de root, il est possible d'utiliser sudo aevc le helper temporaire sudo_path
-# Il permet d'utiliser sudo en gardant le $PATH modifié
-# ynh_install_nodejs installe la version de nodejs demandée en argument, avec nvm
-# ynh_use_nodejs active une version de nodejs dans le script courant
-# 3 variables sont mises à disposition, et 2 sont stockées dans la config de l'app
-# - nodejs_path: Le chemin absolu de cette version de node
-# Utilisé pour des appels directs à npm ou node.
-# - nodejs_version: Simplement le numéro de version de nodejs pour cette application
-# - nodejs_use_version: Un alias pour charger une version de node dans le shell courant.
-# Utilisé pour démarrer un service ou un script qui utilise node ou npm
-# Dans ce cas, c'est $PATH qui contient le chemin de la version de node. Il doit être propagé sur les autres shell si nécessaire.
-
-nvm_install_dir="/opt/nvm"
-ynh_use_nodejs () {
-	nodejs_path=$(ynh_app_setting_get $app nodejs_path)
-	nodejs_version=$(ynh_app_setting_get $app nodejs_version)
-
-	# And store the command to use a specific version of node. Equal to `nvm use version`
-	nodejs_use_version="source $nvm_install_dir/nvm.sh; nvm use \"$nodejs_version\""
-
-	# Desactive set -u for this script.
-	set +u
-	eval $nodejs_use_version
-	set -u
-}
-
-ynh_install_nodejs () {
-	local nodejs_version="$1"
-	local nvm_install_script="https://raw.githubusercontent.com/creationix/nvm/v0.33.1/install.sh"
-
-	local nvm_exec="source $nvm_install_dir/nvm.sh; nvm"
-
-	sudo mkdir -p "$nvm_install_dir"
-
-	# If nvm is not previously setup, install it
-	"$nvm_exec --version" > /dev/null 2>&1 || \
-	( cd "$nvm_install_dir"
-	echo "Installation of NVM"
-	sudo wget --no-verbose "$nvm_install_script" -O- | sudo NVM_DIR="$nvm_install_dir" bash > /dev/null)
-
-	# Install the requested version of nodejs
-	sudo su -c "$nvm_exec install \"$nodejs_version\" > /dev/null"
-
-	# Store the ID of this app and the version of node requested for it
-	echo "$YNH_APP_ID:$nodejs_version" | sudo tee --append "$nvm_install_dir/ynh_app_version"
-
-	# Get the absolute path of this version of node
-	nodejs_path="$(dirname "$(sudo su -c "$nvm_exec which \"$nodejs_version\"")")"
-
-	# Store nodejs_path and nodejs_version into the config of this app
-	ynh_app_setting_set $app nodejs_path $nodejs_path
-	ynh_app_setting_set $app nodejs_version $nodejs_version
-
-	ynh_use_nodejs
-}
-
-ynh_remove_nodejs () {
-	nodejs_version=$(ynh_app_setting_get $app nodejs_version)
-
-	# Remove the line for this app
-	sudo sed --in-place "/$YNH_APP_ID:$nodejs_version/d" "$nvm_install_dir/ynh_app_version"
-
-	# If none another app uses this version of nodejs, remove it.
-	if ! grep --quiet "$nodejs_version" "$nvm_install_dir/ynh_app_version"
-	then
-		sudo su -c "source $nvm_install_dir/nvm.sh; nvm deactivate; nvm uninstall \"$nodejs_version\" > /dev/null"
-	fi
-
-	# If none another app uses nvm, remove nvm and clean the root's bashrc file
-	if [ ! -s "$nvm_install_dir/ynh_app_version" ]
-	then
-		ynh_secure_remove "$nvm_install_dir"
-		sudo sed --in-place "/NVM_DIR/d" /root/.bashrc
-	fi
-}
-
-#=================================================
 #=================================================
 # FUTUR YNH HELPERS
 #=================================================
@@ -363,73 +225,6 @@ ynh_normalize_url_path () {
 		path_url="${path_url:0:${#path_url}-1}"	# Delete the last character
 	fi
 	echo $path_url
-}
-
-# Check if a mysql user exists
-#
-# usage: ynh_mysql_user_exists user
-# | arg: user - the user for which to check existence
-function ynh_mysql_user_exists()
-{
-	local user=$1
-	if [[ -z $(ynh_mysql_execute_as_root "SELECT User from mysql.user WHERE User = '$user';") ]]
-	then
-		return 1
-	else
-		return 0
-	fi
-}
-
-# Create a database, an user and its password. Then store the password in the app's config
-#
-# After executing this helper, the password of the created database will be available in $db_pwd
-# It will also be stored as "mysqlpwd" into the app settings.
-#
-# usage: ynh_mysql_setup_db user name
-# | arg: user - Owner of the database
-# | arg: name - Name of the database
-ynh_mysql_setup_db () {
-	local db_user="$1"
-	local db_name="$2"
-	db_pwd=$(ynh_string_random)	# Generate a random password
-	ynh_mysql_create_db "$db_name" "$db_user" "$db_pwd"	# Create the database
-	ynh_app_setting_set $app mysqlpwd $db_pwd	# Store the password in the app's config
-}
-
-# Remove a database if it exists, and the associated user
-#
-# usage: ynh_mysql_remove_db user name
-# | arg: user - Owner of the database
-# | arg: name - Name of the database
-ynh_mysql_remove_db () {
-	local db_user="$1"
-	local db_name="$2"
-	local mysql_root_password=$(sudo cat $MYSQL_ROOT_PWD_FILE)
-	if mysqlshow -u root -p$mysql_root_password | grep -q "^| $db_name"; then	# Check if the database exists
-		echo "Removing database $db_name" >&2
-		ynh_mysql_drop_db $db_name	# Remove the database	
-	else
-		echo "Database $db_name not found" >&2
-	fi
-
-	# Remove mysql user if it exists
-	if $(ynh_mysql_user_exists $db_user); then
-		ynh_mysql_drop_user $db_user
-	fi
-}
-
-# Correct the name given in argument for mariadb
-#
-# Avoid invalid name for your database
-#
-# Exemple: dbname=$(ynh_make_valid_dbid $app)
-#
-# usage: ynh_make_valid_dbid name
-# | arg: name - name to correct
-# | ret: the corrected name
-ynh_make_valid_dbid () {
-	dbid=${1//[-.]/_}	# Mariadb doesn't support - and . in the name of databases. It will be replace by _
-	echo $dbid
 }
 
 # Manage a fail of the script
@@ -476,119 +271,6 @@ ynh_abort_if_errors () {
 	trap ynh_exit_properly EXIT	# Capturing exit signals on shell script
 }
 
-# Define and install dependencies with a equivs control file
-# This helper can/should only be called once per app
-#
-# usage: ynh_install_app_dependencies dep [dep [...]]
-# | arg: dep - the package name to install in dependence
-ynh_install_app_dependencies () {
-    dependencies=$@
-    manifest_path="../manifest.json"
-    if [ ! -e "$manifest_path" ]; then
-    	manifest_path="../settings/manifest.json"	# Into the restore script, the manifest is not at the same place
-    fi
-    version=$(grep '\"version\": ' "$manifest_path" | cut -d '"' -f 4)	# Retrieve the version number in the manifest file.
-    dep_app=${app//_/-}	# Replace all '_' by '-'
-
-    if ynh_package_is_installed "${dep_app}-ynh-deps"; then
-		echo "A package named ${dep_app}-ynh-deps is already installed" >&2
-    else
-        cat > ./${dep_app}-ynh-deps.control << EOF	# Make a control file for equivs-build
-Section: misc
-Priority: optional
-Package: ${dep_app}-ynh-deps
-Version: ${version}
-Depends: ${dependencies// /, }
-Architecture: all
-Description: Fake package for ${app} (YunoHost app) dependencies
- This meta-package is only responsible of installing its dependencies.
-EOF
-        ynh_package_install_from_equivs ./${dep_app}-ynh-deps.control \
-            || ynh_die "Unable to install dependencies"	# Install the fake package and its dependencies
-        ynh_app_setting_set $app apt_dependencies $dependencies
-    fi
-}
-
-# Remove fake package and its dependencies
-#
-# Dependencies will removed only if no other package need them.
-#
-# usage: ynh_remove_app_dependencies
-ynh_remove_app_dependencies () {
-    dep_app=${app//_/-}	# Replace all '_' by '-'
-    ynh_package_autoremove ${dep_app}-ynh-deps	# Remove the fake package and its dependencies if they not still used.
-}
-
-# Use logrotate to manage the logfile
-#
-# usage: ynh_use_logrotate [logfile]
-# | arg: logfile - absolute path of logfile
-#
-# If no argument provided, a standard directory will be use. /var/log/${app}
-# You can provide a path with the directory only or with the logfile.
-# /parentdir/logdir/
-# /parentdir/logdir/logfile.log
-#
-# It's possible to use this helper several times, each config will added to same logrotate config file.
-ynh_use_logrotate () {
-	if [ "$#" -gt 0 ]; then
-		if [ "$(echo ${1##*.})" == "log" ]; then	# Keep only the extension to check if it's a logfile
-			logfile=$1	# In this case, focus logrotate on the logfile
-		else
-			logfile=$1/.log	# Else, uses the directory and all logfile into it.
-		fi
-	else
-		logfile="/var/log/${app}/.log" # Without argument, use a defaut directory in /var/log
-	fi
-	cat > ./${app}-logrotate << EOF	# Build a config file for logrotate
-$logfile {
-		# Rotate if the logfile exceeds 100Mo
-	size 100M
-		# Keep 12 old log maximum
-	rotate 12
-		# Compress the logs with gzip
-	compress
-		# Compress the log at the next cycle. So keep always 2 non compressed logs
-	delaycompress
-		# Copy and truncate the log to allow to continue write on it. Instead of move the log.
-	copytruncate
-		# Do not do an error if the log is missing
-	missingok
-		# Not rotate if the log is empty
-	notifempty
-		# Keep old logs in the same dir
-	noolddir
-}
-EOF
-	sudo mkdir -p $(dirname "$logfile")	# Create the log directory, if not exist
-	cat ${app}-logrotate | sudo tee -a /etc/logrotate.d/$app > /dev/null	# Append this config to the others for this app. If a config file already exist
-}
-
-# Remove the app's logrotate config.
-#
-# usage: ynh_remove_logrotate
-ynh_remove_logrotate () {
-	if [ -e "/etc/logrotate.d/$app" ]; then
-		sudo rm "/etc/logrotate.d/$app"
-	fi
-}
-
-# Find a free port and return it
-#
-# example: port=$(ynh_find_port 8080)
-#
-# usage: ynh_find_port begin_port
-# | arg: begin_port - port to start to search
-ynh_find_port () {
-	port=$1
-	test -n "$port" || ynh_die "The argument of ynh_find_port must be a valid port."
-	while netcat -z 127.0.0.1 $port       # Check if the port is free
-	do
-		port=$((port+1))	# Else, pass to next port
-	done
-	echo $port
-}
-
 # Create a system user
 #
 # usage: ynh_system_user_create user_name [home_dir]
@@ -618,37 +300,6 @@ ynh_system_user_delete () {
 	else
 		echo "The user $1 was not found" >&2
     fi
-}
-
-# Curl abstraction to help with POST requests to local pages (such as installation forms)
-#
-# $domain and $path_url should be defined externally (and correspond to the domain.tld and the /path (of the app?))
-#
-# example: ynh_local_curl "/install.php?installButton" "foo=$var1" "bar=$var2"
-# 
-# usage: ynh_local_curl "page_uri" "key1=value1" "key2=value2" ...
-# | arg: page_uri    - Path (relative to $path_url) of the page where POST data will be sent
-# | arg: key1=value1 - (Optionnal) POST key and corresponding value
-# | arg: key2=value2 - (Optionnal) Another POST key and corresponding value
-# | arg: ...         - (Optionnal) More POST keys and values
-ynh_local_curl () {
-	# Define url of page to curl
-	full_page_url=https://localhost$path_url$1
-
-	# Concatenate all other arguments with '&' to prepare POST data
-	POST_data=""
-	for arg in "${@:2}"
-	do
-		POST_data="${POST_data}${arg}&"
-	done
-	if [ -n "$POST_data" ]
-	then
-		# Add --data arg and remove the last character, which is an unecessary '&'
-		POST_data="--data \"${POST_data::-1}\""
-	fi
-
-	# Curl the URL
-	curl --silent --show-error -kL -H "Host: $domain" --resolve $domain:443:127.0.0.1 $POST_data "$full_page_url"
 }
 
 # Substitute/replace a string by another in a file
@@ -805,32 +456,4 @@ ynh_setup_source () {
 		cp -a $YNH_EXECUTION_DIR/../sources/extra_files/$src_id/. "$dest_dir"
 	fi
 
-}
-
-# Check availability of a web path
-#
-# example: ynh_webpath_available some.domain.tld /coffee
-#
-# usage: ynh_webpath_available domain path
-# | arg: domain - the domain/host of the url
-# | arg: path - the web path to check the availability of
-ynh_webpath_available () {
-	local domain=$1
-	local path=$2
-	sudo yunohost domain url-available $domain $path
-}
-
-# Register/book a web path for an app
-#
-# example: ynh_webpath_register wordpress some.domain.tld /coffee
-#
-# usage: ynh_webpath_register app domain path
-# | arg: app - the app for which the domain should be registered
-# | arg: domain - the domain/host of the web path
-# | arg: path - the web path to be registered
-ynh_webpath_register () {
-	local app=$1
-	local domain=$2
-	local path=$3
-	sudo yunohost app register-url $app $domain $path
 }
