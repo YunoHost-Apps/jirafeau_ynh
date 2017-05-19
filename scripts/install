@@ -127,10 +127,11 @@ sudo chmod -R 700 $var_root
 # SETUP SSOWAT
 #=================================================
 
-ynh_app_setting_set $app skipped_uris "/"
+ynh_app_setting_set $app unprotected_uris "/"
 if [ $is_public -eq 0 ]
 then
-	ynh_app_setting_set $app protected_regex "jirafeau/$"
+	domain_regex=$(echo "$domain" | sed 's@-@.@g')
+	ynh_app_setting_set $app protected_regex "$domain_regex$path_url/$","$domain_regex$path_url/admin.php.*$"
 fi
 
 #=================================================
