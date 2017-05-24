@@ -1,101 +1,141 @@
 #!/bin/bash
 
-# causes the shell to exit if any subcommand or pipeline returns a non-zero status
-set -e
+#=================================================
+# GENERIC STARTING
+#=================================================
+# IMPORT GENERIC HELPERS
+#=================================================
 
-# This is a multi-instance app, meaning it can be installed several times independently
-# The id of the app as stated in the manifest is available as $YNH_APP_ID
-# The instance number is available as $YNH_APP_INSTANCE_NUMBER (equals "1", "2", ...)
-# The app instance name is available as $YNH_APP_INSTANCE_NAME
-#    - the first time the app is installed, YNH_APP_INSTANCE_NAME = ynhexample
-#    - the second time the app is installed, YNH_APP_INSTANCE_NAME = ynhexample__2
-#    - ynhexample__{N} for the subsequent installations, with N=3,4, ...
-# The app instance name is probably what you are interested the most, since this is
-# guaranteed to be unique. This is a good unique identifier to define installation path,
-# db names, ...
-app=$YNH_APP_INSTANCE_NAME
+source _common.sh
+source /usr/share/yunohost/helpers
 
-# Retrieve arguments
+#=================================================
+# MANAGE FAILURE OF THE SCRIPT
+#=================================================
+
+ynh_clean_setup () {
+# Nettoyage des résidus d'installation non pris en charge par le script remove.
+# Pas de nettoyage supplémentaire nécessaire ici...
+	echo ""
+}
+ynh_abort_if_errors	# Active trap pour arrêter le script si une erreur est détectée.
+
+#=================================================
+# RETRIEVE ARGUMENTS FROM THE MANIFEST
+#=================================================
+
 domain=$YNH_APP_ARG_DOMAIN
-path=$YNH_APP_ARG_PATH
+path_url=$YNH_APP_ARG_PATH
 admin_user=$YNH_APP_ARG_ADMIN_USER
 upload_password=$YNH_APP_ARG_UPLOAD_PASSWORD
 is_public=$YNH_APP_ARG_IS_PUBLIC
 
-# Check domain/path availability
-sudo yunohost app checkurl $domain$path -a $app
-if [[ ! $? -eq 0 ]]; then
-    exit 1
-fi
+app=$YNH_APP_INSTANCE_NAME
 
-# Remove trailing "/" for next commands
-path=${path%/}
+#=================================================
+# CHECK IF THE APP CAN BE INSTALLED WITH THIS ARGS
+#=================================================
 
-# Check that admin user is an existing account
-sudo yunohost user list --json | grep -q "\"username\": \"$admin_user\""
-if [[ ! $? -eq 0 ]]; then
-    echo "Error : the chosen admin user does not exist"
-    exit 1
-fi
+path_url=$(ynh_normalize_url_path $path_url)	# Vérifie et corrige la syntaxe du path.
+CHECK_DOMAINPATH	# Vérifie la disponibilité du path et du domaine.
+CHECK_FINALPATH	# Vérifie que le dossier de destination n'est pas déjà utilisé.
 
-# Save specific settings
-sudo yunohost app setting $app admin_user -v $admin_user
-sudo yunohost app setting $app is_public -v $is_public
+#=================================================
+# STORE SETTINGS FROM MANIFEST
+#=================================================
+
+ynh_app_setting_set $app domain $domain
+ynh_app_setting_set $app path $path_url
+ynh_app_setting_set $app admin $admin_user
+ynh_app_setting_set $app is_public $is_public
+
+#=================================================
+# STANDARD MODIFICATIONS
+#=================================================
+# DOWNLOAD, CHECK AND UNPACK SOURCE
+#=================================================
+
+ynh_app_setting_set $app final_path $final_path
+ynh_setup_source "$final_path"	# Télécharge la source, décompresse et copie dans $final_path
+
+#=================================================
+# NGINX CONFIGURATION
+#=================================================
+
+ynh_nginx_config
+
+#=================================================
+# CREATE DEDICATED USER
+#=================================================
+
+ynh_system_user_create $app	# Créer un utilisateur système dédié à l'app
+
+#=================================================
+# PHP-FPM CONFIGURATION
+#=================================================
+
+ynh_fpm_config	# Créer le fichier de configuration du pool php-fpm et le configure.
+
+#=================================================
+# SPECIFIC SETUP
+#=================================================
+# SET AND SAVE THE UPLOAD PASSWORD
+#=================================================
+
+jirafeauconfigfile="$final_path/lib/config.local.php"
+sudo cp "../conf/config.local.php" "$jirafeauconfigfile"
 
 # Set and save upload password, allowing an empty one
-if [[ -z "$upload_password" ]]; then
-    sed -i "s@YNH_UPLOAD_PASSWORD@@g" ../conf/config.local.php
-    sudo yunohost app setting $app upload_password -v ''
+if [ -z "$upload_password" ]
+then
+    ynh_replace_string "YNH_UPLOAD_PASSWORD" "" "$jirafeauconfigfile"
+	ynh_app_setting_set $app upload_password ""
 else
-    sed -i "s@YNH_UPLOAD_PASSWORD@'$upload_password'@g" ../conf/config.local.php
-    sudo yunohost app setting $app upload_password -v "$upload_password"
+    ynh_replace_string "YNH_UPLOAD_PASSWORD" "$upload_password" "$jirafeauconfigfile"
+	ynh_app_setting_set $app upload_password "$upload_password"
 fi
 
-# Copy files to the right place
-final_path=/var/www/$app
+#=================================================
+# CONFIGURE JIRAFEAU
+#=================================================
+
 var_root=/home/yunohost.app/$app
-sudo mkdir -p $final_path
-sudo cp -r ../sources/* $final_path
-sed -i "s@YNH_DOMAIN@$domain@g" ../conf/config.local.php
-sed -i "s@YNH_WWW_PATH@$path@g" ../conf/config.local.php
-sed -i "s@YNH_VAR_ROOT@$var_root@g" ../conf/config.local.php
-sed -i "s@YNH_ADMIN_USER@$admin_user@g" ../conf/config.local.php
-sudo cp ../conf/config.local.php $final_path/lib
+ynh_replace_string "YNH_DOMAIN" "$domain" "$jirafeauconfigfile"
+ynh_replace_string "YNH_WWW_PATH" "$path_url" "$jirafeauconfigfile"
+ynh_replace_string "YNH_VAR_ROOT" "$var_root" "$jirafeauconfigfile"
+ynh_replace_string "YNH_ADMIN_USER" "$admin_user" "$jirafeauconfigfile"
+
+ynh_store_file_checksum "$jirafeauconfigfile"	# Enregistre la somme de contrôle du fichier de config
+
+# Remove the install.php
 sudo rm $final_path/install.php
 
-# Files owned by root, www-data can just read
-sudo find $final_path -type f | xargs sudo chmod 644
-sudo find $final_path -type d | xargs sudo chmod 755
+#=================================================
+# GENERIC FINALISATION
+#=================================================
+# SECURING FILES AND DIRECTORIES
+#=================================================
+
+# Les fichiers appartiennent à root
 sudo chown -R root: $final_path
 
 sudo mkdir -p $var_root/{files,links,async,block}
-sudo chown -R www-data:root $var_root
+sudo chown -R $app:root $var_root
 sudo chmod -R 700 $var_root
 
-# Modify Nginx configuration file and copy it to Nginx conf directory
-sed -i "s@YNH_WWW_PATH@$path@g" ../conf/nginx.conf
-sed -i "s@YNH_WWW_ALIAS@$final_path/@g" ../conf/nginx.conf
-if [[ "$path" == "" ]]; then
-	sed -i "s@YNH_WWW_LOCATION@/@g" ../conf/nginx.conf
-else
-	sed -i "s@YNH_WWW_LOCATION@$path@g" ../conf/nginx.conf
-fi
-nginxconf=/etc/nginx/conf.d/$domain.d/$app.conf
-sudo cp ../conf/nginx.conf $nginxconf
-sudo chown root: $nginxconf
-sudo chmod 600 $nginxconf
+#=================================================
+# SETUP SSOWAT
+#=================================================
 
-sed -i "s@NAMETOCHANGE@$app@g" ../conf/php-fpm.conf
-finalphpconf=/etc/php5/fpm/pool.d/$app.conf
-sudo cp ../conf/php-fpm.conf $finalphpconf
-sudo chown root: $finalphpconf
-sudo chmod 644 $finalphpconf
-
-if [ "$is_public" = "Yes" ];
+ynh_app_setting_set $app unprotected_uris "/"
+if [ $is_public -eq 0 ]
 then
-  sudo yunohost app setting $app unprotected_uris -v "/" 
+	domain_regex=$(echo "$domain" | sed 's@-@.@g')
+	ynh_app_setting_set $app protected_regex "$domain_regex$path_url/$","$domain_regex$path_url/admin.php.*$"
 fi
 
-sudo service php5-fpm restart
-sudo service nginx reload
-sudo yunohost app ssowatconf
+#=================================================
+# RELOAD NGINX
+#=================================================
+
+sudo systemctl reload nginx
