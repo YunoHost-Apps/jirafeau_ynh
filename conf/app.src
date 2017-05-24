@@ -1,0 +1,6 @@
+SOURCE_URL=https://gitlab.com/mojo42/Jirafeau/repository/archive.tar.gz?ref=3.2.0
+SOURCE_SUM=1b3ed1587b5f5ec5d0f65cd17e93d8ce
+SOURCE_SUM_PRG=md5sum
+SOURCE_FORMAT=tar.gz
+SOURCE_IN_SUBDIR=true
+SOURCE_FILENAME=
