@@ -1,26 +1,56 @@
 #!/bin/bash
 
-# Treat unset variables as an error
-set -u
+#=================================================
+# GENERIC STARTING
+#=================================================
+# IMPORT GENERIC HELPERS
+#=================================================
 
-# This is a multi-instance app, meaning it can be installed several times independently
-# The id of the app as stated in the manifest is available as $YNH_APP_ID
-# The instance number is available as $YNH_APP_INSTANCE_NUMBER (equals "1", "2", ...)
-# The app instance name is available as $YNH_APP_INSTANCE_NAME
-#    - the first time the app is installed, YNH_APP_INSTANCE_NAME = ynhexample
-#    - the second time the app is installed, YNH_APP_INSTANCE_NAME = ynhexample__2
-#    - ynhexample__{N} for the subsequent installations, with N=3,4, ...
-# The app instance name is probably what you are interested the most, since this is
-# guaranteed to be unique. This is a good unique identifier to define installation path,
-# db names, ...
+source _common.sh
+source /usr/share/yunohost/helpers
+
+#=================================================
+# LOAD SETTINGS
+#=================================================
+
 app=$YNH_APP_INSTANCE_NAME
 
-domain=$(sudo yunohost app setting $app domain)
+domain=$(ynh_app_setting_get $app domain)
+final_path=$(ynh_app_setting_get $app final_path)
 
-sudo rm -rf /home/yunohost.app/$app
-sudo rm -rf /var/www/$app
-sudo rm -f /etc/nginx/conf.d/$domain.d/$app.conf
-sudo rm -f /etc/php5/fpm/pool.d/$app.conf
+#=================================================
+# STANDARD REMOVE
+#=================================================
+# REMOVE THE MAIN DIR OF THE APP
+#=================================================
 
-sudo service php5-fpm restart
-sudo service nginx reload
+ynh_secure_remove "$final_path"	# Suppression du dossier de l'application
+
+#=================================================
+# REMOVE THE NGINX CONFIGURATION
+#=================================================
+
+ynh_remove_nginx_config	# Suppression de la configuration nginx
+
+#=================================================
+# REMOVE THE PHP-FPM CONFIGURATION
+#=================================================
+
+ynh_remove_fpm_config	# Suppression de la configuration du pool php-fpm
+
+#=================================================
+# SPECIFIC REMOVE
+#=================================================
+# REMOVE THE DATA DIRECTORY
+#=================================================
+
+# Suppression d'un dossier
+ynh_secure_remove "/home/yunohost.app/$app"
+
+#=================================================
+# GENERIC FINALISATION
+#=================================================
+# REMOVE DEDICATED USER
+#=================================================
+
+ynh_system_user_delete $app
