@@ -1,74 +1,75 @@
 {
-    "name": "Jirafeau",
-    "id": "jirafeau",
-    "packaging_format": 1,
-    "requirements": {
-        "yunohost": ">= 2.4.0"
-    },
-    "description": {
-        "en": "Upload a file in a simple way and give a unique link to it",
-        "fr": "Hébergez simplement un fichier et partagez-le avec un lien unique"
-    },
-    "url": "https://gitlab.com/mojo42/Jirafeau",
-    "license": "free",
-    "maintainer": {
-        "name": "julien",
-        "email": "julien.malik@paraiso.me"
-    },
-    "multi_instance": "false",
-    "services": [
-        "nginx",
-        "php5-fpm"
-    ],
-    "arguments": {
-        "install" : [
-            {
-                "name": "domain",
-                "type": "domain",
-                "ask": {
-                    "en": "Choose a domain for Jirafeau",
-                    "fr": "Choisissez un domaine pour Jirafeau"
-                },
-                "example": "domain.org"
-            },
-            {
-                "name": "path",
-                "type": "path",
-                "ask": {
-                    "en": "Choose a path for Jirafeau",
-                    "fr": "Choisissez un chemin pour Jirafeau"
-                },
-                "example": "/jirafeau",
-                "default": "/jirafeau"
-            },
-            {
-                "name": "admin_user",
-                "type": "user",
-                "ask": {
-                    "en": "Choose an admin user (will be able to access admin.php page)",
-                    "fr": "Choisissez l'administrateur (seul autorisé à accéder à la page admin.php)"
-                },
-                "example": "johndoe"
-            },
-            {
-                "name": "upload_password",
-                "type": "password",
-                "optional": "true",
-                "ask": {
-                    "en": "Set the password granting upload permissions (leave empty to allow anybody to upload)",
-                    "fr": "Définissez le mot de passe permettant l'accès à l'envoi de fichiers (laissez vide pour autoriser tout le monde)"
-                },
-                "example": "supersecretpassword"
-            },
-            {
-                "name": "is_public",
-                "ask": {
-                    "en": "Is it a public Jirafeau site?",
-                    "fr": "Est-ce un site public ?"
-                },
-                "choices": ["Yes", "No"],
-                "default": "Yes"
-            }
-        ]
-    }
+	"name": "Jirafeau",
+	"id": "jirafeau",
+	"packaging_format": 1,
+	"requirements": {
+		"yunohost": ">= 2.4.0"
+	},
+	"description": {
+		"en": "Upload a file in a simple way and give a unique link to it",
+		"fr": "Hébergez simplement un fichier et partagez-le avec un lien unique"
+	},
+	"url": "https://gitlab.com/mojo42/Jirafeau",
+	"version": "3.2.0",
+	"license": "AGPLv3",
+	"maintainer": {
+		"name": "julien",
+		"email": "julien.malik@paraiso.me"
+	},
+	"multi_instance": "false",
+	"services": [
+		"nginx",
+		"php5-fpm"
+	],
+	"arguments": {
+		"install" : [
+			{
+				"name": "domain",
+				"type": "domain",
+				"ask": {
+					"en": "Choose a domain for Jirafeau",
+					"fr": "Choisissez un domaine pour Jirafeau"
+				},
+				"example": "domain.org"
+			},
+			{
+				"name": "path",
+				"type": "path",
+				"ask": {
+					"en": "Choose a path for Jirafeau",
+					"fr": "Choisissez un chemin pour Jirafeau"
+				},
+				"example": "/jirafeau",
+				"default": "/jirafeau"
+			},
+			{
+				"name": "admin_user",
+				"type": "user",
+				"ask": {
+					"en": "Choose an admin user (will be able to access admin.php page)",
+					"fr": "Choisissez l'administrateur (seul autorisé à accéder à la page admin.php)"
+				},
+				"example": "johndoe"
+			},
+			{
+				"name": "upload_password",
+				"type": "password",
+				"optional": "true",
+				"ask": {
+					"en": "Set the password granting upload permissions (leave empty to allow anybody to upload)",
+					"fr": "Définissez le mot de passe permettant l'accès à l'envoi de fichiers (laissez vide pour autoriser tout le monde)"
+				},
+				"example": "supersecretpassword"
+			},
+			{
+				"name": "is_public",
+				"type": "boolean",
+				"ask": {
+					"en": "Is it a public Jirafeau site?",
+					"fr": "Est-ce un site public ?"
+				},
+				"default": true
+			}
+		]
+	}
 }
