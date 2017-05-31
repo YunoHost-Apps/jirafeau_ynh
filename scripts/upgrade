@@ -109,7 +109,12 @@ fi
 
 var_root=/home/yunohost.app/$app
 ynh_replace_string "YNH_DOMAIN" "$domain" "$jirafeauconfigfile"
-ynh_replace_string "YNH_WWW_PATH" "$path_url" "$jirafeauconfigfile"
+if [ "$path_url" = "/" ]
+then
+	ynh_replace_string "YNH_WWW_PATH" "" "$jirafeauconfigfile"
+else
+	ynh_replace_string "YNH_WWW_PATH" "$path_url" "$jirafeauconfigfile"
+fi
 ynh_replace_string "YNH_VAR_ROOT" "$var_root" "$jirafeauconfigfile"
 ynh_replace_string "YNH_ADMIN_USER" "$admin_user" "$jirafeauconfigfile"
 
@@ -139,6 +144,7 @@ ynh_app_setting_set $app unprotected_uris "/"
 if [ $is_public -eq 0 ]
 then
 	domain_regex=$(echo "$domain" | sed 's@-@.@g')
+	[ "$path_url" = "/" ] && path_url=""
 	ynh_app_setting_set $app protected_regex "$domain_regex$path_url/$","$domain_regex$path_url/admin.php.*$"
 fi
 
