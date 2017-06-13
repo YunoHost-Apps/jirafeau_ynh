@@ -6,28 +6,6 @@
 #=================================================
 #=================================================
 
-YNH_EXECUTION_DIR="."
-
-ynh_backup_abstract () {
-	# A intégrer à ynh_backup directement.
-	ynh_backup "$@"
-	echo "$2" "$1" >> backup_list
-}
-
-ynh_restore_file () {
-	file_and_dest=$(grep "^$1" backup_list)
-	backup_file=${file_and_dest%% *}
-	backup_dest=${file_and_dest#* }
-	if [ -f "$backup_dest" ]; then
-		ynh_die "There is already a file at this path: $backup_dest"
-	fi
-	if test -d "$backup_file"; then
-		sudo cp -a "$backup_file/." "$backup_dest"
-	else
-		sudo cp -a "$backup_file" "$backup_dest"
-	fi
-}
-
 ynh_fpm_config () {
 	finalphpconf="/etc/php5/fpm/pool.d/$app.conf"
 	ynh_backup_if_checksum_is_different "$finalphpconf" 1
@@ -96,7 +74,16 @@ ynh_remove_nginx_config () {
 #=================================================
 
 CHECK_DOMAINPATH () {	# Vérifie la disponibilité du path et du domaine.
-	sudo yunohost app checkurl $domain$path_url -a $app
+	if sudo yunohost app --help | grep --quiet url-available
+	then
+		# Check availability of a web path
+		ynh_webpath_available $domain $path_url
+		# Register/book a web path for an app
+		ynh_webpath_register $app $domain $path_url
+	else
+		# Use the legacy command
+		sudo yunohost app checkurl $domain$path_url -a $app
+	fi
 }
 
 CHECK_FINALPATH () {	# Vérifie que le dossier de destination n'est pas déjà utilisé.
@@ -165,6 +152,14 @@ CHECK_SIZE () {	# Vérifie avant chaque backup que l'espace est suffisant
 		WARNING echo "Espace disponible: $(HUMAN_SIZE $free_space)"
 		ynh_die "Espace nécessaire: $(HUMAN_SIZE $backup_size)"
 	fi
+}
+
+# Ce helper est temporaire et sert de remplacement à la véritable fonction ynh_restore_file. Le temps qu'elle arrive...
+ynh_restore_file () {
+	if [ -f "$1" ]; then
+		ynh_die "There is already a file at this path: $1"
+	fi
+	sudo cp -a "${YNH_APP_BACKUP_DIR}$1" "$1"
 }
 
 #=================================================
@@ -353,81 +348,109 @@ ynh_secure_remove () {
 # usage: ynh_setup_source dest_dir [source_id]
 # | arg: dest_dir  - Directory where to setup sources
 # | arg: source_id - Name of the app, if the package contains more than one app
+YNH_EXECUTION_DIR="."
 ynh_setup_source () {
-	local dest_dir=$1
-	local src_id=${2:-app} # If the argument is not given, source_id equal "app"
+    local dest_dir=$1
+    local src_id=${2:-app} # If the argument is not given, source_id equal "app"
 
-	# Load value from configuration file (see above for a small doc about this file
-	# format)
-	local src_url=$(grep 'SOURCE_URL=' "$YNH_EXECUTION_DIR/../conf/${src_id}.src" | cut -d= -f2-)
-	local src_sum=$(grep 'SOURCE_SUM=' "$YNH_EXECUTION_DIR/../conf/${src_id}.src" | cut -d= -f2-)
-	local src_sumprg=$(grep 'SOURCE_SUM_PRG=' "$YNH_EXECUTION_DIR/../conf/${src_id}.src" | cut -d= -f2-)
-	local src_format=$(grep 'SOURCE_FORMAT=' "$YNH_EXECUTION_DIR/../conf/${src_id}.src" | cut -d= -f2-)
-	local src_in_subdir=$(grep 'SOURCE_IN_SUBDIR=' "$YNH_EXECUTION_DIR/../conf/${src_id}.src" | cut -d= -f2-)
-	local src_filename=$(grep 'SOURCE_FILENAME=' "$YNH_EXECUTION_DIR/../conf/${src_id}.src" | cut -d= -f2-)
+    # Load value from configuration file (see above for a small doc about this file
+    # format)
+    local src_url=$(grep 'SOURCE_URL=' "$YNH_EXECUTION_DIR/../conf/${src_id}.src" | cut -d= -f2-)
+    local src_sum=$(grep 'SOURCE_SUM=' "$YNH_EXECUTION_DIR/../conf/${src_id}.src" | cut -d= -f2-)
+    local src_sumprg=$(grep 'SOURCE_SUM_PRG=' "$YNH_EXECUTION_DIR/../conf/${src_id}.src" | cut -d= -f2-)
+    local src_format=$(grep 'SOURCE_FORMAT=' "$YNH_EXECUTION_DIR/../conf/${src_id}.src" | cut -d= -f2-)
+    local src_in_subdir=$(grep 'SOURCE_IN_SUBDIR=' "$YNH_EXECUTION_DIR/../conf/${src_id}.src" | cut -d= -f2-)
+    local src_filename=$(grep 'SOURCE_FILENAME=' "$YNH_EXECUTION_DIR/../conf/${src_id}.src" | cut -d= -f2-)
 
-	# Default value
-	src_sumprg=${src_sumprg:-sha256sum}
-	src_in_subdir=${src_in_subdir:-true}
-	src_format=${src_format:-tar.gz}
-	src_format=$(echo "$src_format" | tr '[:upper:]' '[:lower:]')
-	if [ "$src_filename" = "" ] ; then
-		src_filename="${src_id}.${src_format}"
-	fi
-	local local_src="/opt/yunohost-apps-src/${YNH_APP_ID}/${src_filename}"
+    # Default value
+    src_sumprg=${src_sumprg:-sha256sum}
+    src_in_subdir=${src_in_subdir:-true}
+    src_format=${src_format:-tar.gz}
+    src_format=$(echo "$src_format" | tr '[:upper:]' '[:lower:]')
+    if [ "$src_filename" = "" ] ; then
+        src_filename="${src_id}.${src_format}"
+    fi
+    local local_src="/opt/yunohost-apps-src/${YNH_APP_ID}/${src_filename}"
 
-	if test -e "$local_src"
-	then    # Use the local source file if it is present
-		sudo cp $local_src $src_filename
-	else    # If not, download the source
-		wget -nv -O $src_filename $src_url
-	fi
+    if test -e "$local_src"
+    then    # Use the local source file if it is present
+        cp $local_src $src_filename
+    else    # If not, download the source
+        wget -nv -O $src_filename $src_url
+    fi
 
-	# Check the control sum
-	echo "${src_sum} ${src_filename}" | ${src_sumprg} -c --status \
-		|| ynh_die "Corrupt source"
+    # Check the control sum
+    echo "${src_sum} ${src_filename}" | ${src_sumprg} -c --status \
+        || ynh_die "Corrupt source"
 
-	# Extract source into the app dir
-	sudo mkdir -p "$dest_dir"
-	if [ "$src_format" = "zip" ]
-	then 
-		# Zip format
-		# Using of a temp directory, because unzip doesn't manage --strip-components
-		if $src_in_subdir ; then
-			local tmp_dir=$(mktemp -d)
-			unzip -quo $src_filename -d "$tmp_dir"
-			sudo cp -a $tmp_dir/*/. "$dest_dir"
-			ynh_secure_remove "$tmp_dir"
-		else
-			sudo unzip -quo $src_filename -d "$dest_dir"
-		fi
-	else
-		local strip=""
-		if $src_in_subdir ; then
-			strip="--strip-components 1"
-		fi
-		if [[ "$src_format" =~ ^tar.gz|tar.bz2|tar.xz$ ]] ; then
-			sudo tar -xf $src_filename -C "$dest_dir" $strip
-		else
-			ynh_die "Archive format unrecognized."
-		fi
-	fi
+    # Extract source into the app dir
+    sudo mkdir -p "$dest_dir"
+    if [ "$src_format" = "zip" ]
+    then 
+        # Zip format
+        # Using of a temp directory, because unzip doesn't manage --strip-components
+        if $src_in_subdir ; then
+            local tmp_dir=$(mktemp -d)
+            sudo unzip -quo $src_filename -d "$tmp_dir"
+            sudo cp -a $tmp_dir/*/. "$dest_dir"
+            ynh_secure_remove "$tmp_dir"
+        else
+            sudo unzip -quo $src_filename -d "$dest_dir"
+        fi
+    else
+        local strip=""
+        if $src_in_subdir ; then
+            strip="--strip-components 1"
+        fi
+        if [[ "$src_format" =~ ^tar.gz|tar.bz2|tar.xz$ ]] ; then
+            sudo tar -xf $src_filename -C "$dest_dir" $strip
+        else
+            ynh_die "Archive format unrecognized."
+        fi
+    fi
 
-	# Apply patches
-	if (( $(find $YNH_EXECUTION_DIR/../sources/patches/ -type f -name "${src_id}-*.patch" 2> /dev/null | wc -l) > "0" )); then
-		local old_dir=$(pwd)
-		(cd "$dest_dir" \
-			&& for p in $YNH_EXECUTION_DIR/../sources/patches/${src_id}-*.patch; do \
-				patch -p1 < $p; done) \
-			|| ynh_die "Unable to apply patches"
-		cd $old_dir
-	fi
+    # Apply patches
+    if (( $(find $YNH_EXECUTION_DIR/../sources/patches/ -type f -name "${src_id}-*.patch" 2> /dev/null | wc -l) > "0" )); then
+        local old_dir=$(pwd)
+        (cd "$dest_dir" \
+            && for p in $YNH_EXECUTION_DIR/../sources/patches/${src_id}-*.patch; do \
+                sudo patch -p1 < $p; done) \
+            || ynh_die "Unable to apply patches"
+        cd $old_dir
+    fi
 
-	# Add supplementary files
-	if test -e "$YNH_EXECUTION_DIR/../sources/extra_files/${src_id}"; then
-		cp -a $YNH_EXECUTION_DIR/../sources/extra_files/$src_id/. "$dest_dir"
-	fi
+    # Add supplementary files
+    if test -e "$YNH_EXECUTION_DIR/../sources/extra_files/${src_id}"; then
+        sudo cp -a $YNH_EXECUTION_DIR/../sources/extra_files/$src_id/. "$dest_dir"
+    fi
+}
 
+# Check availability of a web path
+#
+# example: ynh_webpath_available some.domain.tld /coffee
+#
+# usage: ynh_webpath_available domain path
+# | arg: domain - the domain/host of the url
+# | arg: path - the web path to check the availability of
+ynh_webpath_available () {
+	local domain=$1
+	local path=$2
+	sudo yunohost domain url-available $domain $path
+}
+
+# Register/book a web path for an app
+#
+# example: ynh_webpath_register wordpress some.domain.tld /coffee
+#
+# usage: ynh_webpath_register app domain path
+# | arg: app - the app for which the domain should be registered
+# | arg: domain - the domain/host of the web path
+# | arg: path - the web path to be registered
+ynh_webpath_register () {
+	local app=$1
+	local domain=$2
+	local path=$3
+	sudo yunohost app register-url $app $domain $path
 }
 
 # Calculate and store a file checksum into the app settings

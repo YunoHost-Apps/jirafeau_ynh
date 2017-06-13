@@ -47,13 +47,13 @@ test ! -d $final_path \
 # RESTORE OF THE NGINX CONFIGURATION
 #=================================================
 
-ynh_restore_file nginx.conf
+ynh_restore_file "/etc/nginx/conf.d/$domain.d/$app.conf"
 
 #=================================================
 # RESTORE OF THE MAIN DIR OF THE APP
 #=================================================
 
-ynh_restore_file sources
+ynh_restore_file "$final_path"
 
 #=================================================
 # RECREATE OF THE DEDICATED USER
@@ -72,8 +72,8 @@ sudo chown -R root: $final_path
 # RESTORE OF THE PHP-FPM CONFIGURATION
 #=================================================
 
-ynh_restore_file php-fpm.conf
-ynh_restore_file php-fpm.ini
+ynh_restore_file "/etc/php5/fpm/pool.d/$app.conf"
+ynh_restore_file "/etc/php5/fpm/conf.d/20-$app.ini"
 
 #=================================================
 # SPECIFIC RESTORE
@@ -81,7 +81,7 @@ ynh_restore_file php-fpm.ini
 # RESTORE THE DATA OF JIRAFEAU
 #=================================================
 
-ynh_restore_file data
+ynh_restore_file "/home/yunohost.app/$app"
 
 #=================================================
 # GENERIC FINALISATION
