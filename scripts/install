@@ -86,7 +86,7 @@ then
     ynh_replace_string "YNH_UPLOAD_PASSWORD" "" "$jirafeauconfigfile"
 	ynh_app_setting_set $app upload_password ""
 else
-    ynh_replace_string "YNH_UPLOAD_PASSWORD" "$upload_password" "$jirafeauconfigfile"
+    ynh_replace_string "YNH_UPLOAD_PASSWORD" "\'$upload_password\'" "$jirafeauconfigfile"
 	ynh_app_setting_set $app upload_password "$upload_password"
 fi
 
