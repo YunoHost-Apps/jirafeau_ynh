@@ -36,25 +36,24 @@ domain=$(ynh_app_setting_get $app domain)
 # BACKUP OF THE MAIN DIR OF THE APP
 #=================================================
 
-CHECK_SIZE "$final_path"
-ynh_backup "$final_path" "${YNH_APP_BACKUP_DIR}$final_path"
+ynh_backup "$final_path"
 
 #=================================================
 # BACKUP OF THE DATA DIR
 #=================================================
 
 CHECK_SIZE "/home/yunohost.app/$app"
-ynh_backup "/home/yunohost.app/$app" "${YNH_APP_BACKUP_DIR}/home/yunohost.app/$app"
+ynh_backup "/home/yunohost.app/$app"
 
 #=================================================
 # BACKUP OF THE NGINX CONFIGURATION
 #=================================================
 
-ynh_backup "/etc/nginx/conf.d/$domain.d/$app.conf" "${YNH_APP_BACKUP_DIR}/etc/nginx/conf.d/$domain.d/$app.conf"
+ynh_backup "/etc/nginx/conf.d/$domain.d/$app.conf"
 
 #=================================================
 # BACKUP OF THE PHP-FPM CONFIGURATION
 #=================================================
 
-ynh_backup "/etc/php5/fpm/pool.d/$app.conf" "${YNH_APP_BACKUP_DIR}/etc/php5/fpm/pool.d/$app.conf"
-ynh_backup "/etc/php5/fpm/conf.d/20-$app.ini" "${YNH_APP_BACKUP_DIR}/etc/php5/fpm/conf.d/20-$app.ini"
+ynh_backup "/etc/php5/fpm/pool.d/$app.conf"
+ynh_backup "/etc/php5/fpm/conf.d/20-$app.ini"

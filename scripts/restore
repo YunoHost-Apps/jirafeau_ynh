@@ -13,12 +13,12 @@ set -eu
 # IMPORT GENERIC HELPERS
 #=================================================
 
-if [ ! -e _common.sh ]; then
-	# Rapatrie le fichier de fonctions si il n'est pas dans le dossier courant
-	sudo cp ../settings/scripts/_common.sh ./_common.sh
-	sudo chmod a+rx _common.sh
-fi
-source _common.sh
+# if [ ! -e _common.sh ]; then
+# 	# Rapatrie le fichier de fonctions si il n'est pas dans le dossier courant
+# 	sudo cp ../settings/scripts/_common.sh ./_common.sh
+# 	sudo chmod a+rx _common.sh
+# fi
+# source _common.sh
 source /usr/share/yunohost/helpers
 
 #=================================================
@@ -59,14 +59,8 @@ ynh_restore_file "$final_path"
 # RECREATE OF THE DEDICATED USER
 #=================================================
 
-ynh_system_user_create $app	# Recreate the dedicated user, if not exist
-
-#=================================================
-# RESTORE USER RIGHTS
-#=================================================
-
-# Les fichiers appartiennent à root
-sudo chown -R root: $final_path
+# Create the dedicated user (if not existing)
+ynh_system_user_create $app
 
 #=================================================
 # RESTORE OF THE PHP-FPM CONFIGURATION
@@ -82,6 +76,12 @@ ynh_restore_file "/etc/php5/fpm/conf.d/20-$app.ini"
 #=================================================
 
 ynh_restore_file "/home/yunohost.app/$app"
+
+#=================================================
+# RESTORE USER RIGHTS
+#=================================================
+
+chown -R $app:root /home/yunohost.app/$app
 
 #=================================================
 # GENERIC FINALISATION

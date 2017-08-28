@@ -6,7 +6,7 @@
 # IMPORT GENERIC HELPERS
 #=================================================
 
-source _common.sh
+# source _common.sh
 source /usr/share/yunohost/helpers
 
 #=================================================
@@ -31,9 +31,16 @@ app=$YNH_APP_INSTANCE_NAME
 # CHECK IF THE APP CAN BE INSTALLED WITH THIS ARGS
 #=================================================
 
-path_url=$(ynh_normalize_url_path $path_url)	# Vérifie et corrige la syntaxe du path.
-CHECK_DOMAINPATH	# Vérifie la disponibilité du path et du domaine.
-CHECK_FINALPATH	# Vérifie que le dossier de destination n'est pas déjà utilisé.
+final_path=/var/www/$app
+test ! -e "$final_path" || ynh_die "This path already contains a folder"
+
+# Normalize the url path syntax
+path_url=$(ynh_normalize_url_path $path_url)
+
+# Check web path availability
+ynh_webpath_available $domain $path_url
+# Register (book) web path
+ynh_webpath_register $app $domain $path_url
 
 #=================================================
 # STORE SETTINGS FROM MANIFEST
@@ -57,19 +64,22 @@ ynh_setup_source "$final_path"	# Télécharge la source, décompresse et copie d
 # NGINX CONFIGURATION
 #=================================================
 
-ynh_nginx_config
+# Create a dedicated nginx config
+ynh_add_nginx_config
 
 #=================================================
 # CREATE DEDICATED USER
 #=================================================
 
-ynh_system_user_create $app	# Créer un utilisateur système dédié à l'app
+# Create a system user
+ynh_system_user_create $app
 
 #=================================================
 # PHP-FPM CONFIGURATION
 #=================================================
 
-ynh_fpm_config	# Créer le fichier de configuration du pool php-fpm et le configure.
+# Create a dedicated php-fpm config
+ynh_add_fpm_config
 
 #=================================================
 # SPECIFIC SETUP
@@ -78,7 +88,7 @@ ynh_fpm_config	# Créer le fichier de configuration du pool php-fpm et le config
 #=================================================
 
 jirafeauconfigfile="$final_path/lib/config.local.php"
-sudo cp "../conf/config.local.php" "$jirafeauconfigfile"
+cp "../conf/config.local.php" "$jirafeauconfigfile"
 
 # Set and save upload password, allowing an empty one
 if [ -z "$upload_password" ]
@@ -105,10 +115,11 @@ fi
 ynh_replace_string "YNH_VAR_ROOT" "$var_root" "$jirafeauconfigfile"
 ynh_replace_string "YNH_ADMIN_USER" "$admin_user" "$jirafeauconfigfile"
 
-ynh_store_file_checksum "$jirafeauconfigfile"	# Enregistre la somme de contrôle du fichier de config
+# Calculate and store the config file checksum into the app settings
+ynh_store_file_checksum "$jirafeauconfigfile"
 
 # Remove the install.php
-sudo rm $final_path/install.php
+rm $final_path/install.php
 
 #=================================================
 # GENERIC FINALISATION
@@ -116,12 +127,11 @@ sudo rm $final_path/install.php
 # SECURING FILES AND DIRECTORIES
 #=================================================
 
-# Les fichiers appartiennent à root
-sudo chown -R root: $final_path
+chown -R root: $final_path
 
-sudo mkdir -p $var_root/{files,links,async,block}
-sudo chown -R $app:root $var_root
-sudo chmod -R 700 $var_root
+mkdir -p $var_root/{files,links,async,block}
+chown -R $app:root $var_root
+chmod -R 700 $var_root
 
 #=================================================
 # SETUP SSOWAT
@@ -139,4 +149,4 @@ fi
 # RELOAD NGINX
 #=================================================
 
-sudo systemctl reload nginx
+systemctl reload nginx
