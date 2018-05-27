@@ -3,15 +3,15 @@
 	"id": "jirafeau",
 	"packaging_format": 1,
 	"requirements": {
-		"yunohost": ">= 2.4.0"
+		"yunohost": ">= 2.7.12"
 	},
 	"description": {
 		"en": "Upload a file in a simple way and give a unique link to it",
 		"fr": "Hébergez simplement un fichier et partagez-le avec un lien unique"
 	},
 	"url": "https://gitlab.com/mojo42/Jirafeau",
-	"version": "3.4.1~ynh1",
-	"license": "AGPLv3",
+	"version": "3.4.1~ynh2",
+	"license": "AGPL-3.0-only",
 	"maintainer": {
 		"name": "julien",
 		"email": "julien.malik@paraiso.me"
