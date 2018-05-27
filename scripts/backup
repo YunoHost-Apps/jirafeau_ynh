@@ -42,8 +42,9 @@ ynh_backup "$final_path"
 # BACKUP OF THE DATA DIR
 #=================================================
 
-CHECK_SIZE "/home/yunohost.app/$app"
-ynh_backup "/home/yunohost.app/$app"
+# The 1 parameter indicates the directory is "big",
+# so that it won't be backed up before upgrade
+ynh_backup "/home/yunohost.app/$app" 1
 
 #=================================================
 # BACKUP OF THE NGINX CONFIGURATION
