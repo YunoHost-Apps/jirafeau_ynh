@@ -66,6 +66,11 @@ ynh_setup_source "$final_path"	# Télécharge la source, décompresse et copie d
 
 # Create a dedicated nginx config
 ynh_add_nginx_config
+if [ "$path_url" != "/" ]
+then
+	ynh_replace_string "^#sub_path_only" "" "/etc/nginx/conf.d/$domain.d/$app.conf"
+fi
+ynh_store_file_checksum "/etc/nginx/conf.d/$domain.d/$app.conf"
 
 #=================================================
 # CREATE DEDICATED USER
