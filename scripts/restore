@@ -4,12 +4,7 @@
 # IMPORT GENERIC HELPERS
 #=================================================
 
-# if [ ! -e _common.sh ]; then
-# 	# Rapatrie le fichier de fonctions si il n'est pas dans le dossier courant
-# 	sudo cp ../settings/scripts/_common.sh ./_common.sh
-# 	sudo chmod a+rx _common.sh
-# fi
-# source _common.sh
+source ../settings/scripts/_common.sh
 source /usr/share/yunohost/helpers
 
 #=================================================
@@ -42,26 +37,26 @@ test ! -d $final_path \
 #=================================================
 # STANDARD RESTORE STEPS
 #=================================================
-# RESTORE OF THE NGINX CONFIGURATION
+# RESTORE THE NGINX CONFIGURATION
 #=================================================
 
 ynh_restore_file "/etc/nginx/conf.d/$domain.d/$app.conf"
 
 #=================================================
-# RESTORE OF THE MAIN DIR OF THE APP
+# RESTORE THE APP MAIN DIR
 #=================================================
 
 ynh_restore_file "$final_path"
 
 #=================================================
-# RECREATE OF THE DEDICATED USER
+# RECREATE THE DEDICATED USER
 #=================================================
 
 # Create the dedicated user (if not existing)
 ynh_system_user_create $app
 
 #=================================================
-# RESTORE OF THE PHP-FPM CONFIGURATION
+# RESTORE THE PHP-FPM CONFIGURATION
 #=================================================
 
 ynh_restore_file "/etc/php5/fpm/pool.d/$app.conf"

@@ -4,12 +4,7 @@
 # IMPORT GENERIC HELPERS
 #=================================================
 
-if [ ! -e _common.sh ]; then
-	# Rapatrie le fichier de fonctions si il n'est pas dans le dossier courant
-	sudo cp ../settings/scripts/_common.sh ./_common.sh
-	sudo chmod a+rx _common.sh
-fi
-source _common.sh
+source ../settings/scripts/_common.sh
 source /usr/share/yunohost/helpers
 
 #=================================================
@@ -42,7 +37,8 @@ ynh_backup "$final_path"
 
 # The 1 parameter indicates the directory is "big",
 # so that it won't be backed up before upgrade
-ynh_backup "/home/yunohost.app/$app" 1
+# This argument has to be the third one.
+ynh_backup "/home/yunohost.app/$app" "/home/yunohost.app/$app" 1
 
 #=================================================
 # BACKUP OF THE NGINX CONFIGURATION

@@ -27,11 +27,11 @@
 
 /* URL of installation, with traling slash (eg. »https://exmaple.com/jirafeau/«)
  */
-$cfg['web_root'] = 'https://' . 'YNH_DOMAIN' . 'YNH_WWW_PATH' . '/';
+$cfg['web_root'] = 'https://' . '__YNH_DOMAIN__' . '__YNH_WWW_PATH__' . '/';
 
 /* Path to data directory, with trailing slash (eg. »/var/www/data/var_314159265358979323846264«
  */
-$cfg['var_root'] = 'YNH_VAR_ROOT' . '/';
+$cfg['var_root'] = '__YNH_VAR_ROOT__' . '/';
 
 /* Language - choice between 'auto' or any language located in the /lib/locales/ folder.
  * The mode »auto« will cause the script to detect the user's browser information
@@ -74,7 +74,7 @@ $cfg['link_name_length'] = 8;
  * $cfg['upload_password'] = array('psw1');         // One password
  * $cfg['upload_password'] = array('psw1', 'psw2'); // Two passwords
  */
-$cfg['upload_password'] = array(YNH_UPLOAD_PASSWORD);
+$cfg['upload_password'] = array(__YNH_UPLOAD_PASSWORD__);
 
 /* List of IP allowed to upload a file.
  * If the list is empty, then there is no upload restriction based on IP.
@@ -96,7 +96,7 @@ $cfg['admin_password'] = '';
  * that the provided user is logged in.
  * If »admin_password« parameter is set, then the »admin_password« is ignored.
  */
-$cfg['admin_http_auth_user'] = 'YNH_ADMIN_USER';
+$cfg['admin_http_auth_user'] = '__YNH_ADMIN_USER__';
 
 /* Allow user to select different options for file expiration time.
  * Possible values in array:
