@@ -2,9 +2,6 @@
 	"name": "Jirafeau",
 	"id": "jirafeau",
 	"packaging_format": 1,
-	"requirements": {
-		"yunohost": ">= 2.7.12"
-	},
 	"description": {
 		"en": "Upload a file in a simple way and give a unique link to it",
 		"fr": "Hébergez simplement un fichier et partagez-le avec un lien unique"
@@ -16,10 +13,13 @@
 		"name": "julien",
 		"email": "julien.malik@paraiso.me"
 	},
+	"requirements": {
+		"yunohost": ">= 3.0"
+	},
 	"multi_instance": false,
 	"services": [
 		"nginx",
-		"php5-fpm"
+		"php7.0-fpm"
 	],
 	"arguments": {
 		"install" : [
