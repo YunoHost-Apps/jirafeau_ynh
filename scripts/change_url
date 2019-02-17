@@ -24,6 +24,7 @@ app=$YNH_APP_INSTANCE_NAME
 #=================================================
 # LOAD SETTINGS
 #=================================================
+ynh_print_info "Loading installation settings..."
 
 final_path=$(ynh_app_setting_get $app final_path)
 
@@ -57,6 +58,7 @@ fi
 #=================================================
 # MODIFY URL IN NGINX CONF
 #=================================================
+ynh_print_info "Updating nginx web server configuration..."
 
 nginx_conf_path=/etc/nginx/conf.d/$old_domain.d/$app.conf
 
@@ -94,5 +96,12 @@ ynh_replace_string "\$cfg['web_root'] = .*" "\$cfg['web_root'] = 'https://' . '$
 #=================================================
 # RELOAD NGINX
 #=================================================
+ynh_print_info "Reloading nginx web server..."
 
 systemctl reload nginx
+
+#=================================================
+# END OF SCRIPT
+#=================================================
+
+ynh_print_info "Change of url completed for $app"

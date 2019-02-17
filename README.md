@@ -18,7 +18,7 @@ Jirafeau is a web site permitting to upload a file in a simple way and give an u
 
 ## Demo
 
-* [YunoHost demo](https://jirafeau.net/)
+* [YunoHost demo](https://demo.yunohost.org/jirafeau/)
 
 ## Configuration
 
