@@ -72,7 +72,17 @@ ynh_restore_file "/etc/php/7.0/fpm/pool.d/$app.conf"
 #=================================================
 ynh_print_info "Restoring the data directory..."
 
-ynh_restore_file "/home/yunohost.app/$app"
+datadir="/home/yunohost.app/$app"
+
+# The data directory will be restored only if it exists in the backup archive
+# So only if it was backup previously.
+if [ -d "$YNH_BACKUP_DIR/apps/$app/backup$datadir" ]
+then
+	ynh_restore_file "$datadir"
+else
+	# Create app folders
+	mkdir -p "$datadir"/{files,links,async,block}
+fi
 
 #=================================================
 # RESTORE USER RIGHTS
