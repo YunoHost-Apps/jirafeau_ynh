@@ -54,7 +54,7 @@
 			{
 				"name": "upload_password",
 				"type": "password",
-				"optional": "true",
+				"optional": true,
 				"ask": {
 					"en": "Set the password granting upload permissions (leave empty to allow anybody to upload)",
 					"fr": "Définissez le mot de passe permettant l'accès à l'envoi de fichiers (laissez vide pour autoriser tout le monde)"
