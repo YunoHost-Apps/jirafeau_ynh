@@ -6,12 +6,13 @@
 # IMPORT GENERIC HELPERS
 #=================================================
 
-# source _common.sh
+source _common.sh
 source /usr/share/yunohost/helpers
 
 #=================================================
 # LOAD SETTINGS
 #=================================================
+ynh_print_info "Loading installation settings..."
 
 app=$YNH_APP_INSTANCE_NAME
 
@@ -23,8 +24,9 @@ final_path=$(ynh_app_setting_get $app final_path)
 is_public=$(ynh_app_setting_get $app is_public)
 
 #=================================================
-# FIX OLD THINGS
+# ENSURE DOWNWARD COMPATIBILITY
 #=================================================
+ynh_print_info "Ensuring downward compatibility..."
 
 # Fix is_public as a boolean value
 if [ "$is_public" = "Yes" ]; then
@@ -44,12 +46,16 @@ fi
 #=================================================
 # BACKUP BEFORE UPGRADE THEN ACTIVE TRAP
 #=================================================
+ynh_print_info "Backing up the app before upgrading (may take a while)..."
 
-ynh_backup_before_upgrade	# Backup the current version of the app
+# Backup the current version of the app
+ynh_backup_before_upgrade
 ynh_clean_setup () {
-	ynh_restore_upgradebackup	# restore it if the upgrade fails
+	# restore it if the upgrade fails
+	ynh_restore_upgradebackup
 }
-ynh_abort_if_errors	# Exit if an error occurs during the execution of the script
+# Exit if an error occurs during the execution of the script
+ynh_abort_if_errors
 
 #=================================================
 # CHECK THE PATH
@@ -63,6 +69,7 @@ path_url=$(ynh_normalize_url_path $path_url)
 #=================================================
 # DOWNLOAD, CHECK AND UNPACK SOURCE
 #=================================================
+ynh_print_info "Upgrading source files..."
 
 # Download, check integrity, uncompress and patch the source from app.src
 ynh_setup_source "$final_path"
@@ -70,25 +77,23 @@ ynh_setup_source "$final_path"
 #=================================================
 # NGINX CONFIGURATION
 #=================================================
+ynh_print_info "Upgrading nginx web server configuration..."
 
 # Create a dedicated nginx config
 ynh_add_nginx_config
-if [ "$path_url" != "/" ]
-then
-	ynh_replace_string "^#sub_path_only" "" "/etc/nginx/conf.d/$domain.d/$app.conf"
-fi
-ynh_store_file_checksum "/etc/nginx/conf.d/$domain.d/$app.conf"
 
 #=================================================
 # CREATE DEDICATED USER
 #=================================================
+ynh_print_info "Making sure dedicated system user exists..."
 
-# Create a system user
+# Create a dedicated user (if not existing)
 ynh_system_user_create $app
 
 #=================================================
 # PHP-FPM CONFIGURATION
 #=================================================
+ynh_print_info "Upgrading php-fpm configuration..."
 
 # Create a dedicated php-fpm config
 ynh_add_fpm_config
@@ -101,36 +106,39 @@ ynh_add_fpm_config
 
 jirafeauconfigfile="$final_path/lib/config.local.php"
 
-ynh_backup_if_checksum_is_different "$final_path/lib/config.local.php"	# Créé un backup du fichier de config si il a été modifié.
+ynh_backup_if_checksum_is_different "$final_path/lib/config.local.php"
 
-sudo cp "../conf/config.local.php" "$final_path/lib/config.local.php"
+cp "../conf/config.local.php" "$final_path/lib/config.local.php"
 
 # Set and save upload password, allowing an empty one
 if [ -z "$upload_password" ]
 then
-    ynh_replace_string "YNH_UPLOAD_PASSWORD" "" "$jirafeauconfigfile"
+    ynh_replace_string "__YNH_UPLOAD_PASSWORD__" "" "$jirafeauconfigfile"
 	ynh_app_setting_set $app upload_password ""
 else
-    ynh_replace_string "YNH_UPLOAD_PASSWORD" "'$upload_password'" "$jirafeauconfigfile"
+    ynh_replace_string "__YNH_UPLOAD_PASSWORD__" "'$upload_password'" "$jirafeauconfigfile"
 	ynh_app_setting_set $app upload_password "$upload_password"
 fi
 
 #=================================================
 # CONFIGURE JIRAFEAU
 #=================================================
+ynh_print_info "Upgrading jirafeau configuration..."
 
 var_root=/home/yunohost.app/$app
-ynh_replace_string "YNH_DOMAIN" "$domain" "$jirafeauconfigfile"
+
+ynh_replace_string "__YNH_DOMAIN__" "$domain" "$jirafeauconfigfile"
 if [ "$path_url" = "/" ]
 then
-	ynh_replace_string "YNH_WWW_PATH" "" "$jirafeauconfigfile"
+	ynh_replace_string "__YNH_WWW_PATH__" "" "$jirafeauconfigfile"
 else
-	ynh_replace_string "YNH_WWW_PATH" "$path_url" "$jirafeauconfigfile"
+	ynh_replace_string "__YNH_WWW_PATH__" "$path_url" "$jirafeauconfigfile"
 fi
-ynh_replace_string "YNH_VAR_ROOT" "$var_root" "$jirafeauconfigfile"
-ynh_replace_string "YNH_ADMIN_USER" "$admin_user" "$jirafeauconfigfile"
+ynh_replace_string "__YNH_VAR_ROOT__" "$var_root" "$jirafeauconfigfile"
+ynh_replace_string "__YNH_ADMIN_USER__" "$admin_user" "$jirafeauconfigfile"
 
-ynh_store_file_checksum "$jirafeauconfigfile"	# Enregistre la somme de contrôle du fichier de config
+# Recalculate and store the checksum of the file for the next upgrade.
+ynh_store_file_checksum "$jirafeauconfigfile"
 
 # Remove the install.php
 rm $final_path/install.php
@@ -141,15 +149,16 @@ rm $final_path/install.php
 # SECURING FILES AND DIRECTORIES
 #=================================================
 
-sudo chown -R root: $final_path
+chown -R root: $final_path
 
-sudo mkdir -p $var_root/{files,links,async,block}
-sudo chown -R $app:root $var_root
-sudo chmod -R 700 $var_root
+mkdir -p $var_root/{files,links,async,block}
+chown -R $app:root $var_root
+chmod -R 700 $var_root
 
 #=================================================
 # SETUP SSOWAT
 #=================================================
+ynh_print_info "Upgrading SSOwat configuration..."
 
 ynh_app_setting_set $app unprotected_uris "/"
 if [ $is_public -eq 0 ]
@@ -162,5 +171,12 @@ fi
 #=================================================
 # RELOAD NGINX
 #=================================================
+ynh_print_info "Reloading nginx web server..."
 
-sudo systemctl reload nginx
+systemctl reload nginx
+
+#=================================================
+# END OF SCRIPT
+#=================================================
+
+ynh_print_info "Upgrade of $app completed"

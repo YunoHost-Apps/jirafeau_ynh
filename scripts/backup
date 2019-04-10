@@ -4,12 +4,7 @@
 # IMPORT GENERIC HELPERS
 #=================================================
 
-if [ ! -e _common.sh ]; then
-	# Rapatrie le fichier de fonctions si il n'est pas dans le dossier courant
-	sudo cp ../settings/scripts/_common.sh ./_common.sh
-	sudo chmod a+rx _common.sh
-fi
-source _common.sh
+source ../settings/scripts/_common.sh
 source /usr/share/yunohost/helpers
 
 #=================================================
@@ -22,6 +17,7 @@ ynh_abort_if_errors
 #=================================================
 # LOAD SETTINGS
 #=================================================
+ynh_print_info "Loading installation settings..."
 
 app=$YNH_APP_INSTANCE_NAME
 
@@ -33,25 +29,36 @@ domain=$(ynh_app_setting_get $app domain)
 #=================================================
 # BACKUP OF THE MAIN DIR OF THE APP
 #=================================================
+ynh_print_info "Backing up the main app directory..."
 
 ynh_backup "$final_path"
 
 #=================================================
 # BACKUP OF THE DATA DIR
 #=================================================
+ynh_print_info "Backing up data directory..."
 
 # The 1 parameter indicates the directory is "big",
 # so that it won't be backed up before upgrade
-ynh_backup "/home/yunohost.app/$app" 1
+# This argument has to be the third one.
+ynh_backup "/home/yunohost.app/$app" "/home/yunohost.app/$app" 1
 
 #=================================================
 # BACKUP OF THE NGINX CONFIGURATION
 #=================================================
+ynh_print_info "Backing up nginx web server configuration..."
 
 ynh_backup "/etc/nginx/conf.d/$domain.d/$app.conf"
 
 #=================================================
 # BACKUP OF THE PHP-FPM CONFIGURATION
 #=================================================
+ynh_print_info "Backing up php-fpm configuration..."
 
-ynh_backup "/etc/php5/fpm/pool.d/$app.conf"
+ynh_backup "/etc/php/7.0/fpm/pool.d/$app.conf"
+
+#=================================================
+# END OF SCRIPT
+#=================================================
+
+ynh_print_info "Backup script completed for $app. (YunoHost will then actually copy those files to the archive)."

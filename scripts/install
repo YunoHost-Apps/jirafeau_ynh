@@ -6,14 +6,15 @@
 # IMPORT GENERIC HELPERS
 #=================================================
 
-# source _common.sh
+source _common.sh
 source /usr/share/yunohost/helpers
 
 #=================================================
-# MANAGE FAILURE OF THE SCRIPT
+# MANAGE SCRIPT FAILURE
 #=================================================
 
-ynh_abort_if_errors	# Active trap pour arrêter le script si une erreur est détectée.
+# Exit if an error occurs during the execution of the script
+ynh_abort_if_errors
 
 #=================================================
 # RETRIEVE ARGUMENTS FROM THE MANIFEST
@@ -28,8 +29,9 @@ is_public=$YNH_APP_ARG_IS_PUBLIC
 app=$YNH_APP_INSTANCE_NAME
 
 #=================================================
-# CHECK IF THE APP CAN BE INSTALLED WITH THIS ARGS
+# CHECK IF THE APP CAN BE INSTALLED WITH THESE ARGS
 #=================================================
+ynh_print_info "Validating installation parameters..."
 
 final_path=/var/www/$app
 test ! -e "$final_path" || ynh_die "This path already contains a folder"
@@ -37,14 +39,13 @@ test ! -e "$final_path" || ynh_die "This path already contains a folder"
 # Normalize the url path syntax
 path_url=$(ynh_normalize_url_path $path_url)
 
-# Check web path availability
-ynh_webpath_available $domain $path_url
 # Register (book) web path
 ynh_webpath_register $app $domain $path_url
 
 #=================================================
 # STORE SETTINGS FROM MANIFEST
 #=================================================
+ynh_print_info "Storing installation settings..."
 
 ynh_app_setting_set $app domain $domain
 ynh_app_setting_set $app path $path_url
@@ -56,6 +57,7 @@ ynh_app_setting_set $app is_public $is_public
 #=================================================
 # DOWNLOAD, CHECK AND UNPACK SOURCE
 #=================================================
+ynh_print_info "Setting up source files..."
 
 ynh_app_setting_set $app final_path $final_path
 ynh_setup_source "$final_path"	# Télécharge la source, décompresse et copie dans $final_path
@@ -63,18 +65,15 @@ ynh_setup_source "$final_path"	# Télécharge la source, décompresse et copie d
 #=================================================
 # NGINX CONFIGURATION
 #=================================================
+ynh_print_info "Configuring nginx web server..."
 
 # Create a dedicated nginx config
 ynh_add_nginx_config
-if [ "$path_url" != "/" ]
-then
-	ynh_replace_string "^#sub_path_only" "" "/etc/nginx/conf.d/$domain.d/$app.conf"
-fi
-ynh_store_file_checksum "/etc/nginx/conf.d/$domain.d/$app.conf"
 
 #=================================================
 # CREATE DEDICATED USER
 #=================================================
+ynh_print_info "Configuring system user..."
 
 # Create a system user
 ynh_system_user_create $app
@@ -82,6 +81,7 @@ ynh_system_user_create $app
 #=================================================
 # PHP-FPM CONFIGURATION
 #=================================================
+ynh_print_info "Configuring php-fpm..."
 
 # Create a dedicated php-fpm config
 ynh_add_fpm_config
@@ -98,27 +98,29 @@ cp "../conf/config.local.php" "$jirafeauconfigfile"
 # Set and save upload password, allowing an empty one
 if [ -z "$upload_password" ]
 then
-    ynh_replace_string "YNH_UPLOAD_PASSWORD" "" "$jirafeauconfigfile"
+    ynh_replace_string "__YNH_UPLOAD_PASSWORD__" "" "$jirafeauconfigfile"
 	ynh_app_setting_set $app upload_password ""
 else
-    ynh_replace_string "YNH_UPLOAD_PASSWORD" "'$upload_password'" "$jirafeauconfigfile"
+    ynh_replace_string "__YNH_UPLOAD_PASSWORD__" "'$upload_password'" "$jirafeauconfigfile"
 	ynh_app_setting_set $app upload_password "$upload_password"
 fi
 
 #=================================================
 # CONFIGURE JIRAFEAU
 #=================================================
+ynh_print_info "Configuring jirafeau..."
 
 var_root=/home/yunohost.app/$app
-ynh_replace_string "YNH_DOMAIN" "$domain" "$jirafeauconfigfile"
+
+ynh_replace_string "__YNH_DOMAIN__" "$domain" "$jirafeauconfigfile"
 if [ "$path_url" = "/" ]
 then
-	ynh_replace_string "YNH_WWW_PATH" "" "$jirafeauconfigfile"
+	ynh_replace_string "__YNH_WWW_PATH__" "" "$jirafeauconfigfile"
 else
-	ynh_replace_string "YNH_WWW_PATH" "$path_url" "$jirafeauconfigfile"
+	ynh_replace_string "__YNH_WWW_PATH__" "$path_url" "$jirafeauconfigfile"
 fi
-ynh_replace_string "YNH_VAR_ROOT" "$var_root" "$jirafeauconfigfile"
-ynh_replace_string "YNH_ADMIN_USER" "$admin_user" "$jirafeauconfigfile"
+ynh_replace_string "__YNH_VAR_ROOT__" "$var_root" "$jirafeauconfigfile"
+ynh_replace_string "__YNH_ADMIN_USER__" "$admin_user" "$jirafeauconfigfile"
 
 # Calculate and store the config file checksum into the app settings
 ynh_store_file_checksum "$jirafeauconfigfile"
@@ -141,6 +143,7 @@ chmod -R 700 $var_root
 #=================================================
 # SETUP SSOWAT
 #=================================================
+ynh_print_info "Configuring SSOwat..."
 
 ynh_app_setting_set $app unprotected_uris "/"
 if [ $is_public -eq 0 ]
@@ -153,5 +156,12 @@ fi
 #=================================================
 # RELOAD NGINX
 #=================================================
+ynh_print_info "Reloading nginx web server..."
 
 systemctl reload nginx
+
+#=================================================
+# END OF SCRIPT
+#=================================================
+
+ynh_print_info "Installation of $app completed"

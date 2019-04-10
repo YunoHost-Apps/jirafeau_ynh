@@ -4,12 +4,7 @@
 # IMPORT GENERIC HELPERS
 #=================================================
 
-# if [ ! -e _common.sh ]; then
-# 	# Rapatrie le fichier de fonctions si il n'est pas dans le dossier courant
-# 	sudo cp ../settings/scripts/_common.sh ./_common.sh
-# 	sudo chmod a+rx _common.sh
-# fi
-# source _common.sh
+source ../settings/scripts/_common.sh
 source /usr/share/yunohost/helpers
 
 #=================================================
@@ -22,6 +17,7 @@ ynh_abort_if_errors
 #=================================================
 # LOAD SETTINGS
 #=================================================
+ynh_print_info "Loading settings..."
 
 app=$YNH_APP_INSTANCE_NAME
 
@@ -33,6 +29,7 @@ db_name=$(ynh_app_setting_get $app db_name)
 #=================================================
 # CHECK IF THE APP CAN BE RESTORED
 #=================================================
+ynh_print_info "Validating restoration parameters..."
 
 ynh_webpath_available $domain $path_url \
 	|| ynh_die "Path not available: ${domain}${path_url}"
@@ -42,37 +39,50 @@ test ! -d $final_path \
 #=================================================
 # STANDARD RESTORE STEPS
 #=================================================
-# RESTORE OF THE NGINX CONFIGURATION
+# RESTORE THE NGINX CONFIGURATION
 #=================================================
 
 ynh_restore_file "/etc/nginx/conf.d/$domain.d/$app.conf"
 
 #=================================================
-# RESTORE OF THE MAIN DIR OF THE APP
+# RESTORE THE APP MAIN DIR
 #=================================================
+ynh_print_info "Restoring the app main directory..."
 
 ynh_restore_file "$final_path"
 
 #=================================================
-# RECREATE OF THE DEDICATED USER
+# RECREATE THE DEDICATED USER
 #=================================================
+ynh_print_info "Recreating the dedicated system user..."
 
 # Create the dedicated user (if not existing)
 ynh_system_user_create $app
 
 #=================================================
-# RESTORE OF THE PHP-FPM CONFIGURATION
+# RESTORE THE PHP-FPM CONFIGURATION
 #=================================================
 
-ynh_restore_file "/etc/php5/fpm/pool.d/$app.conf"
+ynh_restore_file "/etc/php/7.0/fpm/pool.d/$app.conf"
 
 #=================================================
 # SPECIFIC RESTORE
 #=================================================
 # RESTORE THE DATA OF JIRAFEAU
 #=================================================
+ynh_print_info "Restoring the data directory..."
 
-ynh_restore_file "/home/yunohost.app/$app"
+datadir="/home/yunohost.app/$app"
+
+# The data directory will be restored only if it exists in the backup archive
+# So only if it was backup previously.
+if [ -d "$YNH_BACKUP_DIR/apps/$app/backup$datadir" ]
+then
+	ynh_restore_file "$datadir"
+else
+	# Create app folders
+	mkdir -p "$datadir"/{files,links,async,block}
+fi
 
 #=================================================
 # RESTORE USER RIGHTS
@@ -85,6 +95,13 @@ chown -R $app:root /home/yunohost.app/$app
 #=================================================
 # RELOAD NGINX AND PHP-FPM
 #=================================================
+ynh_print_info "Reloading nginx web server and php-fpm..."
 
-sudo systemctl reload php5-fpm
-sudo systemctl reload nginx
+systemctl reload php7.0-fpm
+systemctl reload nginx
+
+#=================================================
+# END OF SCRIPT
+#=================================================
+
+ynh_print_info "Restoration completed for $app"
