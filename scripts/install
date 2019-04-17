@@ -98,10 +98,10 @@ cp "../conf/config.local.php" "$jirafeauconfigfile"
 # Set and save upload password, allowing an empty one
 if [ -z "$upload_password" ]
 then
-    ynh_replace_string "__YNH_UPLOAD_PASSWORD__" "" "$jirafeauconfigfile"
+	ynh_replace_string "__YNH_UPLOAD_PASSWORD__" "" "$jirafeauconfigfile"
 	ynh_app_setting_set $app upload_password ""
 else
-    ynh_replace_string "__YNH_UPLOAD_PASSWORD__" "'$upload_password'" "$jirafeauconfigfile"
+	ynh_replace_string "__YNH_UPLOAD_PASSWORD__" "'$upload_password'" "$jirafeauconfigfile"
 	ynh_app_setting_set $app upload_password "$upload_password"
 fi
 
