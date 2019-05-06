@@ -31,41 +31,39 @@ app=$YNH_APP_INSTANCE_NAME
 #=================================================
 # CHECK IF THE APP CAN BE INSTALLED WITH THESE ARGS
 #=================================================
-ynh_print_info "Validating installation parameters..."
+ynh_script_progression --message="Validating installation parameters..."
 
 final_path=/var/www/$app
 test ! -e "$final_path" || ynh_die "This path already contains a folder"
 
-# Normalize the url path syntax
-path_url=$(ynh_normalize_url_path $path_url)
-
 # Register (book) web path
-ynh_webpath_register $app $domain $path_url
+ynh_webpath_register --app=$app --domain=$domain --path_url=$path_url
 
 #=================================================
 # STORE SETTINGS FROM MANIFEST
 #=================================================
-ynh_print_info "Storing installation settings..."
+ynh_script_progression --message="Storing installation settings..."
 
-ynh_app_setting_set $app domain $domain
-ynh_app_setting_set $app path $path_url
-ynh_app_setting_set $app admin $admin_user
-ynh_app_setting_set $app is_public $is_public
+ynh_app_setting_set --app=$app --key=domain --value=$domain
+ynh_app_setting_set --app=$app --key=path --value=$path_url
+ynh_app_setting_set --app=$app --key=admin --value=$admin_user
+ynh_app_setting_set --app=$app --key=is_public --value=$is_public
 
 #=================================================
 # STANDARD MODIFICATIONS
 #=================================================
 # DOWNLOAD, CHECK AND UNPACK SOURCE
 #=================================================
-ynh_print_info "Setting up source files..."
+ynh_script_progression --message="Setting up source files..." --weight=3
 
-ynh_app_setting_set $app final_path $final_path
-ynh_setup_source "$final_path"	# Télécharge la source, décompresse et copie dans $final_path
+ynh_app_setting_set --app=$app --key=final_path --value=$final_path
+# Download, check integrity, uncompress and patch the source from app.src
+ynh_setup_source --dest_dir="$final_path"
 
 #=================================================
 # NGINX CONFIGURATION
 #=================================================
-ynh_print_info "Configuring nginx web server..."
+ynh_script_progression --message="Configuring nginx web server..."
 
 # Create a dedicated nginx config
 ynh_add_nginx_config
@@ -73,15 +71,15 @@ ynh_add_nginx_config
 #=================================================
 # CREATE DEDICATED USER
 #=================================================
-ynh_print_info "Configuring system user..."
+ynh_script_progression --message="Configuring system user..." --weight=2
 
 # Create a system user
-ynh_system_user_create $app
+ynh_system_user_create --username=$app
 
 #=================================================
 # PHP-FPM CONFIGURATION
 #=================================================
-ynh_print_info "Configuring php-fpm..."
+ynh_script_progression --message="Configuring php-fpm..." --weight=2
 
 # Create a dedicated php-fpm config
 ynh_add_fpm_config
@@ -98,32 +96,32 @@ cp "../conf/config.local.php" "$jirafeauconfigfile"
 # Set and save upload password, allowing an empty one
 if [ -z "$upload_password" ]
 then
-	ynh_replace_string "__YNH_UPLOAD_PASSWORD__" "" "$jirafeauconfigfile"
-	ynh_app_setting_set $app upload_password ""
+	ynh_replace_string --match_string="__YNH_UPLOAD_PASSWORD__" --replace_string="" --target_file="$jirafeauconfigfile"
+	ynh_app_setting_set --app=$app --key=upload_password --value=""
 else
-	ynh_replace_string "__YNH_UPLOAD_PASSWORD__" "'$upload_password'" "$jirafeauconfigfile"
-	ynh_app_setting_set $app upload_password "$upload_password"
+	ynh_replace_string --match_string="__YNH_UPLOAD_PASSWORD__" --replace_string="'$upload_password'" --target_file="$jirafeauconfigfile"
+	ynh_app_setting_set --app=$app --key=upload_password --value="$upload_password"
 fi
 
 #=================================================
 # CONFIGURE JIRAFEAU
 #=================================================
-ynh_print_info "Configuring jirafeau..."
+ynh_script_progression --message="Configuring jirafeau..."
 
 var_root=/home/yunohost.app/$app
 
-ynh_replace_string "__YNH_DOMAIN__" "$domain" "$jirafeauconfigfile"
+ynh_replace_string --match_string="__YNH_DOMAIN__" --replace_string="$domain" --target_file="$jirafeauconfigfile"
 if [ "$path_url" = "/" ]
 then
-	ynh_replace_string "__YNH_WWW_PATH__" "" "$jirafeauconfigfile"
+	ynh_replace_string --match_string="__YNH_WWW_PATH__" --replace_string="" --target_file="$jirafeauconfigfile"
 else
-	ynh_replace_string "__YNH_WWW_PATH__" "$path_url" "$jirafeauconfigfile"
+	ynh_replace_string --match_string="__YNH_WWW_PATH__" --replace_string="$path_url" --target_file="$jirafeauconfigfile"
 fi
-ynh_replace_string "__YNH_VAR_ROOT__" "$var_root" "$jirafeauconfigfile"
-ynh_replace_string "__YNH_ADMIN_USER__" "$admin_user" "$jirafeauconfigfile"
+ynh_replace_string --match_string="__YNH_VAR_ROOT__" --replace_string="$var_root" --target_file="$jirafeauconfigfile"
+ynh_replace_string --match_string="__YNH_ADMIN_USER__" --replace_string="$admin_user" --target_file="$jirafeauconfigfile"
 
 # Calculate and store the config file checksum into the app settings
-ynh_store_file_checksum "$jirafeauconfigfile"
+ynh_store_file_checksum --file="$jirafeauconfigfile"
 
 # Remove the install.php
 rm $final_path/install.php
@@ -143,25 +141,25 @@ chmod -R 700 $var_root
 #=================================================
 # SETUP SSOWAT
 #=================================================
-ynh_print_info "Configuring SSOwat..."
+ynh_script_progression --message="Configuring SSOwat..."
 
-ynh_app_setting_set $app unprotected_uris "/"
+ynh_app_setting_set --app=$app --key=unprotected_uris --value="/"
 if [ $is_public -eq 0 ]
 then
 	domain_regex=$(echo "$domain" | sed 's@-@.@g')
 	[ "$path_url" = "/" ] && path_url=""
-	ynh_app_setting_set $app protected_regex "$domain_regex$path_url/$","$domain_regex$path_url/admin.php.*$"
+	ynh_app_setting_set --app=$app --key=protected_regex --value="$domain_regex$path_url/$","$domain_regex$path_url/admin.php.*$"
 fi
 
 #=================================================
 # RELOAD NGINX
 #=================================================
-ynh_print_info "Reloading nginx web server..."
+ynh_script_progression --message="Reloading nginx web server..."
 
-systemctl reload nginx
+ynh_systemd_action --service_name=nginx --action=reload
 
 #=================================================
 # END OF SCRIPT
 #=================================================
 
-ynh_print_info "Installation of $app completed"
+ynh_script_progression --message="Installation of $app completed" --last
