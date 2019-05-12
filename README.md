@@ -31,9 +31,9 @@ Jirafeau is a web site permitting to upload a file in a simple way and give an u
 
 #### Supported architectures
 
-* x86-64b - [![Build Status](https://ci-apps.yunohost.org/ci/logs/jirafeau%20%28Official%29.svg)](https://ci-apps.yunohost.org/ci/apps/jirafeau/)
-* ARMv8-A - [![Build Status](https://ci-apps-arm.yunohost.org/ci/logs/jirafeau%20%28Official%29.svg)](https://ci-apps-arm.yunohost.org/ci/apps/jirafeau/)
-* Jessie x86-64b - [![Build Status](https://ci-stretch.nohost.me/ci/logs/jirafeau%20%28Official%29.svg)](https://ci-stretch.nohost.me/ci/apps/jirafeau/)
+* x86-64b - [![Build Status](https://ci-apps.yunohost.org/ci/logs/jirafeau%20%28Apps%29.svg)](https://ci-apps.yunohost.org/ci/apps/jirafeau/)
+* ARMv8-A - [![Build Status](https://ci-apps-arm.yunohost.org/ci/logs/jirafeau%20%28Apps%29.svg)](https://ci-apps-arm.yunohost.org/ci/apps/jirafeau/)
+* Jessie x86-64b - [![Build Status](https://ci-stretch.nohost.me/ci/logs/jirafeau%20%28Apps%29.svg)](https://ci-stretch.nohost.me/ci/apps/jirafeau/)
 
 ## Limitations
 
@@ -43,6 +43,7 @@ Jirafeau is a web site permitting to upload a file in a simple way and give an u
 
  * Report a bug: https://github.com/YunoHost-Apps/jirafeau_ynh/issues
  * Jirafeau website: https://gitlab.com/mojo42/Jirafeau
+ * Upstream app repository: https://gitlab.com/mojo42/Jirafeau
  * YunoHost website: https://yunohost.org/
 
 ---
