@@ -6,57 +6,69 @@
 # IMPORT GENERIC HELPERS
 #=================================================
 
-# source _common.sh
+source _common.sh
 source /usr/share/yunohost/helpers
 
 #=================================================
 # LOAD SETTINGS
 #=================================================
+ynh_script_progression --message="Loading installation settings..." --weight=2
 
 app=$YNH_APP_INSTANCE_NAME
 
-domain=$(ynh_app_setting_get $app domain)
-path_url=$(ynh_app_setting_get $app path)
-admin_user=$(ynh_app_setting_get $app admin_user)
-upload_password=$(ynh_app_setting_get $app upload_password)
-final_path=$(ynh_app_setting_get $app final_path)
-is_public=$(ynh_app_setting_get $app is_public)
+domain=$(ynh_app_setting_get --app=$app --key=domain)
+path_url=$(ynh_app_setting_get --app=$app --key=path)
+admin_user=$(ynh_app_setting_get --app=$app --key=admin_user)
+is_public=$(ynh_app_setting_get --app=$app --key=is_public)
+final_path=$(ynh_app_setting_get --app=$app --key=final_path)
+upload_password=$(ynh_app_setting_get --app=$app --key=upload_password)
 
 #=================================================
-# FIX OLD THINGS
+# CHECK VERSION
 #=================================================
+
+upgrade_type=$(ynh_check_app_version_changed)
+
+#=================================================
+# ENSURE DOWNWARD COMPATIBILITY
+#=================================================
+ynh_script_progression --message="Ensuring downward compatibility..."
 
 # Fix is_public as a boolean value
 if [ "$is_public" = "Yes" ]; then
-	ynh_app_setting_set $app is_public 1
+	ynh_app_setting_set --app=$app --key=is_public --value=1
 	is_public=1
 elif [ "$is_public" = "No" ]; then
-	ynh_app_setting_set $app is_public 0
+	ynh_app_setting_set --app=$app --key=is_public --value=0
 	is_public=0
 fi
 
 # If final_path doesn't exist, create it
-if [ -z $final_path ]; then
+if [ -z "$final_path" ]; then
 	final_path=/var/www/$app
-	ynh_app_setting_set $app final_path $final_path
+	ynh_app_setting_set --app=$app --key=final_path --value=$final_path
 fi
 
 #=================================================
 # BACKUP BEFORE UPGRADE THEN ACTIVE TRAP
 #=================================================
+ynh_script_progression --message="Backing up the app before upgrading (may take a while)..." --weight=3
 
-ynh_backup_before_upgrade	# Backup the current version of the app
+# Backup the current version of the app
+ynh_backup_before_upgrade
 ynh_clean_setup () {
-	ynh_restore_upgradebackup	# restore it if the upgrade fails
+	# restore it if the upgrade fails
+	ynh_restore_upgradebackup
 }
-ynh_abort_if_errors	# Exit if an error occurs during the execution of the script
+# Exit if an error occurs during the execution of the script
+ynh_abort_if_errors
 
 #=================================================
 # CHECK THE PATH
 #=================================================
 
 # Normalize the URL path syntax
-path_url=$(ynh_normalize_url_path $path_url)
+path_url=$(ynh_normalize_url_path --path_url=$path_url)
 
 #=================================================
 # STANDARD UPGRADE STEPS
@@ -64,31 +76,34 @@ path_url=$(ynh_normalize_url_path $path_url)
 # DOWNLOAD, CHECK AND UNPACK SOURCE
 #=================================================
 
-# Download, check integrity, uncompress and patch the source from app.src
-ynh_setup_source "$final_path"
+if [ "$upgrade_type" == "UPGRADE_APP" ]
+then
+	ynh_script_progression --message="Upgrading source files..." --weight=2
+
+	# Download, check integrity, uncompress and patch the source from app.src
+	ynh_setup_source --dest_dir="$final_path"
+fi
 
 #=================================================
 # NGINX CONFIGURATION
 #=================================================
+ynh_script_progression --message="Upgrading nginx web server configuration..." --weight=2
 
 # Create a dedicated nginx config
 ynh_add_nginx_config
-if [ "$path_url" != "/" ]
-then
-	ynh_replace_string "^#sub_path_only" "" "/etc/nginx/conf.d/$domain.d/$app.conf"
-fi
-ynh_store_file_checksum "/etc/nginx/conf.d/$domain.d/$app.conf"
 
 #=================================================
 # CREATE DEDICATED USER
 #=================================================
+ynh_script_progression --message="Making sure dedicated system user exists..."
 
-# Create a system user
-ynh_system_user_create $app
+# Create a dedicated user (if not existing)
+ynh_system_user_create --username=$app
 
 #=================================================
 # PHP-FPM CONFIGURATION
 #=================================================
+ynh_script_progression --message="Upgrading php-fpm configuration..." --weight=2
 
 # Create a dedicated php-fpm config
 ynh_add_fpm_config
@@ -101,36 +116,39 @@ ynh_add_fpm_config
 
 jirafeauconfigfile="$final_path/lib/config.local.php"
 
-ynh_backup_if_checksum_is_different "$final_path/lib/config.local.php"	# Créé un backup du fichier de config si il a été modifié.
+ynh_backup_if_checksum_is_different --file="$final_path/lib/config.local.php"
 
-sudo cp "../conf/config.local.php" "$final_path/lib/config.local.php"
+cp "../conf/config.local.php" "$final_path/lib/config.local.php"
 
 # Set and save upload password, allowing an empty one
 if [ -z "$upload_password" ]
 then
-    ynh_replace_string "YNH_UPLOAD_PASSWORD" "" "$jirafeauconfigfile"
-	ynh_app_setting_set $app upload_password ""
+    ynh_replace_string --match_string="__YNH_UPLOAD_PASSWORD__" --replace_string="" --target_file="$jirafeauconfigfile"
+	ynh_app_setting_set --app=$app --key=upload_password --value=""
 else
-    ynh_replace_string "YNH_UPLOAD_PASSWORD" "'$upload_password'" "$jirafeauconfigfile"
-	ynh_app_setting_set $app upload_password "$upload_password"
+    ynh_replace_string --match_string="__YNH_UPLOAD_PASSWORD__" --replace_string="'$upload_password'" --target_file="$jirafeauconfigfile"
+	ynh_app_setting_set --app=$app --key=upload_password --value="$upload_password"
 fi
 
 #=================================================
 # CONFIGURE JIRAFEAU
 #=================================================
+ynh_script_progression --message="Upgrading jirafeau configuration..."
 
 var_root=/home/yunohost.app/$app
-ynh_replace_string "YNH_DOMAIN" "$domain" "$jirafeauconfigfile"
+
+ynh_replace_string --match_string="__YNH_DOMAIN__" --replace_string="$domain" --target_file="$jirafeauconfigfile"
 if [ "$path_url" = "/" ]
 then
-	ynh_replace_string "YNH_WWW_PATH" "" "$jirafeauconfigfile"
+	ynh_replace_string --match_string="__YNH_WWW_PATH__" --replace_string="" --target_file="$jirafeauconfigfile"
 else
-	ynh_replace_string "YNH_WWW_PATH" "$path_url" "$jirafeauconfigfile"
+	ynh_replace_string --match_string="__YNH_WWW_PATH__" --replace_string="$path_url" --target_file="$jirafeauconfigfile"
 fi
-ynh_replace_string "YNH_VAR_ROOT" "$var_root" "$jirafeauconfigfile"
-ynh_replace_string "YNH_ADMIN_USER" "$admin_user" "$jirafeauconfigfile"
+ynh_replace_string --match_string="__YNH_VAR_ROOT__" --replace_string="$var_root" --target_file="$jirafeauconfigfile"
+ynh_replace_string --match_string="__YNH_ADMIN_USER__" --replace_string="$admin_user" --target_file="$jirafeauconfigfile"
 
-ynh_store_file_checksum "$jirafeauconfigfile"	# Enregistre la somme de contrôle du fichier de config
+# Recalculate and store the checksum of the file for the next upgrade.
+ynh_store_file_checksum --file="$jirafeauconfigfile"
 
 # Remove the install.php
 rm $final_path/install.php
@@ -141,26 +159,34 @@ rm $final_path/install.php
 # SECURING FILES AND DIRECTORIES
 #=================================================
 
-sudo chown -R root: $final_path
+chown -R root: $final_path
 
-sudo mkdir -p $var_root/{files,links,async,block}
-sudo chown -R $app:root $var_root
-sudo chmod -R 700 $var_root
+mkdir -p $var_root/{files,links,async,block}
+chown -R $app:root $var_root
+chmod -R 700 $var_root
 
 #=================================================
 # SETUP SSOWAT
 #=================================================
+ynh_script_progression --message="Upgrading SSOwat configuration..." --weight=2
 
-ynh_app_setting_set $app unprotected_uris "/"
+ynh_app_setting_set --app=$app --key=unprotected_uris --value="/"
 if [ $is_public -eq 0 ]
 then
 	domain_regex=$(echo "$domain" | sed 's@-@.@g')
 	[ "$path_url" = "/" ] && path_url=""
-	ynh_app_setting_set $app protected_regex "$domain_regex$path_url/$","$domain_regex$path_url/admin.php.*$"
+	ynh_app_setting_set --app=$app --key=protected_regex --value="$domain_regex$path_url/$","$domain_regex$path_url/admin.php.*$"
 fi
 
 #=================================================
 # RELOAD NGINX
 #=================================================
+ynh_script_progression --message="Reloading nginx web server..."
 
-sudo systemctl reload nginx
+ynh_systemd_action --service_name=nginx --action=reload
+
+#=================================================
+# END OF SCRIPT
+#=================================================
+
+ynh_script_progression --message="Upgrade of $app completed" --last
