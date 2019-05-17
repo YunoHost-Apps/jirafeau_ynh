@@ -124,7 +124,7 @@ ynh_replace_string --match_string="__YNH_ADMIN_USER__" --replace_string="$admin_
 ynh_store_file_checksum --file="$jirafeauconfigfile"
 
 # Remove the install.php
-rm $final_path/install.php
+ynh_secure_remove --file=$final_path/install.php
 
 #=================================================
 # GENERIC FINALISATION
