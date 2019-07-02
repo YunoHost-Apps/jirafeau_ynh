@@ -102,7 +102,7 @@ then
 	ynh_replace_string --match_string="__YNH_UPLOAD_PASSWORD__" --replace_string="" --target_file="$jirafeauconfigfile"
 	ynh_app_setting_set --app=$app --key=upload_password --value=""
 else
-	ynh_replace_string --match_string="__YNH_UPLOAD_PASSWORD__" --replace_string="'$upload_password'" --target_file="$jirafeauconfigfile"
+	ynh_replace_special_string --match_string="__YNH_UPLOAD_PASSWORD__" --replace_string="'$upload_password'" --target_file="$jirafeauconfigfile"
 	ynh_app_setting_set --app=$app --key=upload_password --value="$upload_password"
 fi
 ynh_print_ON
