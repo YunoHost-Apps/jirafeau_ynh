@@ -158,6 +158,15 @@ ynh_store_file_checksum --file="$jirafeauconfigfile"
 ynh_secure_remove --file=$final_path/install.php
 
 #=================================================
+# SET THE CRON FILE
+#=================================================
+ynh_script_progression --message="Configuring the cron file..."
+
+cp ../conf/cron /etc/cron.d/$app
+ynh_replace_string --match_string="__FINALPATH__" --replace_string="$final_path" --target_file=/etc/cron.d/$app
+ynh_replace_string --match_string="__APP__" --replace_string=$app --target_file=/etc/cron.d/$app
+
+#=================================================
 # GENERIC FINALISATION
 #=================================================
 # SECURING FILES AND DIRECTORIES
