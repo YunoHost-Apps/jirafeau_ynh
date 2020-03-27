@@ -93,7 +93,7 @@ then
                     if [ "$type" = "files" ]; then
                             mv "${full_file}_count" "$full_path"
                     fi
-            done <<< "$(sudo find "$var_root/$type" -type f)" # List all files, without directories
+            done <<< "$(find "$var_root/$type" -type f)" # List all files, without directories
     done
 
     # And clean the old directories
@@ -108,7 +108,7 @@ then
                     then
                             rm -r "$file"
                     fi
-            done <<< "$(sudo find "$var_root/$type" -maxdepth 1 -mindepth 1 -type d)" # List all first level directories
+            done <<< "$(find "$var_root/$type" -maxdepth 1 -mindepth 1 -type d)" # List all first level directories
     done
 fi
 
