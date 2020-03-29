@@ -1,6 +1,6 @@
 # Jirafeau for YunoHost
 
-[![Integration level](https://dash.yunohost.org/integration/jirafeau.svg)](https://dash.yunohost.org/appci/app/jirafeau)  
+[![Integration level](https://dash.yunohost.org/integration/jirafeau.svg)](https://dash.yunohost.org/appci/app/jirafeau) ![](https://ci-apps.yunohost.org/ci/badges/jirafeau.status.svg) ![](https://ci-apps.yunohost.org/ci/badges/jirafeau.maintain.svg)  
 [![Install Jirafeau with YunoHost](https://install-app.yunohost.org/install-with-yunohost.png)](https://install-app.yunohost.org/?app=jirafeau)
 
 > *This package allow you to install Jirafeau quickly and simply on a YunoHost server.  
