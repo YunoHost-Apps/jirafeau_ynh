@@ -51,6 +51,67 @@ if [ -z "$final_path" ]; then
 	ynh_app_setting_set --app=$app --key=final_path --value=$final_path
 fi
 
+# Migrate files from 3.4.1 to 4.1.1
+current_version="$(ynh_app_upstream_version --manifest="/etc/yunohost/apps/$app/manifest.json")"
+update_version="$(ynh_app_upstream_version)"
+# If the upgrade if from a version 3 or less to 4 or more. Migrate the files
+if [ ${current_version:0:1} -le 3 ] && [ ${update_version:0:1} -ge 4 ]
+then
+    ynh_script_progression --message="Migrating files..." --weight=5
+
+    var_root=/home/yunohost.app/$app
+
+    # Migrate files and links to the new directory structure
+    for type in files links
+    do
+            while read file
+            do
+                    # Ignore _count files
+                    if echo "$file" | grep --quiet "_count$"; then
+                            continue
+                    fi
+
+                    # Remove all directories before the file name
+                    full_file="$file"
+                    file=$(basename $file)
+
+                    # Split the file name every 8 characters
+                    split=0
+                    full_path="$var_root/$type"
+                    while [ $split -le ${#file} ]
+                    do
+                            part_dir="${file:$split:8}"
+                            # Increment the point where with start reading of 8.
+                            split=$((split+8))
+                            full_path="$full_path/$part_dir"
+                    done
+
+                    # Create the new crazy directory structure
+                    mkdir -p "$full_path"
+                    # And move the file to this place
+                    mv "$full_file" "$full_path/$file"
+                    if [ "$type" = "files" ]; then
+                            mv "${full_file}_count" "$full_path"
+                    fi
+            done <<< "$(find "$var_root/$type" -type f)" # List all files, without directories
+    done
+
+    # And clean the old directories
+    for type in files links
+    do
+            while read file
+            do
+                    # Remove all directories before the last one
+                    dirname="$(basename $file)"
+                    # Delete the directory if it's only one character long
+                    if [ ${#dirname} -eq 1 ]
+                    then
+                            rm -r "$file"
+                    fi
+            done <<< "$(find "$var_root/$type" -maxdepth 1 -mindepth 1 -type d)" # List all first level directories
+    done
+fi
+
 #=================================================
 # BACKUP BEFORE UPGRADE THEN ACTIVE TRAP
 #=================================================
