@@ -1,0 +1,4 @@
+# https://gitlab.com/mojo42/Jirafeau/#how-can-i-automatize-the-cleaning-of-old-expired-files
+
+12 3    * * *   __APP__  php7.0 __FINALPATH__/admin.php clean_expired
+16 3    * * *   __APP__  php7.0 __FINALPATH__/admin.php clean_async

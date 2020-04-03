@@ -66,6 +66,13 @@ ynh_system_user_create --username=$app
 ynh_restore_file --origin_path="/etc/php/7.0/fpm/pool.d/$app.conf"
 
 #=================================================
+# RESTORE THE CRON FILE
+#=================================================
+ynh_script_progression --message="Restoring the cron file..."
+
+ynh_restore_file --origin_path="/etc/cron.d/$app"
+
+#=================================================
 # SPECIFIC RESTORE
 #=================================================
 # RESTORE THE DATA OF JIRAFEAU
