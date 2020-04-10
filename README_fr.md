@@ -22,8 +22,11 @@ Jirafeau est un site web permettant d'héberger et de partager des fichiers de m
 
 * [Démo officielle](https://demo.yunohost.org/jirafeau/)
 
+## Configuration
+
 ## Documentation
 
+ * Documentation officielle: 
  * Documentation YunoHost: Si une documentation spécifique est nécessaire, n'hésitez pas à contribuer.
 
 ## Caractéristiques spécifiques YunoHost
@@ -32,6 +35,11 @@ Jirafeau est un site web permettant d'héberger et de partager des fichiers de m
 
 * x86-64b - [![Build Status](https://ci-apps.yunohost.org/ci/logs/jirafeau%20%28Apps%29.svg)](https://ci-apps.yunohost.org/ci/apps/jirafeau/)
 * ARMv8-A - [![Build Status](https://ci-apps-arm.yunohost.org/ci/logs/jirafeau%20%28Apps%29.svg)](https://ci-apps-arm.yunohost.org/ci/apps/jirafeau/)
+* Jessie x86-64b - [![Build Status](https://ci-stretch.nohost.me/ci/logs/jirafeau%20%28Apps%29.svg)](https://ci-stretch.nohost.me/ci/apps/jirafeau/)
+
+## Limitations
+
+## Informations additionnelles
 
 ## Liens
 
@@ -42,8 +50,10 @@ Jirafeau est un site web permettant d'héberger et de partager des fichiers de m
 
 ---
 
-## Informations pour les développeurs
+Informations pour les développeurs
+----------------
 
+**Seulement si vous voulez utiliser une branche de test pour le codage, au lieu de fusionner directement dans la banche principale.**
 Merci de faire vos pull request sur la [branche testing](https://github.com/YunoHost-Apps/jirafeau_ynh/tree/testing).
 
 Pour essayer la branche testing, procédez comme suit.
