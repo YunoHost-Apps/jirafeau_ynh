@@ -22,11 +22,8 @@ Jirafeau is a web site permitting to upload a file in a simple way and give an u
 
 * [YunoHost demo](https://demo.yunohost.org/jirafeau/)
 
-## Configuration
-
 ## Documentation
 
- * Official documentation: 
  * YunoHost documentation: If specific documentation is needed, feel free to contribute.
 
 ## YunoHost specific features
@@ -35,11 +32,6 @@ Jirafeau is a web site permitting to upload a file in a simple way and give an u
 
 * x86-64b - [![Build Status](https://ci-apps.yunohost.org/ci/logs/jirafeau%20%28Apps%29.svg)](https://ci-apps.yunohost.org/ci/apps/jirafeau/)
 * ARMv8-A - [![Build Status](https://ci-apps-arm.yunohost.org/ci/logs/jirafeau%20%28Apps%29.svg)](https://ci-apps-arm.yunohost.org/ci/apps/jirafeau/)
-* Jessie x86-64b - [![Build Status](https://ci-stretch.nohost.me/ci/logs/jirafeau%20%28Apps%29.svg)](https://ci-stretch.nohost.me/ci/apps/jirafeau/)
-
-## Limitations
-
-## Additional information
 
 ## Links
 
