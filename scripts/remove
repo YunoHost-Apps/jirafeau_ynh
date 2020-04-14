@@ -46,6 +46,13 @@ ynh_script_progression --message="Removing php-fpm configuration..." --weight=2
 ynh_remove_fpm_config
 
 #=================================================
+# REMOVE THE CRON FILE
+#=================================================
+ynh_script_progression --message="Removing the cron file..."
+
+ynh_secure_remove --file="/etc/cron.d/$app"
+
+#=================================================
 # SPECIFIC REMOVE
 #=================================================
 # REMOVE THE DATA DIRECTORY

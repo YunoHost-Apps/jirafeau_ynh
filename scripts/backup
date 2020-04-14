@@ -55,6 +55,13 @@ ynh_script_progression --message="Backing up php-fpm configuration..."
 ynh_backup --src_path="/etc/php/7.0/fpm/pool.d/$app.conf"
 
 #=================================================
+# BACKUP THE CRON FILE
+#=================================================
+ynh_script_progression --message="Backing up the cron file..."
+
+ynh_backup --src_path="/etc/cron.d/$app"
+
+#=================================================
 # END OF SCRIPT
 #=================================================
 
