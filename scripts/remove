@@ -24,7 +24,7 @@ final_path=$(ynh_app_setting_get --app=$app --key=final_path)
 #=================================================
 # REMOVE THE MAIN DIR OF THE APP
 #=================================================
-ynh_script_progression --message="Removing app main directory..." --weight=2
+ynh_script_progression --message="Removing Jirafeau main directory..." --weight=2
 
 # Remove the app directory securely
 ynh_secure_remove --file="$final_path"
@@ -75,4 +75,4 @@ ynh_system_user_delete --username=$app
 # END OF SCRIPT
 #=================================================
 
-ynh_script_progression --message="Removal of $app completed" --last
+ynh_script_progression --message="Removal of Jirafeau completed" --last

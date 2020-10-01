@@ -27,7 +27,7 @@ Jirafeau is a web site permitting to upload a file in a simple way and give an u
 ## Documentation
 
  * Official documentation: 
- * YunoHost documentation: If specific documentation is needed, feel free to contribute.
+ * YunoHost documentation: https://yunohost.org/#/app_jirafeau
 
 ## YunoHost specific features
 

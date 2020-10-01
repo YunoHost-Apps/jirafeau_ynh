@@ -27,7 +27,7 @@ Jirafeau est un site web permettant d'héberger et de partager des fichiers de m
 ## Documentation
 
  * Documentation officielle : 
- * Documentation YunoHost : Si une documentation spécifique est nécessaire, n'hésitez pas à contribuer.
+ * Documentation YunoHost : https://yunohost.org/#/app_jirafeau_fr
 
 ## Caractéristiques spécifiques YunoHost
 
