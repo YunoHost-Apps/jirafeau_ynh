@@ -33,9 +33,8 @@ Jirafeau is a web site permitting to upload a file in a simple way and give an u
 
 #### Supported architectures
 
-* x86-64b - [![Build Status](https://ci-apps.yunohost.org/ci/logs/jirafeau%20%28Apps%29.svg)](https://ci-apps.yunohost.org/ci/apps/jirafeau/)
+* x86-64 - [![Build Status](https://ci-apps.yunohost.org/ci/logs/jirafeau%20%28Apps%29.svg)](https://ci-apps.yunohost.org/ci/apps/jirafeau/)
 * ARMv8-A - [![Build Status](https://ci-apps-arm.yunohost.org/ci/logs/jirafeau%20%28Apps%29.svg)](https://ci-apps-arm.yunohost.org/ci/apps/jirafeau/)
-* Jessie x86-64b - [![Build Status](https://ci-stretch.nohost.me/ci/logs/jirafeau%20%28Apps%29.svg)](https://ci-stretch.nohost.me/ci/apps/jirafeau/)
 
 ## Limitations
 
@@ -50,8 +49,7 @@ Jirafeau is a web site permitting to upload a file in a simple way and give an u
 
 ---
 
-Developers info
-----------------
+## Developers info
 
 Please do your pull request to the [testing branch](https://github.com/YunoHost-Apps/jirafeau_ynh/tree/testing).
 
