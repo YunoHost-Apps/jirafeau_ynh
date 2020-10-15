@@ -24,6 +24,7 @@ final_path=$(ynh_app_setting_get --app=$app --key=final_path)
 ynh_print_OFF
 upload_password=$(ynh_app_setting_get --app=$app --key=upload_password)
 ynh_print_ON
+phpversion=$(ynh_app_setting_get --app=$app --key=phpversion)
 
 #=================================================
 # CHECK VERSION
@@ -34,7 +35,7 @@ upgrade_type=$(ynh_check_app_version_changed)
 #=================================================
 # ENSURE DOWNWARD COMPATIBILITY
 #=================================================
-ynh_script_progression --message="Ensuring downward compatibility..."
+ynh_script_progression --message="Ensuring downward compatibility..." --weight=1
 
 # Fix is_public as a boolean value
 if [ "$is_public" = "Yes" ]; then
@@ -150,15 +151,15 @@ fi
 #=================================================
 # NGINX CONFIGURATION
 #=================================================
-ynh_script_progression --message="Upgrading nginx web server configuration..." --weight=2
+ynh_script_progression --message="Upgrading NGINX web server configuration..." --weight=2
 
-# Create a dedicated nginx config
+# Create a dedicated NGINX config
 ynh_add_nginx_config
 
 #=================================================
 # CREATE DEDICATED USER
 #=================================================
-ynh_script_progression --message="Making sure dedicated system user exists..."
+ynh_script_progression --message="Making sure dedicated system user exists..." --weight=1
 
 # Create a dedicated user (if not existing)
 ynh_system_user_create --username=$app
@@ -166,7 +167,7 @@ ynh_system_user_create --username=$app
 #=================================================
 # PHP-FPM CONFIGURATION
 #=================================================
-ynh_script_progression --message="Upgrading php-fpm configuration..." --weight=2
+ynh_script_progression --message="Upgrading PHP-FPM configuration..." --weight=2
 
 # Create a dedicated php-fpm config
 ynh_add_fpm_config
@@ -198,7 +199,7 @@ ynh_print_ON
 #=================================================
 # CONFIGURE JIRAFEAU
 #=================================================
-ynh_script_progression --message="Upgrading jirafeau configuration..."
+ynh_script_progression --message="Upgrading Jirafeau configuration..." --weight=2
 
 var_root=/home/yunohost.app/$app
 
@@ -221,7 +222,7 @@ ynh_secure_remove --file=$final_path/install.php
 #=================================================
 # SET THE CRON FILE
 #=================================================
-ynh_script_progression --message="Configuring the cron file..."
+ynh_script_progression --message="Configuring the cron file..." --weight=1
 
 cp ../conf/cron /etc/cron.d/$app
 ynh_replace_string --match_string="__FINALPATH__" --replace_string="$final_path" --target_file=/etc/cron.d/$app
@@ -255,7 +256,7 @@ fi
 #=================================================
 # RELOAD NGINX
 #=================================================
-ynh_script_progression --message="Reloading nginx web server..."
+ynh_script_progression --message="Reloading NGINX web server..." --weight=1
 
 ynh_systemd_action --service_name=nginx --action=reload
 
@@ -263,4 +264,4 @@ ynh_systemd_action --service_name=nginx --action=reload
 # END OF SCRIPT
 #=================================================
 
-ynh_script_progression --message="Upgrade of $app completed" --last
+ynh_script_progression --message="Upgrade of Jirafeau completed" --last

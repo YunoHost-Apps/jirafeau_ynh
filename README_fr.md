@@ -5,14 +5,14 @@
 
 *[Read this readme in english.](./README.md)* 
 
-> *Ce package vous permet d'installer Jirafeau rapidement et simplement sur un serveur Yunohost.  
+> *Ce package vous permet d'installer Jirafeau rapidement et simplement sur un serveur YunoHost.  
 Si vous n'avez pas YunoHost, regardez [ici](https://yunohost.org/#/install) pour savoir comment l'installer et en profiter.*
 
 ## Vue d'ensemble
 
 Jirafeau est un site web permettant d'héberger et de partager des fichiers de manière simple en leur donnant un lien unique.
 
-**Version incluse:** 4.1.1
+**Version incluse :** 4.1.1
 
 ## Captures d'écran
 
@@ -26,16 +26,15 @@ Jirafeau est un site web permettant d'héberger et de partager des fichiers de m
 
 ## Documentation
 
- * Documentation officielle: 
- * Documentation YunoHost: Si une documentation spécifique est nécessaire, n'hésitez pas à contribuer.
+ * Documentation officielle : 
+ * Documentation YunoHost : https://yunohost.org/#/app_jirafeau_fr
 
 ## Caractéristiques spécifiques YunoHost
 
 #### Architectures supportées
 
-* x86-64b - [![Build Status](https://ci-apps.yunohost.org/ci/logs/jirafeau%20%28Apps%29.svg)](https://ci-apps.yunohost.org/ci/apps/jirafeau/)
+* x86-64 - [![Build Status](https://ci-apps.yunohost.org/ci/logs/jirafeau%20%28Apps%29.svg)](https://ci-apps.yunohost.org/ci/apps/jirafeau/)
 * ARMv8-A - [![Build Status](https://ci-apps-arm.yunohost.org/ci/logs/jirafeau%20%28Apps%29.svg)](https://ci-apps-arm.yunohost.org/ci/apps/jirafeau/)
-* Jessie x86-64b - [![Build Status](https://ci-stretch.nohost.me/ci/logs/jirafeau%20%28Apps%29.svg)](https://ci-stretch.nohost.me/ci/apps/jirafeau/)
 
 ## Limitations
 
@@ -43,17 +42,15 @@ Jirafeau est un site web permettant d'héberger et de partager des fichiers de m
 
 ## Liens
 
- * Signaler un bug: https://github.com/YunoHost-Apps/jirafeau_ynh/issues
- * Site de l'application: https://gitlab.com/mojo42/Jirafeau
- * Dépôt de l'application principale: https://gitlab.com/mojo42/Jirafeau
- * Site web YunoHost: https://yunohost.org/
+ * Signaler un bug : https://github.com/YunoHost-Apps/jirafeau_ynh/issues
+ * Site de l'application : https://gitlab.com/mojo42/Jirafeau
+ * Dépôt de l'application principale : https://gitlab.com/mojo42/Jirafeau
+ * Site web YunoHost : https://yunohost.org/
 
 ---
 
-Informations pour les développeurs
-----------------
+## Informations pour les développeurs
 
-**Seulement si vous voulez utiliser une branche de test pour le codage, au lieu de fusionner directement dans la banche principale.**
 Merci de faire vos pull request sur la [branche testing](https://github.com/YunoHost-Apps/jirafeau_ynh/tree/testing).
 
 Pour essayer la branche testing, procédez comme suit.
