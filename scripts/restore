@@ -64,7 +64,7 @@ ynh_system_user_create --username=$app
 # RESTORE THE PHP-FPM CONFIGURATION
 #=================================================
 
-ynh_restore_file --origin_path="/etc/php/7.0/fpm/pool.d/$app.conf"
+ynh_restore_file --origin_path="/etc/php/$phpversion/fpm/pool.d/$app.conf"
 
 #=================================================
 # RESTORE THE CRON FILE
