@@ -107,7 +107,7 @@ then
                     # Delete the directory if it's only one character long
                     if [ ${#dirname} -eq 1 ]
                     then
-                            rm -r "$file"
+                            ynh_secure_remove "$file"
                     fi
             done <<< "$(find "$var_root/$type" -maxdepth 1 -mindepth 1 -type d)" # List all first level directories
     done
