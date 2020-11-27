@@ -80,7 +80,7 @@ fi
 #=================================================
 
 # Change domain name in parameters.yml
-ynh_replace_string --match_string="\$cfg['web_root'] = .*" --replace_string="\$cfg['web_root'] = 'https://' . '$new_domain' . '${new_path%/}' . '/';" --target_file="$final_path/lib/config.local.php"
+ynh_replace_string --match_string="\$cfg\['web_root'\] = .*" --replace_string="\$cfg['web_root'] = 'https://' . '$new_domain' . '${new_path%/}' . '/';" --target_file="$final_path/lib/config.local.php"
 
 #=================================================
 # GENERIC FINALISATION
