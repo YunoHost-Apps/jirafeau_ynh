@@ -12,7 +12,7 @@ Si vous n'avez pas YunoHost, regardez [ici](https://yunohost.org/#/install) pour
 
 Jirafeau est un site web permettant d'héberger et de partager des fichiers de manière simple en leur donnant un lien unique.
 
-**Version incluse :** 4.1.1
+**Version incluse :** 4.2.0
 
 ## Captures d'écran
 
@@ -56,6 +56,6 @@ Merci de faire vos pull request sur la [branche testing](https://github.com/Yuno
 Pour essayer la branche testing, procédez comme suit.
 ```
 sudo yunohost app install https://github.com/YunoHost-Apps/jirafeau_ynh/tree/testing --debug
-or
+ou
 sudo yunohost app upgrade jirafeau -u https://github.com/YunoHost-Apps/jirafeau_ynh/tree/testing --debug
 ```
