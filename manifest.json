@@ -6,7 +6,7 @@
 		"en": "Upload a file in a simple way and give a unique link to it",
 		"fr": "Hébergez simplement un fichier et partagez-le avec un lien unique"
 	},
-	"version": "4.2.0~ynh1",
+	"version": "4.3.0~ynh1",
 	"url": "https://gitlab.com/mojo42/Jirafeau",
 	"license": "AGPL-3.0-only",
 	"maintainer": {
@@ -19,7 +19,7 @@
 	"multi_instance": false,
 	"services": [
 		"nginx",
-		"php7.0-fpm"
+		"php7.3-fpm"
 	],
 	"arguments": {
 		"install" : [
