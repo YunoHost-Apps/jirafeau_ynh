@@ -12,7 +12,7 @@ Si vous n'avez pas YunoHost, regardez [ici](https://yunohost.org/#/install) pour
 
 Jirafeau est un site web permettant d'héberger et de partager des fichiers de manière simple en leur donnant un lien unique.
 
-**Version incluse :** 4.2.0
+**Version incluse :** 4.3.0
 
 ## Captures d'écran
 

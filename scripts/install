@@ -156,9 +156,10 @@ chmod -R 700 $var_root
 #=================================================
 # SETUP SSOWAT
 #=================================================
-ynh_script_progression --message="Configuring SSOwat..." --weight=2
+ynh_script_progression --message="Configuring permissions..." --weight=2
 
-ynh_app_setting_set --app=$app --key=unprotected_uris --value="/"
+ynh_permission_update --permission="main" --add="visitors"
+
 if [ $is_public -eq 0 ]
 then
 	domain_regex=$(echo "$domain" | sed 's@-@.@g')
