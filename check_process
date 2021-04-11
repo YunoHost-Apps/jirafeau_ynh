@@ -13,7 +13,6 @@
 		setup_private=1
 		setup_public=1
 		upgrade=1
-		upgrade=1	from_commit=48ed2dc5b80ed7f1ddd39a46917f993a8c4207d5
 		backup_restore=1
 		multi_instance=0
 		change_url=1
@@ -21,7 +20,7 @@
 Email=
 Notification=none
 ;;; Upgrade options
-	; commit=48ed2dc5b80ed7f1ddd39a46917f993a8c4207d5
-		name=Refactoring and upgrade 3.3.0
+	; commit=
+		name=
 		manifest_arg=domain=DOMAIN&path=PATH&admin_user=USER&upload_password=supersecretpassword&is_public=1&
 		
