@@ -100,10 +100,10 @@ cp "../conf/config.local.php" "$jirafeauconfigfile"
 ynh_print_OFF
 if [ -z "$upload_password" ]
 then
-	ynh_replace_string --match_string="__YNH_UPLOAD_PASSWORD__" --replace_string="" --target_file="$jirafeauconfigfile"
+	ynh_replace_string --match_string="__UPLOAD_PASSWORD__" --replace_string="" --target_file="$jirafeauconfigfile"
 	ynh_app_setting_set --app=$app --key=upload_password --value=""
 else
-	ynh_replace_special_string --match_string="__YNH_UPLOAD_PASSWORD__" --replace_string="'$upload_password'" --target_file="$jirafeauconfigfile"
+	ynh_replace_special_string --match_string="__UPLOAD_PASSWORD__" --replace_string="'$upload_password'" --target_file="$jirafeauconfigfile"
 	ynh_app_setting_set --app=$app --key=upload_password --value="$upload_password"
 fi
 ynh_print_ON
@@ -115,15 +115,15 @@ ynh_script_progression --message="Configuring Jirafeau..." --weight=2
 
 var_root=/home/yunohost.app/$app
 
-ynh_replace_string --match_string="__YNH_DOMAIN__" --replace_string="$domain" --target_file="$jirafeauconfigfile"
+ynh_replace_string --match_string="__DOMAIN__" --replace_string="$domain" --target_file="$jirafeauconfigfile"
 if [ "$path_url" = "/" ]
 then
-	ynh_replace_string --match_string="__YNH_WWW_PATH__" --replace_string="" --target_file="$jirafeauconfigfile"
+	ynh_replace_string --match_string="__PATH__" --replace_string="" --target_file="$jirafeauconfigfile"
 else
-	ynh_replace_string --match_string="__YNH_WWW_PATH__" --replace_string="$path_url" --target_file="$jirafeauconfigfile"
+	ynh_replace_string --match_string="__PATH__" --replace_string="$path_url" --target_file="$jirafeauconfigfile"
 fi
-ynh_replace_string --match_string="__YNH_VAR_ROOT__" --replace_string="$var_root" --target_file="$jirafeauconfigfile"
-ynh_replace_string --match_string="__YNH_ADMIN_USER__" --replace_string="$admin_user" --target_file="$jirafeauconfigfile"
+ynh_replace_string --match_string="__VAR_ROOT__" --replace_string="$var_root" --target_file="$jirafeauconfigfile"
+ynh_replace_string --match_string="__ADMIN_USER__" --replace_string="$admin_user" --target_file="$jirafeauconfigfile"
 
 # Calculate and store the config file checksum into the app settings
 ynh_store_file_checksum --file="$jirafeauconfigfile"
@@ -136,10 +136,7 @@ ynh_secure_remove --file=$final_path/install.php
 #=================================================
 ynh_script_progression --message="Configuring the cron file..." --weight=2
 
-cp ../conf/cron /etc/cron.d/$app
-ynh_replace_string --match_string="__FINALPATH__" --replace_string="$final_path" --target_file=/etc/cron.d/$app
-ynh_replace_string --match_string="__APP__" --replace_string=$app --target_file=/etc/cron.d/$app
-ynh_replace_string --match_string="__PHPVERSION__" --replace_string=$phpversion --target_file=/etc/cron.d/$app
+ynh_add_config --template="../conf/cron" --destination="/etc/cron.d/$app"
 
 #=================================================
 # GENERIC FINALISATION
