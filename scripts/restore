@@ -46,19 +46,23 @@ test ! -d $final_path \
 ynh_restore_file --origin_path="/etc/nginx/conf.d/$domain.d/$app.conf"
 
 #=================================================
+# RECREATE THE DEDICATED USER
+#=================================================
+ynh_script_progression --message="Recreating the dedicated system user..." --weight=2
+
+# Create the dedicated user (if not existing)
+ynh_system_user_create --username=$app --home_dir="$final_path"
+
+#=================================================
 # RESTORE THE APP MAIN DIR
 #=================================================
 ynh_script_progression --message="Restoring Jirafeau main directory..." --weight=2
 
 ynh_restore_file --origin_path="$final_path"
 
-#=================================================
-# RECREATE THE DEDICATED USER
-#=================================================
-ynh_script_progression --message="Recreating the dedicated system user..." --weight=2
-
-# Create the dedicated user (if not existing)
-ynh_system_user_create --username=$app
+chmod 750 "$final_path"
+chmod -R o-rwx "$final_path"
+chown -R $app:www-data "$final_path"
 
 #=================================================
 # RESTORE THE PHP-FPM CONFIGURATION
@@ -89,11 +93,6 @@ datadir="/home/yunohost.app/$app"
 # Use --not_mandatory for the data directory, because if the backup has been made with BACKUP_CORE_ONLY, there's no data into the backup.
 ynh_restore_file --origin_path="$datadir" --not_mandatory
 
-#=================================================
-# RESTORE USER RIGHTS
-#=================================================
-
-# Create app folders
 mkdir -p "$datadir"/{files,links,async,block}
 chown -R $app:root /home/yunohost.app/$app
 
