@@ -38,10 +38,23 @@ upgrade_type=$(ynh_check_app_version_changed)
 #=================================================
 ynh_script_progression --message="Ensuring downward compatibility..." --weight=1
 
+# If datadir doesn't exist, create it
+if [ -z "$datadir" ]; then
+	datadir=/home/yunohost.app/$app
+	datadir=$(ynh_app_setting_get --app=$app --key=datadir)
+fi
+
 # If final_path doesn't exist, create it
 if [ -z "$final_path" ]; then
-	final_path=/var/www/$app
-	ynh_app_setting_set --app=$app --key=final_path --value=$final_path
+    final_path=/var/www/$app
+    ynh_app_setting_set --app=$app --key=final_path --value=$final_path
+fi
+
+# Cleaning legacy permissions
+if ynh_legacy_permissions_exists; then
+    ynh_legacy_permissions_delete_all
+
+    ynh_app_setting_delete --app=$app --key=is_public
 fi
 
 # Migrate files from 3.4.1 to 4.1.1
