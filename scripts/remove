@@ -18,13 +18,14 @@ app=$YNH_APP_INSTANCE_NAME
 
 domain=$(ynh_app_setting_get --app=$app --key=domain)
 final_path=$(ynh_app_setting_get --app=$app --key=final_path)
+var_root=$(ynh_app_setting_get --app=$app --key=var_root)
 
 #=================================================
 # STANDARD REMOVE
 #=================================================
 # REMOVE THE MAIN DIR OF THE APP
 #=================================================
-ynh_script_progression --message="Removing Jirafeau main directory..." --weight=2
+ynh_script_progression --message="Removing app main directory..." --weight=2
 
 # Remove the app directory securely
 ynh_secure_remove --file="$final_path"
@@ -59,7 +60,7 @@ ynh_secure_remove --file="/etc/cron.d/$app"
 #=================================================
 ynh_script_progression --message="Removing data directory..." --weight=1
 
-ynh_secure_remove --file="/home/yunohost.app/$app"
+ynh_secure_remove --file="$var_root"
 
 #=================================================
 # GENERIC FINALISATION
@@ -75,4 +76,4 @@ ynh_system_user_delete --username=$app
 # END OF SCRIPT
 #=================================================
 
-ynh_script_progression --message="Removal of Jirafeau completed" --last
+ynh_script_progression --message="Removal of $app completed" --last

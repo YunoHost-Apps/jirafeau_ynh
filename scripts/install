@@ -23,9 +23,7 @@ ynh_abort_if_errors
 domain=$YNH_APP_ARG_DOMAIN
 path_url=$YNH_APP_ARG_PATH
 admin_user=$YNH_APP_ARG_ADMIN_USER
-ynh_print_OFF
 upload_password=$YNH_APP_ARG_UPLOAD_PASSWORD
-ynh_print_ON
 is_public=$YNH_APP_ARG_IS_PUBLIC
 
 app=$YNH_APP_INSTANCE_NAME
@@ -52,6 +50,14 @@ ynh_app_setting_set --app=$app --key=admin --value=$admin_user
 ynh_app_setting_set --app=$app --key=is_public --value=$is_public
 
 #=================================================
+# CREATE DEDICATED USER
+#=================================================
+ynh_script_progression --message="Configuring system user..." --weight=2
+
+# Create a system user
+ynh_system_user_create --username=$app --home_dir="$final_path"
+
+#=================================================
 # STANDARD MODIFICATIONS
 #=================================================
 # DOWNLOAD, CHECK AND UNPACK SOURCE
@@ -62,6 +68,10 @@ ynh_app_setting_set --app=$app --key=final_path --value=$final_path
 # Download, check integrity, uncompress and patch the source from app.src
 ynh_setup_source --dest_dir="$final_path"
 
+chmod 750 "$final_path"
+chmod -R o-rwx "$final_path"
+chown -R $app:www-data "$final_path"
+
 #=================================================
 # NGINX CONFIGURATION
 #=================================================
@@ -69,14 +79,6 @@ ynh_script_progression --message="Configuring NGINX web server..."
 
 # Create a dedicated NGINX config
 ynh_add_nginx_config
-
-#=================================================
-# CREATE DEDICATED USER
-#=================================================
-ynh_script_progression --message="Configuring system user..." --weight=2
-
-# Create a system user
-ynh_system_user_create --username=$app
 
 #=================================================
 # PHP-FPM CONFIGURATION
@@ -109,11 +111,23 @@ fi
 ynh_print_ON
 
 #=================================================
+# CREATE DATA DIRECTORY
+#=================================================
+ynh_script_progression --message="Creating a data directory..." --weight=1
+
+var_root=/home/yunohost.app/$app
+ynh_app_setting_set --app=$app --key=var_root --value=$var_root
+
+mkdir -p $var_root/{files,links,async,block}
+
+chmod 750 "$var_root"
+chmod -R o-rwx "$var_root"
+chown -R $app:www-data "$var_root"
+
+#=================================================
 # CONFIGURE JIRAFEAU
 #=================================================
 ynh_script_progression --message="Configuring Jirafeau..." --weight=2
-
-var_root=/home/yunohost.app/$app
 
 ynh_replace_string --match_string="__DOMAIN__" --replace_string="$domain" --target_file="$jirafeauconfigfile"
 if [ "$path_url" = "/" ]
@@ -131,24 +145,15 @@ ynh_store_file_checksum --file="$jirafeauconfigfile"
 # Remove the install.php
 ynh_secure_remove --file=$final_path/install.php
 
+chmod 400 "$jirafeauconfigfile"
+chown $app:$app "$jirafeauconfigfile"
+
 #=================================================
 # SET THE CRON FILE
 #=================================================
 ynh_script_progression --message="Configuring the cron file..." --weight=2
 
 ynh_add_config --template="../conf/cron" --destination="/etc/cron.d/$app"
-
-#=================================================
-# GENERIC FINALISATION
-#=================================================
-# SECURING FILES AND DIRECTORIES
-#=================================================
-
-chown -R root: $final_path
-
-mkdir -p $var_root/{files,links,async,block}
-chown -R $app:root $var_root
-chmod -R 700 $var_root
 
 #=================================================
 # SETUP SSOWAT
