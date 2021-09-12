@@ -23,7 +23,7 @@ is_public=$(ynh_app_setting_get --app=$app --key=is_public)
 final_path=$(ynh_app_setting_get --app=$app --key=final_path)
 upload_password=$(ynh_app_setting_get --app=$app --key=upload_password)
 phpversion=$(ynh_app_setting_get --app=$app --key=phpversion)
-var_root=$(ynh_app_setting_get --app=$app --key=var_root)
+datadir=$(ynh_app_setting_get --app=$app --key=datadir)
 
 #=================================================
 # CHECK VERSION
@@ -64,8 +64,6 @@ if [ ${current_version:0:1} -le 3 ] && [ ${update_version:0:1} -ge 4 ]
 then
     ynh_script_progression --message="Migrating files..." --weight=5
 
-    var_root=/home/yunohost.app/$app
-
     # Migrate files and links to the new directory structure
     for type in files links
     do
@@ -82,7 +80,7 @@ then
 
                     # Split the file name every 8 characters
                     split=0
-                    full_path="$var_root/$type"
+                    full_path="$datadir/$type"
                     while [ $split -le ${#file} ]
                     do
                             part_dir="${file:$split:8}"
@@ -98,7 +96,7 @@ then
                     if [ "$type" = "files" ]; then
                             mv "${full_file}_count" "$full_path"
                     fi
-            done <<< "$(find "$var_root/$type" -type f)" # List all files, without directories
+            done <<< "$(find "$datadir/$type" -type f)" # List all files, without directories
     done
 
     # And clean the old directories
@@ -113,7 +111,7 @@ then
                     then
                             ynh_secure_remove --file="$file"
                     fi
-            done <<< "$(find "$var_root/$type" -maxdepth 1 -mindepth 1 -type d)" # List all first level directories
+            done <<< "$(find "$datadir/$type" -maxdepth 1 -mindepth 1 -type d)" # List all first level directories
     done
 fi
 
@@ -195,7 +193,7 @@ then
 else
 	ynh_replace_string --match_string="__PATH__" --replace_string="$path_url" --target_file="$jirafeauconfigfile"
 fi
-ynh_replace_string --match_string="__VAR_ROOT__" --replace_string="$var_root" --target_file="$jirafeauconfigfile"
+ynh_replace_string --match_string="__DATADIR__" --replace_string="$datadir" --target_file="$jirafeauconfigfile"
 ynh_replace_string --match_string="__ADMIN_USER__" --replace_string="$admin_user" --target_file="$jirafeauconfigfile"
 
 # Recalculate and store the checksum of the file for the next upgrade.

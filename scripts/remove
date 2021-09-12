@@ -18,7 +18,7 @@ app=$YNH_APP_INSTANCE_NAME
 
 domain=$(ynh_app_setting_get --app=$app --key=domain)
 final_path=$(ynh_app_setting_get --app=$app --key=final_path)
-var_root=$(ynh_app_setting_get --app=$app --key=var_root)
+datadir=$(ynh_app_setting_get --app=$app --key=datadir)
 
 #=================================================
 # STANDARD REMOVE
@@ -60,7 +60,7 @@ ynh_secure_remove --file="/etc/cron.d/$app"
 #=================================================
 ynh_script_progression --message="Removing data directory..." --weight=1
 
-ynh_secure_remove --file="$var_root"
+ynh_secure_remove --file="$datadir"
 
 #=================================================
 # GENERIC FINALISATION

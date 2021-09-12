@@ -115,14 +115,14 @@ ynh_print_ON
 #=================================================
 ynh_script_progression --message="Creating a data directory..." --weight=1
 
-var_root=/home/yunohost.app/$app
-ynh_app_setting_set --app=$app --key=var_root --value=$var_root
+datadir=/home/yunohost.app/$app
+ynh_app_setting_set --app=$app --key=datadir --value=$datadir
 
-mkdir -p $var_root/{files,links,async,block}
+mkdir -p $datadir/{files,links,async,block}
 
-chmod 750 "$var_root"
-chmod -R o-rwx "$var_root"
-chown -R $app:www-data "$var_root"
+chmod 750 "$datadir"
+chmod -R o-rwx "$datadir"
+chown -R $app:www-data "$datadir"
 
 #=================================================
 # CONFIGURE JIRAFEAU
@@ -136,7 +136,7 @@ then
 else
 	ynh_replace_string --match_string="__PATH__" --replace_string="$path_url" --target_file="$jirafeauconfigfile"
 fi
-ynh_replace_string --match_string="__VAR_ROOT__" --replace_string="$var_root" --target_file="$jirafeauconfigfile"
+ynh_replace_string --match_string="__DATADIR__" --replace_string="$datadir" --target_file="$jirafeauconfigfile"
 ynh_replace_string --match_string="__ADMIN_USER__" --replace_string="$admin_user" --target_file="$jirafeauconfigfile"
 
 # Calculate and store the config file checksum into the app settings
