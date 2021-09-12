@@ -8,13 +8,21 @@
 	},
 	"version": "4.3.0~ynh2",
 	"url": "https://gitlab.com/mojo42/Jirafeau",
+	"upstream": {
+        "license": "AGPL-3.0-only",
+        "website": "https://gitlab.com/mojo42/Jirafeau",
+        "demo": "https://demo.yunohost.org/jirafeau/",
+        "admindoc": "https://yunohost.org/packaging_apps",
+        "userdoc": "https://yunohost.org/en/app_jirafeau",
+        "code": "https://gitlab.com/mojo42/Jirafeau"
+    },
 	"license": "AGPL-3.0-only",
 	"maintainer": {
 		"name": "julien",
 		"email": "julien.malik@paraiso.me"
 	},
 	"requirements": {
-		"yunohost": ">= 4.1.7"
+		"yunohost": ">= 4.2.4"
 	},
 	"multi_instance": false,
 	"services": [
