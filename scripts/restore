@@ -92,6 +92,8 @@ ynh_add_fpm_config
 ynh_script_progression --message="Restoring the cron file..." --weight=1
 
 ynh_restore_file --origin_path="/etc/cron.d/$app"
+chown root: "/etc/cron.d/$app"
+chmod 644 "/etc/cron.d/$app"
 
 #=================================================
 # GENERIC FINALISATION
