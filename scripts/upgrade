@@ -56,6 +56,12 @@ if [ -z "$final_path" ]; then
 	ynh_app_setting_set --app=$app --key=final_path --value=$final_path
 fi
 
+# If datadir doesn't exist, create it
+if [ -z "$datadir" ]; then
+    datadir=/home/yunohost.app/$app
+    ynh_app_setting_set --app=$app --key=datadir --value=$datadir
+fi
+
 # Migrate files from 3.4.1 to 4.1.1
 current_version="$(ynh_app_upstream_version --manifest="/etc/yunohost/apps/$app/manifest.json")"
 update_version="$(ynh_app_upstream_version)"
