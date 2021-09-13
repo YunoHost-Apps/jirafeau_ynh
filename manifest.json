@@ -56,8 +56,8 @@
 				"type": "password",
 				"optional": true,
 				"ask": {
-					"en": "Set the password granting upload permissions (leave empty to allow anybody to upload)",
-					"fr": "Définissez le mot de passe permettant l'accès à l'envoi de fichiers (laissez vide pour autoriser tout le monde)"
+					"en": "Set the password granting upload permissions (leave empty to allow anybody to upload). Please avoid using ' (quotes) in the password as it will fail the app...",
+					"fr": "Définissez le mot de passe permettant l'accès à l'envoi de fichiers (laissez vide pour autoriser tout le monde). Veuillez éviter d'utiliser ' (guillemets) dans le mot de passe car cela fera échouer l'application..."
 				},
 				"example": "supersecretpassword"
 			},
