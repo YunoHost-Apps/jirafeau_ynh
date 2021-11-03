@@ -12,8 +12,6 @@
         "license": "AGPL-3.0-only",
         "website": "https://gitlab.com/mojo42/Jirafeau",
         "demo": "https://demo.yunohost.org/jirafeau/",
-        "admindoc": "https://yunohost.org/packaging_apps",
-        "userdoc": "https://yunohost.org/en/app_jirafeau",
         "code": "https://gitlab.com/mojo42/Jirafeau"
     },
 	"license": "AGPL-3.0-only",
@@ -56,8 +54,7 @@
 				"ask": {
 					"en": "Set the password granting upload permissions (leave empty to allow anybody to upload). Please avoid using ' (quotes) in the password as it will fail the app...",
 					"fr": "Définissez le mot de passe permettant l'accès à l'envoi de fichiers (laissez vide pour autoriser tout le monde). Veuillez éviter d'utiliser ' (guillemets) dans le mot de passe car cela fera échouer l'application..."
-				},
-				"example": "supersecretpassword"
+				}
 			},
 			{
 				"name": "is_public",
