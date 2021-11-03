@@ -36,8 +36,6 @@ Pour administrer les fichiers présents au sein de Jirafeau il suffit de se rend
 ## Documentations et ressources
 
 * Site officiel de l'app : https://gitlab.com/mojo42/Jirafeau
-* Documentation officielle utilisateur : https://yunohost.org/en/app_jirafeau
-* Documentation officielle de l'admin : https://yunohost.org/packaging_apps
 * Dépôt de code officiel de l'app : https://gitlab.com/mojo42/Jirafeau
 * Documentation YunoHost pour cette app : https://yunohost.org/app_jirafeau
 * Signaler un bug : https://github.com/YunoHost-Apps/jirafeau_ynh/issues

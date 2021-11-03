@@ -40,8 +40,6 @@ To administer the files within Jirafeau it is enough to go to the address `jiraf
 ## Documentation and resources
 
 * Official app website: https://gitlab.com/mojo42/Jirafeau
-* Official user documentation: https://yunohost.org/en/app_jirafeau
-* Official admin documentation: https://yunohost.org/packaging_apps
 * Upstream app code repository: https://gitlab.com/mojo42/Jirafeau
 * YunoHost documentation for this app: https://yunohost.org/app_jirafeau
 * Report a bug: https://github.com/YunoHost-Apps/jirafeau_ynh/issues
