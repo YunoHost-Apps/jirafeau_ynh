@@ -3,51 +3,42 @@
 [![Niveau d'intégration](https://dash.yunohost.org/integration/jirafeau.svg)](https://dash.yunohost.org/appci/app/jirafeau) ![](https://ci-apps.yunohost.org/ci/badges/jirafeau.status.svg) ![](https://ci-apps.yunohost.org/ci/badges/jirafeau.maintain.svg)  
 [![Installer Jirafeau avec YunoHost](https://install-app.yunohost.org/install-with-yunohost.svg)](https://install-app.yunohost.org/?app=jirafeau)
 
-*[Read this readme in english.](./README.md)* 
+*[Read this readme in english.](./README.md)*
+*[Lire ce readme en français.](./README_fr.md)*
 
-> *Ce package vous permet d'installer Jirafeau rapidement et simplement sur un serveur YunoHost.  
+> *Ce package vous permet d'installer Jirafeau rapidement et simplement sur un serveur YunoHost.
 Si vous n'avez pas YunoHost, regardez [ici](https://yunohost.org/#/install) pour savoir comment l'installer et en profiter.*
 
 ## Vue d'ensemble
 
-Jirafeau est un site web permettant d'héberger et de partager des fichiers de manière simple en leur donnant un lien unique.
+Jirafeau offre la possibilité d'héberger et de partager vos fichiers, le tout en toute simplicité. Choisissez un fichier, Jirafeau vous fournira un lien avec beaucoup d'options. Il est possible de protéger vos liens avec mot de passe ainsi que de choisir la durée de rétention du fichier sur le serveur. Le fichier et le lien s'autodétruiront passé ce délai. Les téléchargements des fichiers transmis peuvent être limités à une certaine date, et chaque fichier peut s'autodétruire après le premier téléchargement. Jirafeau permet de configurer les temps maximum de rétention ainsi que la taille maximale par fichier. Le chiffrement est disponible en option.
 
-**Version incluse :** 4.3.0
+
+**Version incluse :** 4.3.0~ynh2
+
+**Démo :** https://demo.yunohost.org/jirafeau/
 
 ## Captures d'écran
 
-![](http://i.imgur.com/TPjh48P.png)
+![](./doc/screenshots/TPjh48P.png)
 
-## Démo
-
-* [Démo officielle](https://demo.yunohost.org/jirafeau/)
+## Avertissements / informations importantes
 
 ## Configuration
 
-## Documentation
+### Changer les conditions d'utilisation du service
 
- * Documentation officielle : 
- * Documentation YunoHost : https://yunohost.org/fr/app_jirafeau
+Le texte de la licence sur la page "Conditions d'utilisation du service", qui est livrée avec l'installation par défaut, est basé sur les "Conditions d'utilisation du service de l'Initiative Open Source". Pour modifier ce texte, il suffit de copier le fichier `/lib/tos.original.txt`, de le renommer en `/lib/tos.local.txt` et de l'adapter à vos propres besoins. Si vous mettez à jour l'installation, alors seul le fichier `tos.original.txt` peut changer éventuellement, et non votre fichier `tos.local.txt`.
 
-## Caractéristiques spécifiques YunoHost
+## Administration
 
-#### Architectures supportées
+Pour administrer les fichiers présents au sein de Jirafeau il suffit de se rendre à l'adresse `jirafeau.domaine.tld/admin.php`.
+## Documentations et ressources
 
-* x86-64 - [![Build Status](https://ci-apps.yunohost.org/ci/logs/jirafeau.svg)](https://ci-apps.yunohost.org/ci/apps/jirafeau/)
-* ARMv8-A - [![Build Status](https://ci-apps-arm.yunohost.org/ci/logs/jirafeau.svg)](https://ci-apps-arm.yunohost.org/ci/apps/jirafeau/)
-
-## Limitations
-
-## Informations additionnelles
-
-## Liens
-
- * Signaler un bug : https://github.com/YunoHost-Apps/jirafeau_ynh/issues
- * Site de l'application : https://gitlab.com/mojo42/Jirafeau
- * Dépôt de l'application principale : https://gitlab.com/mojo42/Jirafeau
- * Site web YunoHost : https://yunohost.org/
-
----
+* Site officiel de l'app : https://gitlab.com/mojo42/Jirafeau
+* Dépôt de code officiel de l'app : https://gitlab.com/mojo42/Jirafeau
+* Documentation YunoHost pour cette app : https://yunohost.org/app_jirafeau
+* Signaler un bug : https://github.com/YunoHost-Apps/jirafeau_ynh/issues
 
 ## Informations pour les développeurs
 
@@ -59,3 +50,5 @@ sudo yunohost app install https://github.com/YunoHost-Apps/jirafeau_ynh/tree/tes
 ou
 sudo yunohost app upgrade jirafeau -u https://github.com/YunoHost-Apps/jirafeau_ynh/tree/testing --debug
 ```
+
+**Plus d'infos sur le packaging d'applications :** https://yunohost.org/packaging_apps
