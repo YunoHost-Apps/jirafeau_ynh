@@ -21,10 +21,9 @@ path_url=$(ynh_app_setting_get --app=$app --key=path)
 admin_user=$(ynh_app_setting_get --app=$app --key=admin)
 is_public=$(ynh_app_setting_get --app=$app --key=is_public)
 final_path=$(ynh_app_setting_get --app=$app --key=final_path)
-ynh_print_OFF
 upload_password=$(ynh_app_setting_get --app=$app --key=upload_password)
-ynh_print_ON
 phpversion=$(ynh_app_setting_get --app=$app --key=phpversion)
+datadir=$(ynh_app_setting_get --app=$app --key=datadir)
 
 #=================================================
 # CHECK VERSION
@@ -33,23 +32,34 @@ phpversion=$(ynh_app_setting_get --app=$app --key=phpversion)
 upgrade_type=$(ynh_check_app_version_changed)
 
 #=================================================
+# BACKUP BEFORE UPGRADE THEN ACTIVE TRAP
+#=================================================
+ynh_script_progression --message="Backing up Jirafeau before upgrading (may take a while)..." --weight=3
+
+# Backup the current version of the app
+ynh_backup_before_upgrade
+ynh_clean_setup () {
+    # restore it if the upgrade fails
+    ynh_restore_upgradebackup
+}
+# Exit if an error occurs during the execution of the script
+ynh_abort_if_errors
+
+#=================================================
 # ENSURE DOWNWARD COMPATIBILITY
 #=================================================
 ynh_script_progression --message="Ensuring downward compatibility..." --weight=1
-
-# Fix is_public as a boolean value
-if [ "$is_public" = "Yes" ]; then
-	ynh_app_setting_set --app=$app --key=is_public --value=1
-	is_public=1
-elif [ "$is_public" = "No" ]; then
-	ynh_app_setting_set --app=$app --key=is_public --value=0
-	is_public=0
-fi
 
 # If final_path doesn't exist, create it
 if [ -z "$final_path" ]; then
 	final_path=/var/www/$app
 	ynh_app_setting_set --app=$app --key=final_path --value=$final_path
+fi
+
+# If datadir doesn't exist, create it
+if [ -z "$datadir" ]; then
+    datadir=/home/yunohost.app/$app
+    ynh_app_setting_set --app=$app --key=datadir --value=$datadir
 fi
 
 # Migrate files from 3.4.1 to 4.1.1
@@ -59,8 +69,6 @@ update_version="$(ynh_app_upstream_version)"
 if [ ${current_version:0:1} -le 3 ] && [ ${update_version:0:1} -ge 4 ]
 then
     ynh_script_progression --message="Migrating files..." --weight=5
-
-    var_root=/home/yunohost.app/$app
 
     # Migrate files and links to the new directory structure
     for type in files links
@@ -78,7 +86,7 @@ then
 
                     # Split the file name every 8 characters
                     split=0
-                    full_path="$var_root/$type"
+                    full_path="$datadir/$type"
                     while [ $split -le ${#file} ]
                     do
                             part_dir="${file:$split:8}"
@@ -94,7 +102,7 @@ then
                     if [ "$type" = "files" ]; then
                             mv "${full_file}_count" "$full_path"
                     fi
-            done <<< "$(find "$var_root/$type" -type f)" # List all files, without directories
+            done <<< "$(find "$datadir/$type" -type f)" # List all files, without directories
     done
 
     # And clean the old directories
@@ -109,23 +117,17 @@ then
                     then
                             ynh_secure_remove --file="$file"
                     fi
-            done <<< "$(find "$var_root/$type" -maxdepth 1 -mindepth 1 -type d)" # List all first level directories
+            done <<< "$(find "$datadir/$type" -maxdepth 1 -mindepth 1 -type d)" # List all first level directories
     done
 fi
 
 #=================================================
-# BACKUP BEFORE UPGRADE THEN ACTIVE TRAP
+# CREATE DEDICATED USER
 #=================================================
-ynh_script_progression --message="Backing up Jirafeau before upgrading (may take a while)..." --weight=3
+ynh_script_progression --message="Making sure dedicated system user exists..." --weight=1
 
-# Backup the current version of the app
-ynh_backup_before_upgrade
-ynh_clean_setup () {
-	# restore it if the upgrade fails
-	ynh_restore_upgradebackup
-}
-# Exit if an error occurs during the execution of the script
-ynh_abort_if_errors
+# Create a dedicated user (if not existing)
+ynh_system_user_create --username=$app --home_dir="$final_path"
 
 #=================================================
 # STANDARD UPGRADE STEPS
@@ -141,6 +143,10 @@ then
 	ynh_setup_source --dest_dir="$final_path"
 fi
 
+chmod 750 "$final_path"
+chmod -R o-rwx "$final_path"
+chown -R $app:www-data "$final_path"
+
 #=================================================
 # NGINX CONFIGURATION
 #=================================================
@@ -148,14 +154,6 @@ ynh_script_progression --message="Upgrading NGINX web server configuration..." -
 
 # Create a dedicated NGINX config
 ynh_add_nginx_config
-
-#=================================================
-# CREATE DEDICATED USER
-#=================================================
-ynh_script_progression --message="Making sure dedicated system user exists..." --weight=1
-
-# Create a dedicated user (if not existing)
-ynh_system_user_create --username=$app
 
 #=================================================
 # PHP-FPM CONFIGURATION
@@ -178,7 +176,6 @@ ynh_backup_if_checksum_is_different --file="$final_path/lib/config.local.php"
 cp "../conf/config.local.php" "$final_path/lib/config.local.php"
 
 # Set and save upload password, allowing an empty one
-ynh_print_OFF
 if [ -z "$upload_password" ]
 then
     ynh_replace_string --match_string="__UPLOAD_PASSWORD__" --replace_string="" --target_file="$jirafeauconfigfile"
@@ -187,14 +184,11 @@ else
     ynh_replace_special_string --match_string="__UPLOAD_PASSWORD__" --replace_string="'$upload_password'" --target_file="$jirafeauconfigfile"
 	ynh_app_setting_set --app=$app --key=upload_password --value="$upload_password"
 fi
-ynh_print_ON
 
 #=================================================
 # CONFIGURE JIRAFEAU
 #=================================================
-ynh_script_progression --message="Upgrading Jirafeau configuration..." --weight=2
-
-var_root=/home/yunohost.app/$app
+ynh_script_progression --message="Upgrading $app configuration..." --weight=2
 
 ynh_replace_string --match_string="__DOMAIN__" --replace_string="$domain" --target_file="$jirafeauconfigfile"
 if [ "$path_url" = "/" ]
@@ -203,7 +197,7 @@ then
 else
 	ynh_replace_string --match_string="__PATH__" --replace_string="$path_url" --target_file="$jirafeauconfigfile"
 fi
-ynh_replace_string --match_string="__VAR_ROOT__" --replace_string="$var_root" --target_file="$jirafeauconfigfile"
+ynh_replace_string --match_string="__DATADIR__" --replace_string="$datadir" --target_file="$jirafeauconfigfile"
 ynh_replace_string --match_string="__ADMIN_USER__" --replace_string="$admin_user" --target_file="$jirafeauconfigfile"
 
 # Recalculate and store the checksum of the file for the next upgrade.
@@ -218,18 +212,8 @@ ynh_secure_remove --file=$final_path/install.php
 ynh_script_progression --message="Configuring the cron file..." --weight=1
 
 ynh_add_config --template="../conf/cron" --destination="/etc/cron.d/$app"
-
-#=================================================
-# GENERIC FINALISATION
-#=================================================
-# SECURING FILES AND DIRECTORIES
-#=================================================
-
-chown -R root: $final_path
-
-mkdir -p $var_root/{files,links,async,block}
-chown -R $app:root $var_root
-chmod -R 700 $var_root
+chown root: "/etc/cron.d/$app"
+chmod 644 "/etc/cron.d/$app"
 
 #=================================================
 # SETUP SSOWAT
@@ -256,4 +240,4 @@ ynh_systemd_action --service_name=nginx --action=reload
 # END OF SCRIPT
 #=================================================
 
-ynh_script_progression --message="Upgrade of Jirafeau completed" --last
+ynh_script_progression --message="Upgrade of $app completed" --last
