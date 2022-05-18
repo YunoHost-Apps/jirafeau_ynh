@@ -22,7 +22,7 @@ admin_user=$(ynh_app_setting_get --app=$app --key=admin)
 is_public=$(ynh_app_setting_get --app=$app --key=is_public)
 final_path=$(ynh_app_setting_get --app=$app --key=final_path)
 upload_password=$(ynh_app_setting_get --app=$app --key=upload_password)
-phpversion=$(ynh_app_setting_get --app=$app --key=phpversion)
+phpversion=$YNH_PHP_VERSION
 datadir=$(ynh_app_setting_get --app=$app --key=datadir)
 
 #=================================================

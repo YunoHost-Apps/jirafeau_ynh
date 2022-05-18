@@ -25,6 +25,7 @@ path_url=$YNH_APP_ARG_PATH
 admin_user=$YNH_APP_ARG_ADMIN_USER
 upload_password=$YNH_APP_ARG_UPLOAD_PASSWORD
 is_public=$YNH_APP_ARG_IS_PUBLIC
+phpversion=$YNH_PHP_VERSION
 
 app=$YNH_APP_INSTANCE_NAME
 
