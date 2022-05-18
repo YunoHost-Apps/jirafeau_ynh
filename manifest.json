@@ -40,7 +40,7 @@
 				"default": "/jirafeau"
 			},
 			{
-				"name": "admin_user",
+				"name": "admin",
 				"type": "user",
 				"ask": {
 					"en": "Choose an admin user (will be able to access admin.php page)",
