@@ -51,6 +51,13 @@ ynh_app_setting_set --app=$app --key=admin --value=$admin_user
 ynh_app_setting_set --app=$app --key=is_public --value=$is_public
 
 #=================================================
+# INSTALL DEPENDENCIES
+#=================================================
+ynh_script_progression --message="Installing dependencies..." --weight=1
+
+ynh_install_app_dependencies $pkg_dependencies
+
+#=================================================
 # CREATE DEDICATED USER
 #=================================================
 ynh_script_progression --message="Configuring system user..." --weight=2
