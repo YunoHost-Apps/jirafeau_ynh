@@ -62,65 +62,6 @@ if [ -z "$datadir" ]; then
     ynh_app_setting_set --app=$app --key=datadir --value=$datadir
 fi
 
-# Migrate files from 3.4.1 to 4.1.1
-current_version="$(ynh_app_upstream_version --manifest="/etc/yunohost/apps/$app/manifest.json")"
-update_version="$(ynh_app_upstream_version)"
-# If the upgrade if from a version 3 or less to 4 or more. Migrate the files
-if [ ${current_version:0:1} -le 3 ] && [ ${update_version:0:1} -ge 4 ]
-then
-    ynh_script_progression --message="Migrating files..." --weight=5
-
-    # Migrate files and links to the new directory structure
-    for type in files links
-    do
-            while read file
-            do
-                    # Ignore _count files
-                    if echo "$file" | grep --quiet "_count$"; then
-                            continue
-                    fi
-
-                    # Remove all directories before the file name
-                    full_file="$file"
-                    file=$(basename $file)
-
-                    # Split the file name every 8 characters
-                    split=0
-                    full_path="$datadir/$type"
-                    while [ $split -le ${#file} ]
-                    do
-                            part_dir="${file:$split:8}"
-                            # Increment the point where with start reading of 8.
-                            split=$((split+8))
-                            full_path="$full_path/$part_dir"
-                    done
-
-                    # Create the new crazy directory structure
-                    mkdir -p "$full_path"
-                    # And move the file to this place
-                    mv "$full_file" "$full_path/$file"
-                    if [ "$type" = "files" ]; then
-                            mv "${full_file}_count" "$full_path"
-                    fi
-            done <<< "$(find "$datadir/$type" -type f)" # List all files, without directories
-    done
-
-    # And clean the old directories
-    for type in files links
-    do
-            while read file
-            do
-                    # Remove all directories before the last one
-                    dirname="$(basename $file)"
-                    # Delete the directory if it's only one character long
-                    if [ ${#dirname} -eq 1 ]
-                    then
-                            ynh_secure_remove --file="$file"
-                    fi
-            done <<< "$(find "$datadir/$type" -maxdepth 1 -mindepth 1 -type d)" # List all first level directories
-    done
-fi
-
 #=================================================
 # CREATE DEDICATED USER
 #=================================================
@@ -140,7 +81,10 @@ then
 	ynh_script_progression --message="Upgrading source files..." --weight=2
 
 	# Download, check integrity, uncompress and patch the source from app.src
-	ynh_setup_source --dest_dir="$final_path"
+	ynh_setup_source --dest_dir="$final_path" --keep="$final_path/lib/config.local.php"
+
+    # Remove the install.php
+    ynh_secure_remove --file=$final_path/install.php
 fi
 
 chmod 750 "$final_path"
@@ -164,47 +108,11 @@ ynh_script_progression --message="Upgrading PHP-FPM configuration..." --weight=2
 ynh_add_fpm_config
 
 #=================================================
-# SPECIFIC UPGRADE
+# UPGRADE DEPENDENCIES
 #=================================================
-# SET THE UPLOAD PASSWORD
-#=================================================
+ynh_script_progression --message="Upgrading dependencies..." --weight=3
 
-jirafeauconfigfile="$final_path/lib/config.local.php"
-
-ynh_backup_if_checksum_is_different --file="$final_path/lib/config.local.php"
-
-cp "../conf/config.local.php" "$final_path/lib/config.local.php"
-
-# Set and save upload password, allowing an empty one
-if [ -z "$upload_password" ]
-then
-    ynh_replace_string --match_string="__UPLOAD_PASSWORD__" --replace_string="" --target_file="$jirafeauconfigfile"
-	ynh_app_setting_set --app=$app --key=upload_password --value=""
-else
-    ynh_replace_special_string --match_string="__UPLOAD_PASSWORD__" --replace_string="'$upload_password'" --target_file="$jirafeauconfigfile"
-	ynh_app_setting_set --app=$app --key=upload_password --value="$upload_password"
-fi
-
-#=================================================
-# CONFIGURE JIRAFEAU
-#=================================================
-ynh_script_progression --message="Upgrading $app configuration..." --weight=2
-
-ynh_replace_string --match_string="__DOMAIN__" --replace_string="$domain" --target_file="$jirafeauconfigfile"
-if [ "$path_url" = "/" ]
-then
-	ynh_replace_string --match_string="__PATH__" --replace_string="" --target_file="$jirafeauconfigfile"
-else
-	ynh_replace_string --match_string="__PATH__" --replace_string="$path_url" --target_file="$jirafeauconfigfile"
-fi
-ynh_replace_string --match_string="__DATADIR__" --replace_string="$datadir" --target_file="$jirafeauconfigfile"
-ynh_replace_string --match_string="__ADMIN_USER__" --replace_string="$admin_user" --target_file="$jirafeauconfigfile"
-
-# Recalculate and store the checksum of the file for the next upgrade.
-ynh_store_file_checksum --file="$jirafeauconfigfile"
-
-# Remove the install.php
-ynh_secure_remove --file=$final_path/install.php
+ynh_install_app_dependencies $pkg_dependencies
 
 #=================================================
 # SET THE CRON FILE
