@@ -22,7 +22,7 @@ ynh_abort_if_errors
 
 domain=$YNH_APP_ARG_DOMAIN
 path_url=$YNH_APP_ARG_PATH
-admin_user=$YNH_APP_ARG_ADMIN_USER
+admin=$YNH_APP_ARG_ADMIN
 upload_password=$YNH_APP_ARG_UPLOAD_PASSWORD
 is_public=$YNH_APP_ARG_IS_PUBLIC
 phpversion=$YNH_PHP_VERSION
@@ -47,7 +47,7 @@ ynh_script_progression --message="Storing installation settings..." --weight=1
 
 ynh_app_setting_set --app=$app --key=domain --value=$domain
 ynh_app_setting_set --app=$app --key=path --value=$path_url
-ynh_app_setting_set --app=$app --key=admin --value=$admin_user
+ynh_app_setting_set --app=$app --key=admin --value=$admin
 ynh_app_setting_set --app=$app --key=is_public --value=$is_public
 
 #=================================================
@@ -143,7 +143,7 @@ else
 	ynh_replace_string --match_string="__PATH__" --replace_string="$path_url" --target_file="$jirafeauconfigfile"
 fi
 ynh_replace_string --match_string="__DATADIR__" --replace_string="$datadir" --target_file="$jirafeauconfigfile"
-ynh_replace_string --match_string="__ADMIN_USER__" --replace_string="$admin_user" --target_file="$jirafeauconfigfile"
+ynh_replace_string --match_string="__ADMIN__" --replace_string="$admin" --target_file="$jirafeauconfigfile"
 
 # Calculate and store the config file checksum into the app settings
 ynh_store_file_checksum --file="$jirafeauconfigfile"
