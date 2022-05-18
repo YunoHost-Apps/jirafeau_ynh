@@ -96,7 +96,7 @@ $cfg['admin_password'] = '';
  * that the provided user is logged in.
  * If »admin_password« parameter is set, then the »admin_password« is ignored.
  */
-$cfg['admin_http_auth_user'] = '__ADMIN__';
+$cfg['admin_http_auth_user'] = '__ADMIN_USER__';
 
 /* Allow user to select different options for file expiration time.
  * Possible values in array:

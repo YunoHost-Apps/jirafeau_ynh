@@ -2,7 +2,7 @@
 	; Manifest
 		domain="domain.tld"
 		path="/path"
-		admin="package_checker"
+		admin_user="package_checker"
 		upload_password="supersecretpassword"
 		is_public=1
 	; Checks
