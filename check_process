@@ -24,5 +24,4 @@ Notification=none
 ;;; Upgrade options
 	; commit=0615fbcfa5b163812657b2f291026bf24b5e0667
 		name=Merge pull request #92
-		manifest_arg=domain=DOMAIN&path=PATH&admin_user=USER&upload_password=supersecretpassword&is_public=1&
 		
