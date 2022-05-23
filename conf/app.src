@@ -1,5 +1,5 @@
-SOURCE_URL=https://gitlab.com/mojo42/Jirafeau/-/archive/4.3.0/Jirafeau-4.3.0.tar.gz
-SOURCE_SUM=77bd4b69cb822ac8cac9df6890f17a673c978b10d8dd6fce46b60c763b859f74
+SOURCE_URL=https://gitlab.com/mojo42/Jirafeau/-/archive/4.4.0/Jirafeau-4.4.0.tar.gz
+SOURCE_SUM=2afd605756e5d61d621092a1f796be63280d7394a9b61aedf9edbf7308c0cdba
 SOURCE_SUM_PRG=sha256sum
 SOURCE_FORMAT=tar.gz
 SOURCE_IN_SUBDIR=true
