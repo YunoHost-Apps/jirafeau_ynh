@@ -4,9 +4,7 @@
 # COMMON VARIABLES
 #=================================================
 
-YNH_PHP_VERSION="8.0"
-
-pkg_dependencies="php${YNH_PHP_VERSION}-fpm php${YNH_PHP_VERSION}-cli"
+YNH_PHP_VERSION="7.3"
 
 #=================================================
 # PERSONAL HELPERS
