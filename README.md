@@ -5,7 +5,7 @@ It shall NOT be edited by hand.
 
 # Jirafeau for YunoHost
 
-[![Integration level](https://dash.yunohost.org/integration/jirafeau.svg)](https://dash.yunohost.org/appci/app/jirafeau) ![](https://ci-apps.yunohost.org/ci/badges/jirafeau.status.svg) ![](https://ci-apps.yunohost.org/ci/badges/jirafeau.maintain.svg)  
+[![Integration level](https://dash.yunohost.org/integration/jirafeau.svg)](https://dash.yunohost.org/appci/app/jirafeau) ![Working status](https://ci-apps.yunohost.org/ci/badges/jirafeau.status.svg) ![Maintenance status](https://ci-apps.yunohost.org/ci/badges/jirafeau.maintain.svg)  
 [![Install Jirafeau with YunoHost](https://install-app.yunohost.org/install-with-yunohost.svg)](https://install-app.yunohost.org/?app=jirafeau)
 
 *[Lire ce readme en français.](./README_fr.md)*
@@ -24,7 +24,7 @@ Jirafeau offers the possibility to host and share your files with ease. Choose a
 
 ## Screenshots
 
-![](./doc/screenshots/TPjh48P.png)
+![Screenshot of Jirafeau](./doc/screenshots/TPjh48P.png)
 
 ## Disclaimers / important information
 
@@ -39,20 +39,21 @@ The license text on the "Terms of Service" page, which is shipped with the defau
 To administer the files within Jirafeau it is enough to go to the address `jirafeau.domaine.tld/admin.php`.
 ## Documentation and resources
 
-* Official app website: https://gitlab.com/mojo42/Jirafeau
-* Upstream app code repository: https://gitlab.com/mojo42/Jirafeau
-* YunoHost documentation for this app: https://yunohost.org/app_jirafeau
-* Report a bug: https://github.com/YunoHost-Apps/jirafeau_ynh/issues
+* Official app website: <https://gitlab.com/mojo42/Jirafeau>
+* Upstream app code repository: <https://gitlab.com/mojo42/Jirafeau>
+* YunoHost documentation for this app: <https://yunohost.org/app_jirafeau>
+* Report a bug: <https://github.com/YunoHost-Apps/jirafeau_ynh/issues>
 
 ## Developer info
 
 Please send your pull request to the [testing branch](https://github.com/YunoHost-Apps/jirafeau_ynh/tree/testing).
 
 To try the testing branch, please proceed like that.
-```
+
+``` bash
 sudo yunohost app install https://github.com/YunoHost-Apps/jirafeau_ynh/tree/testing --debug
 or
 sudo yunohost app upgrade jirafeau -u https://github.com/YunoHost-Apps/jirafeau_ynh/tree/testing --debug
 ```
 
-**More info regarding app packaging:** https://yunohost.org/packaging_apps
+**More info regarding app packaging:** <https://yunohost.org/packaging_apps>
