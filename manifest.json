@@ -16,8 +16,8 @@
     },
     "license": "AGPL-3.0-only",
     "maintainer": {
-        "name": "julien",
-        "email": "julien.malik@paraiso.me"
+        "name": "",
+        "email": ""
     },
     "requirements": {
         "yunohost": ">= 4.3.0"
