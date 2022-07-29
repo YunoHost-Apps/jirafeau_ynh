@@ -27,7 +27,7 @@
 
 /* URL of installation, with traling slash (eg. »https://exmaple.com/jirafeau/«)
  */
-$cfg['web_root'] = 'https://' . '__DOMAIN__' . '__PATH__' . '/';
+$cfg['web_root'] = 'https://' . '__DOMAIN__' . '__JIRAFEAU_PATH__' . '/';
 
 /* Path to data directory, with trailing slash (eg. »/var/www/data/var_314159265358979323846264«
  */
