@@ -1,66 +1,66 @@
 {
-	"name": "Jirafeau",
-	"id": "jirafeau",
-	"packaging_format": 1,
-	"description": {
-		"en": "Upload a file in a simple way and give a unique link to it",
-		"fr": "Hébergez simplement un fichier et partagez-le avec un lien unique"
-	},
-	"version": "4.4.0~ynh1",
-	"url": "https://gitlab.com/mojo42/Jirafeau",
-	"upstream": {
+    "name": "Jirafeau",
+    "id": "jirafeau",
+    "packaging_format": 1,
+    "description": {
+        "en": "Upload a file in a simple way and give a unique link to it",
+        "fr": "Hébergez simplement un fichier et partagez-le avec un lien unique"
+    },
+    "version": "4.4.0~ynh2",
+    "url": "https://gitlab.com/mojo42/Jirafeau",
+    "upstream": {
         "license": "AGPL-3.0-only",
         "website": "https://gitlab.com/mojo42/Jirafeau",
         "demo": "https://demo.yunohost.org/jirafeau/",
         "code": "https://gitlab.com/mojo42/Jirafeau"
     },
-	"license": "AGPL-3.0-only",
-	"maintainer": {
-		"name": "julien",
-		"email": "julien.malik@paraiso.me"
-	},
-	"requirements": {
-		"yunohost": ">= 4.3.0"
-	},
-	"multi_instance": false,
-	"services": [
-		"nginx",
-		"php7.3-fpm"
-	],
-	"arguments": {
-		"install" : [
-			{
-				"name": "domain",
-				"type": "domain"
-			},
-			{
-				"name": "path",
-				"type": "path",
-				"example": "/jirafeau",
-				"default": "/jirafeau"
-			},
-			{
-				"name": "admin_user",
-				"type": "user",
-				"ask": {
-					"en": "Choose an admin user (will be able to access admin.php page)",
-					"fr": "Choisissez l'administrateur (seul autorisé à accéder à la page admin.php)"
-				}
-			},
-			{
-				"name": "upload_password",
-				"type": "password",
-				"optional": true,
-				"ask": {
-					"en": "Set the password granting upload permissions (leave empty to allow anybody to upload). Please avoid using ' (quotes) in the password as it will fail the app...",
-					"fr": "Définissez le mot de passe permettant l'accès à l'envoi de fichiers (laissez vide pour autoriser tout le monde). Veuillez éviter d'utiliser ' (guillemets) dans le mot de passe car cela fera échouer l'application..."
-				}
-			},
-			{
-				"name": "is_public",
-				"type": "boolean",
-				"default": true
-			}
-		]
-	}
+    "license": "AGPL-3.0-only",
+    "maintainer": {
+        "name": "",
+        "email": ""
+    },
+    "requirements": {
+        "yunohost": ">= 4.3.0"
+    },
+    "multi_instance": false,
+    "services": [
+        "nginx",
+        "php7.3-fpm"
+    ],
+    "arguments": {
+        "install": [
+            {
+                "name": "domain",
+                "type": "domain"
+            },
+            {
+                "name": "path",
+                "type": "path",
+                "example": "/jirafeau",
+                "default": "/jirafeau"
+            },
+            {
+                "name": "is_public",
+                "type": "boolean",
+                "default": true
+            },
+            {
+                "name": "admin_user",
+                "type": "user",
+                "ask": {
+                    "en": "Choose an admin user (will be able to access admin.php page)",
+                    "fr": "Choisissez l'administrateur (seul autorisé à accéder à la page admin.php)"
+                }
+            },
+            {
+                "name": "upload_password",
+                "type": "password",
+                "optional": true,
+                "ask": {
+                    "en": "Set the password granting upload permissions (leave empty to allow anybody to upload). Please avoid using ' (quotes) in the password as it will fail the app...",
+                    "fr": "Définissez le mot de passe permettant l'accès à l'envoi de fichiers (laissez vide pour autoriser tout le monde). Veuillez éviter d'utiliser ' (guillemets) dans le mot de passe car cela fera échouer l'application..."
+                }
+            }
+        ]
+    }
 }
