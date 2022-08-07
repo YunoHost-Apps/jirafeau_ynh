@@ -12,7 +12,8 @@
         "license": "AGPL-3.0-only",
         "website": "https://gitlab.com/mojo42/Jirafeau",
         "demo": "https://demo.yunohost.org/jirafeau/",
-        "code": "https://gitlab.com/mojo42/Jirafeau"
+        "code": "https://gitlab.com/mojo42/Jirafeau",
+        "cpe": "cpe:2.3:a:jirafeau:jirafeau"
     },
     "license": "AGPL-3.0-only",
     "maintainer": {
