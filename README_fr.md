@@ -20,6 +20,7 @@ Jirafeau offre la possibilité d'héberger et de partager vos fichiers, le tout 
 
 **Version incluse :** 4.4.0~ynh3
 
+
 **Démo :** https://demo.yunohost.org/jirafeau/
 
 ## Captures d'écran
