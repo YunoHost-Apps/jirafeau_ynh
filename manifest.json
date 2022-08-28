@@ -6,13 +6,14 @@
         "en": "Upload a file in a simple way and give a unique link to it",
         "fr": "Hébergez simplement un fichier et partagez-le avec un lien unique"
     },
-    "version": "4.4.0~ynh2",
+    "version": "4.5.0~ynh1",
     "url": "https://gitlab.com/mojo42/Jirafeau",
     "upstream": {
         "license": "AGPL-3.0-only",
         "website": "https://gitlab.com/mojo42/Jirafeau",
         "demo": "https://demo.yunohost.org/jirafeau/",
-        "code": "https://gitlab.com/mojo42/Jirafeau"
+        "code": "https://gitlab.com/mojo42/Jirafeau",
+        "cpe": "cpe:2.3:a:jirafeau:jirafeau"
     },
     "license": "AGPL-3.0-only",
     "maintainer": {
@@ -20,12 +21,12 @@
         "email": ""
     },
     "requirements": {
-        "yunohost": ">= 4.3.0"
+        "yunohost": ">= 11.0.9"
     },
     "multi_instance": false,
     "services": [
         "nginx",
-        "php7.3-fpm"
+        "php8.0-fpm"
     ],
     "arguments": {
         "install": [

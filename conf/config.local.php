@@ -74,7 +74,7 @@ $cfg['link_name_length'] = 8;
  * $cfg['upload_password'] = array('psw1');         // One password
  * $cfg['upload_password'] = array('psw1', 'psw2'); // Two passwords
  */
-$cfg['upload_password'] = array(__UPLOAD_PASSWORD__);
+$cfg['upload_password'] = array('__UPLOAD_PASSWORD__');
 
 /* List of IP allowed to upload a file.
  * If the list is empty, then there is no upload restriction based on IP.
