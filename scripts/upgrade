@@ -25,6 +25,10 @@ upload_password=$(ynh_app_setting_get --app=$app --key=upload_password)
 phpversion=$(ynh_app_setting_get --app=$app --key=phpversion)
 datadir=$(ynh_app_setting_get --app=$app --key=datadir)
 
+fpm_footprint=$(ynh_app_setting_get --app=$app --key=fpm_footprint)
+fpm_free_footprint=$(ynh_app_setting_get --app=$app --key=fpm_free_footprint)
+fpm_usage=$(ynh_app_setting_get --app=$app --key=fpm_usage)
+
 #=================================================
 # CHECK VERSION
 #=================================================
@@ -63,6 +67,24 @@ fi
 if [ -z "$datadir" ]; then
     datadir=/home/yunohost.app/$app
     ynh_app_setting_set --app=$app --key=datadir --value=$datadir
+fi
+
+# If fpm_footprint doesn't exist, create it
+if [ -z "$fpm_footprint" ]; then
+    fpm_footprint=low
+    ynh_app_setting_set --app=$app --key=fpm_footprint --value=$fpm_footprint
+fi
+
+# If fpm_free_footprint doesn't exist, create it
+if [ -z "$fpm_free_footprint" ]; then
+    fpm_free_footprint=0
+    ynh_app_setting_set --app=$app --key=fpm_free_footprint --value=$fpm_free_footprint
+fi
+
+# If fpm_usage doesn't exist, create it
+if [ -z "$fpm_usage" ]; then
+    fpm_usage=low
+    ynh_app_setting_set --app=$app --key=fpm_usage --value=$fpm_usage
 fi
 
 ynh_permission_update --permission="main" --add="visitors"
@@ -114,7 +136,8 @@ ynh_install_app_dependencies $pkg_dependencies
 ynh_script_progression --message="Upgrading PHP-FPM configuration..." --weight=2
 
 # Create a dedicated PHP-FPM config
-ynh_add_fpm_config
+ynh_add_fpm_config --phpversion=$phpversion --usage=$fpm_usage --footprint=$fpm_footprint
+phpversion=$(ynh_app_setting_get --app=$app --key=phpversion)
 
 #=================================================
 # NGINX CONFIGURATION
