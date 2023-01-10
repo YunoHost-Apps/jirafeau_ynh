@@ -70,8 +70,8 @@ ynh_permission_update --permission="main" --add="visitors"
 if [ $is_public -eq 0 ]
 then
 	domain_regex=$(echo "$domain" | sed 's@-@.@g')
-	[ "$path_url" = "/" ] && path_url=""
-	ynh_app_setting_set --app=$app --key=protected_regex --value="$domain_regex$path_url/$","$domain_regex$path_url/admin.php.*$"
+	[ "$path_url" = "/" ] && path_url_="" || path_url_="$path_url"
+	ynh_app_setting_set --app=$app --key=protected_regex --value="$domain_regex$path_url_/$","$domain_regex$path_url_/admin.php.*$"
 fi
 
 #=================================================

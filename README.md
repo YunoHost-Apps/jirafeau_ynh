@@ -20,7 +20,6 @@ Jirafeau offers the possibility to host and share your files with ease. Choose a
 
 **Shipped version:** 4.5.0~ynh1
 
-
 **Demo:** https://demo.yunohost.org/jirafeau/
 
 ## Screenshots
