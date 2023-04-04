@@ -13,25 +13,25 @@ source /usr/share/yunohost/helpers
 # MANAGE SCRIPT FAILURE
 #=================================================
 
-ynh_clean_setup () {
+#REMOVEME? ynh_clean_setup () {
 	### Remove this function if there's nothing to clean before calling the remove script.
 	true
 }
 # Exit if an error occurs during the execution of the script
-ynh_abort_if_errors
+#REMOVEME? ynh_abort_if_errors
 
 #=================================================
 # RETRIEVE ARGUMENTS FROM THE MANIFEST
 #=================================================
 
-domain=$YNH_APP_ARG_DOMAIN
-path_url=$YNH_APP_ARG_PATH
-is_public=$YNH_APP_ARG_IS_PUBLIC
-admin_user=$YNH_APP_ARG_ADMIN_USER
-upload_password=$YNH_APP_ARG_UPLOAD_PASSWORD
-phpversion=$YNH_PHP_VERSION
+#REMOVEME? domain=$YNH_APP_ARG_DOMAIN
+#REMOVEME? path=$YNH_APP_ARG_PATH
+#REMOVEME? is_public=$YNH_APP_ARG_IS_PUBLIC
+#REMOVEME? admin_user=$YNH_APP_ARG_ADMIN_USER
+#REMOVEME? upload_password=$YNH_APP_ARG_UPLOAD_PASSWORD
+#REMOVEME? phpversion=$YNH_PHP_VERSION
 
-app=$YNH_APP_INSTANCE_NAME
+#REMOVEME? app=$YNH_APP_INSTANCE_NAME
 
 fpm_footprint="low"
 fpm_free_footprint=0
@@ -40,24 +40,24 @@ fpm_usage="low"
 #=================================================
 # CHECK IF THE APP CAN BE INSTALLED WITH THESE ARGS
 #=================================================
-ynh_script_progression --message="Validating installation parameters..." --weight=1
+#REMOVEME? ynh_script_progression --message="Validating installation parameters..." --weight=1
 
-final_path=/var/www/$app
-test ! -e "$final_path" || ynh_die --message="This path already contains a folder"
+#REMOVEME? install_dir=/var/www/$app
+#REMOVEME? test ! -e "$install_dir" || ynh_die --message="This path already contains a folder"
 
 # Register (book) web path
-ynh_webpath_register --app=$app --domain=$domain --path_url=$path_url
+#REMOVEME? ynh_webpath_register --app=$app --domain=$domain --path=$path
 
 #=================================================
 # STORE SETTINGS FROM MANIFEST
 #=================================================
-ynh_script_progression --message="Storing installation settings..." --weight=1
+#REMOVEME? ynh_script_progression --message="Storing installation settings..." --weight=1
 
-ynh_app_setting_set --app=$app --key=domain --value=$domain
-ynh_app_setting_set --app=$app --key=path --value=$path_url
-ynh_app_setting_set --app=$app --key=admin --value=$admin_user
+#REMOVEME? ynh_app_setting_set --app=$app --key=domain --value=$domain
+#REMOVEME? ynh_app_setting_set --app=$app --key=path --value=$path
+#REMOVEME? ynh_app_setting_set --app=$app --key=admin --value=$admin_user
 ynh_app_setting_set --app=$app --key=is_public --value=$is_public
-ynh_app_setting_set --app=$app --key=upload_password --value="$upload_password"
+#REMOVEME? ynh_app_setting_set --app=$app --key=upload_password --value="$upload_password"
 ynh_app_setting_set --app=$app --key=fpm_footprint --value=$fpm_footprint
 ynh_app_setting_set --app=$app --key=fpm_free_footprint --value=$fpm_free_footprint
 ynh_app_setting_set --app=$app --key=fpm_usage --value=$fpm_usage
@@ -67,33 +67,33 @@ ynh_app_setting_set --app=$app --key=fpm_usage --value=$fpm_usage
 #=================================================
 # INSTALL DEPENDENCIES
 #=================================================
-ynh_script_progression --message="Installing dependencies..." --weight=2
+#REMOVEME? ynh_script_progression --message="Installing dependencies..." --weight=2
 
-ynh_install_app_dependencies $pkg_dependencies
+#REMOVEME? ynh_install_app_dependencies $pkg_dependencies
 
 #=================================================
 # CREATE DEDICATED USER
 #=================================================
-ynh_script_progression --message="Configuring system user..." --weight=2
+#REMOVEME? ynh_script_progression --message="Configuring system user..." --weight=2
 
 # Create a system user
-ynh_system_user_create --username=$app --home_dir="$final_path"
+#REMOVEME? ynh_system_user_create --username=$app --home_dir="$install_dir"
 
 #=================================================
 # DOWNLOAD, CHECK AND UNPACK SOURCE
 #=================================================
 ynh_script_progression --message="Setting up source files..." --weight=3
 
-ynh_app_setting_set --app=$app --key=final_path --value=$final_path
+#REMOVEME? ynh_app_setting_set --app=$app --key=install_dir --value=$install_dir
 # Download, check integrity, uncompress and patch the source from app.src
-ynh_setup_source --dest_dir="$final_path"
+ynh_setup_source --dest_dir="$install_dir"
 
 # Remove the install.php
-ynh_secure_remove --file=$final_path/install.php
+#REMOVEME? ynh_secure_remove --file=$install_dir/install.php
 
-chmod 750 "$final_path"
-chmod -R o-rwx "$final_path"
-chown -R $app:www-data "$final_path"
+chmod 750 "$install_dir"
+chmod -R o-rwx "$install_dir"
+chown -R $app:www-data "$install_dir"
 
 #=================================================
 # PHP-FPM CONFIGURATION
@@ -102,7 +102,7 @@ ynh_script_progression --message="Configuring PHP-FPM..." --weight=2
 
 # Create a dedicated PHP-FPM config
 ynh_add_fpm_config --usage=$fpm_usage --footprint=$fpm_footprint
-phpversion=$(ynh_app_setting_get --app=$app --key=phpversion)
+#REMOVEME? phpversion=$(ynh_app_setting_get --app=$app --key=phpversion)
 
 #=================================================
 # NGINX CONFIGURATION
@@ -119,31 +119,31 @@ ynh_add_nginx_config
 #=================================================
 ynh_script_progression --message="Creating a data directory..." --weight=1
 
-datadir=/home/yunohost.app/$app
-ynh_app_setting_set --app=$app --key=datadir --value=$datadir
+#REMOVEME? data_dir=/home/yunohost.app/$app
+#REMOVEME? ynh_app_setting_set --app=$app --key=data_dir --value=$data_dir
 
-mkdir -p $datadir/{files,links,async,block}
+mkdir -p $data_dir/{files,links,async,block}
 
-chmod 750 "$datadir"
-chmod -R o-rwx "$datadir"
-chown -R $app:www-data "$datadir"
+chmod 750 "$data_dir"
+chmod -R o-rwx "$data_dir"
+chown -R $app:www-data "$data_dir"
 
 #=================================================
 # ADD A CONFIGURATION
 #=================================================
 ynh_script_progression --message="Adding a configuration file..." --weight=2
 
-if [ "$path_url" = "/" ]
+if [ "$path" = "/" ]
 then
 	jirafeau_path=""
 else
-	jirafeau_path="$path_url"
+	jirafeau_path="$path"
 fi
 
-ynh_add_config --template="../conf/config.local.php" --destination="$final_path/lib/config.local.php"
+ynh_add_config --template="../conf/config.local.php" --destination="$install_dir/lib/config.local.php"
 
-chmod 400 "$final_path/lib/config.local.php"
-chown $app:$app "$final_path/lib/config.local.php"
+chmod 400 "$install_dir/lib/config.local.php"
+chown $app:$app "$install_dir/lib/config.local.php"
 
 #=================================================
 # SET THE CRON FILE
@@ -160,23 +160,23 @@ chmod 644 "/etc/cron.d/$app"
 #=================================================
 # SETUP SSOWAT
 #=================================================
-ynh_script_progression --message="Configuring permissions..." --weight=2
+#REMOVEME? ynh_script_progression --message="Configuring permissions..." --weight=2
 
-ynh_permission_update --permission="main" --add="visitors"
+#REMOVEME? ynh_permission_update --permission="main" --add="visitors"
 
-if [ $is_public -eq 0 ]
+#REMOVEME? if [ $is_public -eq 0 ]
 then
 	domain_regex=$(echo "$domain" | sed 's@-@.@g')
-	[ "$path_url" = "/" ] && path_url=""
-	ynh_app_setting_set --app=$app --key=protected_regex --value="$domain_regex$path_url/$","$domain_regex$path_url/admin.php.*$"
+	[ "$path" = "/" ] && path=""
+#REMOVEME? 	ynh_app_setting_set --app=$app --key=protected_regex --value="$domain_regex$path/$","$domain_regex$path/admin.php.*$"
 fi
 
 #=================================================
 # RELOAD NGINX
 #=================================================
-ynh_script_progression --message="Reloading NGINX web server..." --weight=1
+#REMOVEME? ynh_script_progression --message="Reloading NGINX web server..." --weight=1
 
-ynh_systemd_action --service_name=nginx --action=reload
+#REMOVEME? ynh_systemd_action --service_name=nginx --action=reload
 
 #=================================================
 # END OF SCRIPT

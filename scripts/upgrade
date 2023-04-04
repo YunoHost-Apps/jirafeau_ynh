@@ -12,22 +12,22 @@ source /usr/share/yunohost/helpers
 #=================================================
 # LOAD SETTINGS
 #=================================================
-ynh_script_progression --message="Loading installation settings..." --weight=2
+#REMOVEME? ynh_script_progression --message="Loading installation settings..." --weight=2
 
-app=$YNH_APP_INSTANCE_NAME
+#REMOVEME? app=$YNH_APP_INSTANCE_NAME
 
-domain=$(ynh_app_setting_get --app=$app --key=domain)
-path_url=$(ynh_app_setting_get --app=$app --key=path)
-admin_user=$(ynh_app_setting_get --app=$app --key=admin)
-is_public=$(ynh_app_setting_get --app=$app --key=is_public)
-final_path=$(ynh_app_setting_get --app=$app --key=final_path)
-upload_password=$(ynh_app_setting_get --app=$app --key=upload_password)
-phpversion=$(ynh_app_setting_get --app=$app --key=phpversion)
-datadir=$(ynh_app_setting_get --app=$app --key=datadir)
+#REMOVEME? domain=$(ynh_app_setting_get --app=$app --key=domain)
+#REMOVEME? path=$(ynh_app_setting_get --app=$app --key=path)
+#REMOVEME? admin_user=$(ynh_app_setting_get --app=$app --key=admin)
+#REMOVEME? is_public=$(ynh_app_setting_get --app=$app --key=is_public)
+#REMOVEME? #REMOVEME? install_dir=$(ynh_app_setting_get --app=$app --key=install_dir)
+#REMOVEME? upload_password=$(ynh_app_setting_get --app=$app --key=upload_password)
+#REMOVEME? phpversion=$(ynh_app_setting_get --app=$app --key=phpversion)
+#REMOVEME? data_dir=$(ynh_app_setting_get --app=$app --key=data_dir)
 
-fpm_footprint=$(ynh_app_setting_get --app=$app --key=fpm_footprint)
-fpm_free_footprint=$(ynh_app_setting_get --app=$app --key=fpm_free_footprint)
-fpm_usage=$(ynh_app_setting_get --app=$app --key=fpm_usage)
+#REMOVEME? fpm_footprint=$(ynh_app_setting_get --app=$app --key=fpm_footprint)
+#REMOVEME? fpm_free_footprint=$(ynh_app_setting_get --app=$app --key=fpm_free_footprint)
+#REMOVEME? fpm_usage=$(ynh_app_setting_get --app=$app --key=fpm_usage)
 
 #=================================================
 # CHECK VERSION
@@ -39,16 +39,16 @@ upgrade_type=$(ynh_check_app_version_changed)
 #=================================================
 # BACKUP BEFORE UPGRADE THEN ACTIVE TRAP
 #=================================================
-ynh_script_progression --message="Backing up the app before upgrading (may take a while)..." --weight=3
+#REMOVEME? ynh_script_progression --message="Backing up the app before upgrading (may take a while)..." --weight=3
 
 # Backup the current version of the app
-ynh_backup_before_upgrade
-ynh_clean_setup () {
+#REMOVEME? ynh_backup_before_upgrade
+#REMOVEME? ynh_clean_setup () {
 	# Restore it if the upgrade fails
-	ynh_restore_upgradebackup
+#REMOVEME? 	ynh_restore_upgradebackup
 }
 # Exit if an error occurs during the execution of the script
-ynh_abort_if_errors
+#REMOVEME? ynh_abort_if_errors
 
 #=================================================
 # STANDARD UPGRADE STEPS
@@ -57,16 +57,16 @@ ynh_abort_if_errors
 #=================================================
 ynh_script_progression --message="Ensuring downward compatibility..." --weight=1
 
-# If final_path doesn't exist, create it
-if [ -z "$final_path" ]; then
-	final_path=/var/www/$app
-	ynh_app_setting_set --app=$app --key=final_path --value=$final_path
+# If install_dir doesn't exist, create it
+if [ -z "$install_dir" ]; then
+#REMOVEME? 	install_dir=/var/www/$app
+#REMOVEME? 	ynh_app_setting_set --app=$app --key=install_dir --value=$install_dir
 fi
 
-# If datadir doesn't exist, create it
-if [ -z "$datadir" ]; then
-    datadir=/home/yunohost.app/$app
-    ynh_app_setting_set --app=$app --key=datadir --value=$datadir
+# If data_dir doesn't exist, create it
+if [ -z "$data_dir" ]; then
+    data_dir=/home/yunohost.app/$app
+#REMOVEME?     ynh_app_setting_set --app=$app --key=data_dir --value=$data_dir
 fi
 
 # If fpm_footprint doesn't exist, create it
@@ -87,22 +87,22 @@ if [ -z "$fpm_usage" ]; then
     ynh_app_setting_set --app=$app --key=fpm_usage --value=$fpm_usage
 fi
 
-ynh_permission_update --permission="main" --add="visitors"
+#REMOVEME? ynh_permission_update --permission="main" --add="visitors"
 
-if [ $is_public -eq 0 ]
+#REMOVEME? if [ $is_public -eq 0 ]
 then
 	domain_regex=$(echo "$domain" | sed 's@-@.@g')
-	[ "$path_url" = "/" ] && path_url_="" || path_url_="$path_url"
-	ynh_app_setting_set --app=$app --key=protected_regex --value="$domain_regex$path_url_/$","$domain_regex$path_url_/admin.php.*$"
+	[ "$path" = "/" ] && path_="" || path_="$path"
+#REMOVEME? 	ynh_app_setting_set --app=$app --key=protected_regex --value="$domain_regex$path_/$","$domain_regex$path_/admin.php.*$"
 fi
 
 #=================================================
 # CREATE DEDICATED USER
 #=================================================
-ynh_script_progression --message="Making sure dedicated system user exists..." --weight=1
+#REMOVEME? ynh_script_progression --message="Making sure dedicated system user exists..." --weight=1
 
 # Create a dedicated user (if not existing)
-ynh_system_user_create --username=$app --home_dir="$final_path"
+#REMOVEME? ynh_system_user_create --username=$app --home_dir="$install_dir"
 
 #=================================================
 # DOWNLOAD, CHECK AND UNPACK SOURCE
@@ -113,22 +113,22 @@ then
 	ynh_script_progression --message="Upgrading source files..." --weight=2
 
 	# Download, check integrity, uncompress and patch the source from app.src
-	ynh_setup_source --dest_dir="$final_path" --keep="lib/config.local.php"
+	ynh_setup_source --dest_dir="$install_dir" --keep="lib/config.local.php"
 
     # Remove the install.php
-    ynh_secure_remove --file=$final_path/install.php
+#REMOVEME?     ynh_secure_remove --file=$install_dir/install.php
 fi
 
-chmod 750 "$final_path"
-chmod -R o-rwx "$final_path"
-chown -R $app:www-data "$final_path"
+chmod 750 "$install_dir"
+chmod -R o-rwx "$install_dir"
+chown -R $app:www-data "$install_dir"
 
 #=================================================
 # UPGRADE DEPENDENCIES
 #=================================================
-ynh_script_progression --message="Upgrading dependencies..." --weight=3
+#REMOVEME? ynh_script_progression --message="Upgrading dependencies..." --weight=3
 
-ynh_install_app_dependencies $pkg_dependencies
+#REMOVEME? ynh_install_app_dependencies $pkg_dependencies
 
 #=================================================
 # PHP-FPM CONFIGURATION
@@ -137,7 +137,7 @@ ynh_script_progression --message="Upgrading PHP-FPM configuration..." --weight=2
 
 # Create a dedicated PHP-FPM config
 ynh_add_fpm_config --phpversion=$phpversion --usage=$fpm_usage --footprint=$fpm_footprint
-phpversion=$(ynh_app_setting_get --app=$app --key=phpversion)
+#REMOVEME? phpversion=$(ynh_app_setting_get --app=$app --key=phpversion)
 
 #=================================================
 # NGINX CONFIGURATION
@@ -163,9 +163,9 @@ chmod 644 "/etc/cron.d/$app"
 #=================================================
 # RELOAD NGINX
 #=================================================
-ynh_script_progression --message="Reloading NGINX web server..." --weight=1
+#REMOVEME? ynh_script_progression --message="Reloading NGINX web server..." --weight=1
 
-ynh_systemd_action --service_name=nginx --action=reload
+#REMOVEME? ynh_systemd_action --service_name=nginx --action=reload
 
 #=================================================
 # END OF SCRIPT
