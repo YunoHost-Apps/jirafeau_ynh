@@ -6,4 +6,4 @@ Le texte de la licence sur la page "Conditions d'utilisation du service", qui es
 
 ## Administration
 
-Pour administrer les fichiers présents au sein de Jirafeau il suffit de se rendre à l'adresse `jirafeau.domaine.tld/admin.php`.
+Pour administrer les fichiers présents au sein de Jirafeau il suffit de se rendre à l'adresse `__DOMAIN__/admin.php`.
