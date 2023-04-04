@@ -5,15 +5,16 @@ It shall NOT be edited by hand.
 
 # Jirafeau pour YunoHost
 
-[![Niveau d'intégration](https://dash.yunohost.org/integration/jirafeau.svg)](https://dash.yunohost.org/appci/app/jirafeau) ![Statut du fonctionnement](https://ci-apps.yunohost.org/ci/badges/jirafeau.status.svg) ![Statut de maintenance](https://ci-apps.yunohost.org/ci/badges/jirafeau.maintain.svg)  
+[![Niveau d’intégration](https://dash.yunohost.org/integration/jirafeau.svg)](https://dash.yunohost.org/appci/app/jirafeau) ![Statut du fonctionnement](https://ci-apps.yunohost.org/ci/badges/jirafeau.status.svg) ![Statut de maintenance](https://ci-apps.yunohost.org/ci/badges/jirafeau.maintain.svg)
+
 [![Installer Jirafeau avec YunoHost](https://install-app.yunohost.org/install-with-yunohost.svg)](https://install-app.yunohost.org/?app=jirafeau)
 
 *[Read this readme in english.](./README.md)*
 
-> *Ce package vous permet d'installer Jirafeau rapidement et simplement sur un serveur YunoHost.
-Si vous n'avez pas YunoHost, regardez [ici](https://yunohost.org/#/install) pour savoir comment l'installer et en profiter.*
+> *Ce package vous permet d’installer Jirafeau rapidement et simplement sur un serveur YunoHost.
+Si vous n’avez pas YunoHost, regardez [ici](https://yunohost.org/#/install) pour savoir comment l’installer et en profiter.*
 
-## Vue d'ensemble
+## Vue d’ensemble
 
 Jirafeau offre la possibilité d'héberger et de partager vos fichiers, le tout en toute simplicité. Choisissez un fichier, Jirafeau vous fournira un lien avec beaucoup d'options. Il est possible de protéger vos liens avec mot de passe ainsi que de choisir la durée de rétention du fichier sur le serveur. Le fichier et le lien s'autodétruiront passé ce délai. Les téléchargements des fichiers transmis peuvent être limités à une certaine date, et chaque fichier peut s'autodétruire après le premier téléchargement. Jirafeau permet de configurer les temps maximum de rétention ainsi que la taille maximale par fichier. Le chiffrement est disponible en option.
 
@@ -22,9 +23,9 @@ Jirafeau offre la possibilité d'héberger et de partager vos fichiers, le tout 
 
 **Démo :** https://demo.yunohost.org/jirafeau/
 
-## Captures d'écran
+## Captures d’écran
 
-![Capture d'écran de Jirafeau](./doc/screenshots/TPjh48P.png)
+![Capture d’écran de Jirafeau](./doc/screenshots/TPjh48P.png)
 
 ## Avertissements / informations importantes
 
@@ -39,8 +40,8 @@ Le texte de la licence sur la page "Conditions d'utilisation du service", qui es
 Pour administrer les fichiers présents au sein de Jirafeau il suffit de se rendre à l'adresse `jirafeau.domaine.tld/admin.php`.
 ## Documentations et ressources
 
-* Site officiel de l'app : <https://gitlab.com/mojo42/Jirafeau>
-* Dépôt de code officiel de l'app : <https://gitlab.com/mojo42/Jirafeau>
+* Site officiel de l’app : <https://gitlab.com/mojo42/Jirafeau>
+* Dépôt de code officiel de l’app : <https://gitlab.com/mojo42/Jirafeau>
 * Documentation YunoHost pour cette app : <https://yunohost.org/app_jirafeau>
 * Signaler un bug : <https://github.com/YunoHost-Apps/jirafeau_ynh/issues>
 
@@ -56,4 +57,4 @@ ou
 sudo yunohost app upgrade jirafeau -u https://github.com/YunoHost-Apps/jirafeau_ynh/tree/testing --debug
 ```
 
-**Plus d'infos sur le packaging d'applications :** <https://yunohost.org/packaging_apps>
+**Plus d’infos sur le packaging d’applications :** <https://yunohost.org/packaging_apps>

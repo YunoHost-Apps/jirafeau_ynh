@@ -5,7 +5,8 @@ It shall NOT be edited by hand.
 
 # Jirafeau for YunoHost
 
-[![Integration level](https://dash.yunohost.org/integration/jirafeau.svg)](https://dash.yunohost.org/appci/app/jirafeau) ![Working status](https://ci-apps.yunohost.org/ci/badges/jirafeau.status.svg) ![Maintenance status](https://ci-apps.yunohost.org/ci/badges/jirafeau.maintain.svg)  
+[![Integration level](https://dash.yunohost.org/integration/jirafeau.svg)](https://dash.yunohost.org/appci/app/jirafeau) ![Working status](https://ci-apps.yunohost.org/ci/badges/jirafeau.status.svg) ![Maintenance status](https://ci-apps.yunohost.org/ci/badges/jirafeau.maintain.svg)
+
 [![Install Jirafeau with YunoHost](https://install-app.yunohost.org/install-with-yunohost.svg)](https://install-app.yunohost.org/?app=jirafeau)
 
 *[Lire ce readme en français.](./README_fr.md)*
