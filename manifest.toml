@@ -1,0 +1,67 @@
+packaging_format = 2
+
+id = "jirafeau"
+name = "Jirafeau"
+description.en = "Upload a file in a simple way and give a unique link to it"
+description.fr = "Hébergez simplement un fichier et partagez-le avec un lien unique"
+
+version = "4.5.0~ynh1"
+
+maintainers = []
+
+[upstream]
+license = "AGPL-3.0-only"
+website = "https://gitlab.com/mojo42/Jirafeau"
+demo = "https://demo.yunohost.org/jirafeau/"
+code = "https://gitlab.com/mojo42/Jirafeau"
+
+[integration]
+yunohost = ">= 11.1.16"
+architectures = "all"
+multi_instance = false
+ldap = false
+sso = false
+disk = "50M"
+ram.build = "50M"
+ram.runtime = "50M"
+
+[install]
+    [install.domain]
+    type = "domain"
+
+    [install.path]
+    type = "path"
+    default = "/jirafeau"
+
+    [install.init_main_permission]
+    type = "group"
+    default = "visitors"
+
+    [install.admin_user]
+    ask.en = "Choose an admin user (will be able to access admin.php page)"
+    ask.fr = "Choisissez l'administrateur (seul autorisé à accéder à la page admin.php)"
+    type = "user"
+
+    [install.upload_password]
+    ask.en = "Set the password granting upload permissions (leave empty to allow anybody to upload). Please avoid using ' (quotes) in the password as it will fail the app..."
+    ask.fr = "Définissez le mot de passe permettant l'accès à l'envoi de fichiers (laissez vide pour autoriser tout le monde). Veuillez éviter d'utiliser ' (guillemets) dans le mot de passe car cela fera échouer l'application..."
+    type = "password"
+    optional = true
+
+[resources]
+        [resources.sources.main]
+        url = "https://gitlab.com/mojo42/Jirafeau/-/archive/4.5.0/Jirafeau-4.5.0.tar.gz"
+        sha256 = "cc164f086b65c810cefc0eb26bffa6718a12a56ea94b7717d7eba8281d6c66ac"
+
+    [resources.system_user]
+
+    [resources.install_dir]
+
+    [resources.data_dir]
+    subdirs = ["files", "links", "async", "block"]
+
+    [resources.permissions]
+    main.url = "/"
+
+    [resources.apt]
+    packages = "php8.0-fpm"
