@@ -6,4 +6,4 @@ The license text on the "Terms of Service" page, which is shipped with the defau
 
 ## Administration
 
-To administer the files within Jirafeau it is enough to go to the address `jirafeau.domaine.tld/admin.php`.
+To administer the files within Jirafeau it is enough to go to the address `__DOMAIN__/admin.php`.

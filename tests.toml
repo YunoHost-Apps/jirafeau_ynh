@@ -1,0 +1,14 @@
+test_format = 1.0
+
+[default]
+
+
+    args.admin_user = "package_checker"
+    args.upload_password = "supersecretpassword"
+
+
+    # -------------------------------
+    # Commits to test upgrade from
+    # -------------------------------
+
+    test_upgrade_from.0615fbcf.name = "Upgrade from 4.3.0~ynh3"
