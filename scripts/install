@@ -13,6 +13,8 @@ source /usr/share/yunohost/helpers
 # RETRIEVE ARGUMENTS FROM THE MANIFEST
 #=================================================
 
+enable_crypt=false
+
 fpm_footprint="low"
 fpm_free_footprint=0
 fpm_usage="low"
@@ -21,6 +23,7 @@ fpm_usage="low"
 # STORE SETTINGS FROM MANIFEST
 #=================================================
 
+ynh_app_setting_set --app=$app --key=enable_crypt --value=$enable_crypt
 ynh_app_setting_set --app=$app --key=fpm_footprint --value=$fpm_footprint
 ynh_app_setting_set --app=$app --key=fpm_free_footprint --value=$fpm_free_footprint
 ynh_app_setting_set --app=$app --key=fpm_usage --value=$fpm_usage

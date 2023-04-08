@@ -62,7 +62,7 @@ $cfg['preview'] = true;
 /* Enable the encryption feature
  * By enabling it, file-level deduplication won't work anymore. See FAQ.
  */
-$cfg['enable_crypt'] = false;
+$cfg['enable_crypt'] = __ENABLE_CRYPT__;
 
 /* Length of link reference
  */
