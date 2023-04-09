@@ -13,7 +13,7 @@ source /usr/share/yunohost/helpers
 # RETRIEVE ARGUMENTS FROM THE MANIFEST
 #=================================================
 
-enable_crypt=false
+enable_crypt="false"
 
 fpm_footprint="low"
 fpm_free_footprint=0
