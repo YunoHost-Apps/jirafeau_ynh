@@ -3,6 +3,17 @@ version = "1.0"
 [main]
 name = "Jirafeau configuration"
 
+    [main.encrypt]
+    name = "Encryption feature"
+
+        [main.encrypt.enable_crypt]
+        ask = "Enable the encryption feature"
+        type = "boolean"
+        yes = true
+        no = false
+        help = "By enabling encryption feature, file-level deduplication won't work anymore."
+        bind = "ENABLE_CRYPT:__INSTALL_DIR__/lib/config.local.php"
+
     [main.php_fpm_config]
     name = "PHP-FPM configuration"
 
