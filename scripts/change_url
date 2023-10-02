@@ -29,4 +29,4 @@ ynh_replace_string --match_string="\$cfg\['web_root'\] = .*" --replace_string="\
 # END OF SCRIPT
 #=================================================
 
-ynh_script_progression --message="Change of URL completed for Jirafeau" --last
+ynh_script_progression --message="Change of URL completed for $app" --last

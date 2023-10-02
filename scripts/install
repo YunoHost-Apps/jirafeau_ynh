@@ -89,4 +89,4 @@ chmod 644 "/etc/cron.d/$app"
 # END OF SCRIPT
 #=================================================
 
-ynh_script_progression --message="Installation of Jirafeau completed" --last
+ynh_script_progression --message="Installation of $app completed" --last
