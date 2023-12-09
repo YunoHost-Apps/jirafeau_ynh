@@ -31,7 +31,7 @@ Jirafeau offre la possibilité d'héberger et de partager vos fichiers, le tout 
 
 * Site officiel de l’app : <https://gitlab.com/mojo42/Jirafeau>
 * Dépôt de code officiel de l’app : <https://gitlab.com/mojo42/Jirafeau>
-* Documentation YunoHost pour cette app : <https://yunohost.org/app_jirafeau>
+* YunoHost Store: <https://apps.yunohost.org/app/jirafeau>
 * Signaler un bug : <https://github.com/YunoHost-Apps/jirafeau_ynh/issues>
 
 ## Informations pour les développeurs
