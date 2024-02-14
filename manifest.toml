@@ -55,6 +55,7 @@ ram.runtime = "50M"
         [resources.sources.main]
         url = "https://gitlab.com/mojo42/Jirafeau/-/archive/4.5.0/Jirafeau-4.5.0.tar.gz"
         sha256 = "cc164f086b65c810cefc0eb26bffa6718a12a56ea94b7717d7eba8281d6c66ac"
+        autoupdate.strategy = "latest_gitlab_tag"
 
     [resources.system_user]
 
