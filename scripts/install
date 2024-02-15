@@ -50,11 +50,6 @@ ynh_script_progression --message="Configuring PHP-FPM..." --weight=2
 # Create a dedicated PHP-FPM config
 ynh_add_fpm_config --usage=$fpm_usage --footprint=$fpm_footprint
 
-#=================================================
-# NGINX CONFIGURATION
-#=================================================
-ynh_script_progression --message="Configuring NGINX web server..."
-
 # Create a dedicated NGINX config
 ynh_add_nginx_config
 
@@ -70,7 +65,7 @@ else
 	jirafeau_path="$path"
 fi
 
-ynh_add_config --template="../conf/config.local.php" --destination="$install_dir/lib/config.local.php"
+ynh_add_config --template="config.local.php" --destination="$install_dir/lib/config.local.php"
 
 chmod 400 "$install_dir/lib/config.local.php"
 chown $app:$app "$install_dir/lib/config.local.php"
@@ -80,7 +75,7 @@ chown $app:$app "$install_dir/lib/config.local.php"
 #=================================================
 ynh_script_progression --message="Configuring the cron file..." --weight=2
 
-ynh_add_config --template="../conf/cron" --destination="/etc/cron.d/$app"
+ynh_add_config --template="cron" --destination="/etc/cron.d/$app"
 
 chown root: "/etc/cron.d/$app"
 chmod 644 "/etc/cron.d/$app"
@@ -89,4 +84,4 @@ chmod 644 "/etc/cron.d/$app"
 # END OF SCRIPT
 #=================================================
 
-ynh_script_progression --message="Installation of Jirafeau completed" --last
+ynh_script_progression --message="Installation of $app completed" --last
