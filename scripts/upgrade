@@ -55,7 +55,7 @@ then
 	ynh_script_progression --message="Upgrading source files..." --weight=2
 
 	# Download, check integrity, uncompress and patch the source from app.src
-	ynh_setup_source --dest_dir="$install_dir" --keep="lib/config.local.php"
+	ynh_setup_source --dest_dir="$install_dir" --full_replace=1 --keep="lib/config.local.php"
 
     # Remove the install.php
     ynh_secure_remove --file=$install_dir/install.php
