@@ -1,86 +1,75 @@
 #!/bin/bash
 
-#=================================================
-# GENERIC START
-#=================================================
-# IMPORT GENERIC HELPERS
-#=================================================
-
 source _common.sh
 source /usr/share/yunohost/helpers
 
-#=================================================
-# CHECK VERSION
-#=================================================
+ynh_app_setting_set_default --key=php_upload_max_filesize --value=10G
 
-upgrade_type=$(ynh_check_app_version_changed)
-
-#=================================================
-# STANDARD UPGRADE STEPS
 #=================================================
 # ENSURE DOWNWARD COMPATIBILITY
 #=================================================
-ynh_script_progression --message="Ensuring downward compatibility..." --weight=1
+ynh_script_progression "Ensuring downward compatibility..."
 
 # If enable_crypt doesn't exist, create it
+# FIXMEhelpers2.1: maybe replace with: ynh_app_setting_set_default --key=enable_crypt --value=false
 if [ -z "${enable_crypt:-}" ]; then
     enable_crypt=false
-    ynh_app_setting_set --app=$app --key=enable_crypt --value=$enable_crypt
+    ynh_app_setting_set --key=enable_crypt --value=$enable_crypt
 fi
 
 # If fpm_footprint doesn't exist, create it
 if [ -z "${fpm_footprint:-}" ]; then
     fpm_footprint=low
-    ynh_app_setting_set --app=$app --key=fpm_footprint --value=$fpm_footprint
+#REMOVEME? Everything about fpm_footprint is removed in helpers2.1... |     ynh_app_setting_set --key=fpm_footprint --value=$fpm_footprint
 fi
 
 # If fpm_free_footprint doesn't exist, create it
 if [ -z "${fpm_free_footprint:-}" ]; then
     fpm_free_footprint=0
-    ynh_app_setting_set --app=$app --key=fpm_free_footprint --value=$fpm_free_footprint
+#REMOVEME? Everything about fpm_free_footprint is removed in helpers2.1... |     ynh_app_setting_set --key=fpm_free_footprint --value=$fpm_free_footprint
 fi
 
 # If fpm_usage doesn't exist, create it
 if [ -z "${fpm_usage:-}" ]; then
     fpm_usage=low
-    ynh_app_setting_set --app=$app --key=fpm_usage --value=$fpm_usage
+#REMOVEME? Everything about fpm_usage is removed in helpers2.1... |     ynh_app_setting_set --key=fpm_usage --value=$fpm_usage
 fi
 
 #=================================================
 # DOWNLOAD, CHECK AND UNPACK SOURCE
 #=================================================
 
-if [ "$upgrade_type" == "UPGRADE_APP" ]
+# FIXME: this is still supported but the recommendation is now to *always* re-setup the app sources wether or not the upstream sources changed
+if ynh_app_upstream_version_changed
 then
-	ynh_script_progression --message="Upgrading source files..." --weight=2
+	ynh_script_progression "Upgrading source files..."
 
 	# Download, check integrity, uncompress and patch the source from app.src
 	ynh_setup_source --dest_dir="$install_dir" --keep="lib/config.local.php"
 
     # Remove the install.php
-    ynh_secure_remove --file=$install_dir/install.php
+    ynh_safe_rm $install_dir/install.php
 fi
 
-chmod -R o-rwx "$install_dir"
-chown -R $app:www-data "$install_dir"
-
+#REMOVEME? Assuming the install dir is setup using ynh_setup_source, the proper chmod/chowns are now already applied and it shouldn't be necessary to tweak perms | chmod -R o-rwx "$install_dir"
+#REMOVEME? Assuming the install dir is setup using ynh_setup_source, the proper chmod/chowns are now already applied and it shouldn't be necessary to tweak perms | chown -R $app:www-data "$install_dir"
 #=================================================
 # PHP-FPM CONFIGURATION
 #=================================================
-ynh_script_progression --message="Upgrading PHP-FPM configuration..." --weight=2
+ynh_script_progression "Upgrading PHP-FPM configuration..."
 
 # Create a dedicated PHP-FPM config
-ynh_add_fpm_config --usage=$fpm_usage --footprint=$fpm_footprint
+ynh_config_add_phpfpm
 
 # Create a dedicated NGINX config
-ynh_add_nginx_config
+ynh_config_add_nginx
 
-ynh_add_config --template="cron" --destination="/etc/cron.d/$app"
-chown root: "/etc/cron.d/$app"
-chmod 644 "/etc/cron.d/$app"
+ynh_config_add --template="cron" --destination="/etc/cron.d/$app"
+#REMOVEME? Assuming the file is setup using ynh_config_add, the proper chmod/chowns are now already applied and it shouldn't be necessary to tweak perms | chown root: "/etc/cron.d/$app"
+#REMOVEME? Assuming the file is setup using ynh_config_add, the proper chmod/chowns are now already applied and it shouldn't be necessary to tweak perms | chmod 644 "/etc/cron.d/$app"
 
 #=================================================
 # END OF SCRIPT
 #=================================================
 
-ynh_script_progression --message="Upgrade of $app completed" --last
+ynh_script_progression "Upgrade of $app completed"
