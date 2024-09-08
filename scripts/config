@@ -1,12 +1,17 @@
 #!/bin/bash
+# In simple cases, you don't need a config script.
 
-#=================================================
-# GENERIC STARTING
+# With a simple config_panel.toml, you can write in the app settings, in the
+# upstream config file or replace complete files (logo ...) and restart services.
+
+# The config scripts allows you to go further, to handle specific cases
+# (validation of several interdependent fields, specific getter/setter for a value,
+# display dynamic informations or choices, pre-loading of config type .cube... ).
+
 #=================================================
 # IMPORT GENERIC HELPERS
 #=================================================
 
-source _common.sh
 source /usr/share/yunohost/helpers
 
 ynh_abort_if_errors
@@ -15,81 +20,77 @@ ynh_abort_if_errors
 # RETRIEVE ARGUMENTS
 #=================================================
 
-phpversion=$(ynh_app_setting_get --app=$app --key=phpversion)
-current_fpm_footprint=$(ynh_app_setting_get --app=$app --key=fpm_footprint)
+install_dir=$(ynh_app_setting_get --key=install_dir)
 
 #=================================================
 # SPECIFIC GETTERS FOR TOML SHORT KEY
 #=================================================
 
-get__fpm_footprint() {
-    # Free footprint value for php-fpm
-    # Check if current_fpm_footprint is an integer
-    if [ "$current_fpm_footprint" -eq "$current_fpm_footprint" ] 2> /dev/null
-    then
-        echo "specific"
+get__amount() {
+    # Here we can imagine to have an API call to stripe to know the amount of donation during a month
+    local amount=200
+
+    # It's possible to change some properties of the question by overriding it:
+    if [ "$amount" -gt 100 ]; then
+    cat << EOF
+style: success
+value: $amount
+ask:
+  en: A lot of donation this month: **$amount €**
+EOF
     else
-        echo "$current_fpm_footprint"
+    cat << EOF
+style: danger
+value: $amount
+ask:
+  en: Not so much donation this month: $amount €
+EOF
     fi
 }
 
-get__free_footprint() {
-    # Free footprint value for php-fpm
-    # Check if current_fpm_footprint is an integer
-    if [ "$current_fpm_footprint" -eq "$current_fpm_footprint" ] 2> /dev/null
-    then
-        # If current_fpm_footprint is an integer, that's a numeric value for the footprint
-        echo "$current_fpm_footprint"
+get__prices() {
+    local prices
+    prices="$(grep "DONATION\['" "$install_dir/settings.py" | sed -r "s@^DONATION\['([^']*)'\]\['([^']*)'\] = '([^']*)'@\1/\2/\3@g" | sed -z 's/\n/,/g;s/,$/\n/')"
+    if [ "$prices" == "," ]; then
+        # Return YNH_NULL if you prefer to not return a value at all.
+        echo YNH_NULL
     else
-        echo "0"
+        echo "$prices"
     fi
+}
+
+#=================================================
+# SPECIFIC VALIDATORS FOR TOML SHORT KEYS
+#=================================================
+validate__publishable_key() {
+
+    # We can imagine here we test if the key is really a publishable key
+    (is_secret_key "$publishable_key") &&
+        echo 'This key seems to be a secret key'
 }
 
 #=================================================
 # SPECIFIC SETTERS FOR TOML SHORT KEYS
 #=================================================
+set__prices() {
 
-set__fpm_footprint() {
-    if [ "$fpm_footprint" != "specific" ]
-    then
-        ynh_app_setting_set --app=$app --key=fpm_footprint --value="$fpm_footprint"
-    fi
-}
+    #---------------------------------------------
+    # IMPORTANT: setters are triggered only if a change is detected
+    #---------------------------------------------
+    for price in $(echo "$prices" | sed "s/,/ /"); do
+        frequency=$(echo "$price" | cut -d/ -f1)
+        currency=$(echo "$price" | cut -d/ -f2)
+        price_id=$(echo "$price" | cut -d/ -f3)
+        sed "d/DONATION\['$frequency'\]\['$currency'\]" "$install_dir/settings.py"
 
-set__fpm_free_footprint() {
-    if [ "$fpm_footprint" = "specific" ]
-    then
-        ynh_app_setting_set --app=$app --key=fpm_footprint --value="$fpm_free_footprint"
-    fi
+        echo "DONATION['$frequency']['$currency'] = '$price_id'" >> "$install_dir/settings.py"
+    done
+
+    #---------------------------------------------
+    # IMPORTANT: to be able to upgrade properly, you have to save the value in settings too
+    #---------------------------------------------
+    ynh_app_setting_set --key=prices --value="$prices"
 }
 
 #=================================================
-# GENERIC FINALIZATION
-#=================================================
-
-ynh_app_config_validate() {
-    _ynh_app_config_validate
-
-    if [ "${changed[fpm_usage]}" == "true" ] || [ "${changed[fpm_footprint]}" == "true" ] || [ "${changed[fpm_free_footprint]}" == "true" ]; then
-        # If fpm_footprint is set to 'specific', use $fpm_free_footprint value.
-        if [ "$fpm_footprint" = "specific" ]
-        then
-            fpm_footprint=$fpm_free_footprint
-        fi
-
-        if [ "$fpm_footprint" == "0" ]
-        then
-            ynh_print_err --message="When selecting 'specific', you have to set a footprint value into the field below."
-
-            exit 0
-        fi
-    fi
-}
-
-ynh_app_config_apply() {
-    _ynh_app_config_apply
-
-    ynh_add_fpm_config --phpversion=$phpversion --usage=$fpm_usage --footprint=$fpm_footprint
-}
-
-ynh_app_config_run $1
+ynh_app_config_run "$1"
