@@ -11,47 +11,30 @@ ynh_app_setting_set --key=php_upload_max_filesize --value=10G
 
 enable_crypt="false"
 
-#REMOVEME? Everything about fpm_footprint is removed in helpers2.1... | fpm_footprint="low"
-#REMOVEME? Everything about fpm_free_footprint is removed in helpers2.1... | fpm_free_footprint=0
-#REMOVEME? Everything about fpm_usage is removed in helpers2.1... | fpm_usage="low"
-
-#=================================================
-# STORE SETTINGS FROM MANIFEST
-#=================================================
-
 ynh_app_setting_set --key=enable_crypt --value=$enable_crypt
-#REMOVEME? Everything about fpm_footprint is removed in helpers2.1... | ynh_app_setting_set --key=fpm_footprint --value=$fpm_footprint
-#REMOVEME? Everything about fpm_free_footprint is removed in helpers2.1... | ynh_app_setting_set --key=fpm_free_footprint --value=$fpm_free_footprint
-#REMOVEME? Everything about fpm_usage is removed in helpers2.1... | ynh_app_setting_set --key=fpm_usage --value=$fpm_usage
 
 #=================================================
 # DOWNLOAD, CHECK AND UNPACK SOURCE
 #=================================================
 ynh_script_progression "Setting up source files..."
 
-# Download, check integrity, uncompress and patch the source from app.src
 ynh_setup_source --dest_dir="$install_dir"
 
-# Remove the install.php
 ynh_safe_rm $install_dir/install.php
 
-#REMOVEME? Assuming the install dir is setup using ynh_setup_source, the proper chmod/chowns are now already applied and it shouldn't be necessary to tweak perms | chmod -R o-rwx "$install_dir"
-#REMOVEME? Assuming the install dir is setup using ynh_setup_source, the proper chmod/chowns are now already applied and it shouldn't be necessary to tweak perms | chown -R $app:www-data "$install_dir"
 #=================================================
-# PHP-FPM CONFIGURATION
+# SYSTEM CONFIGURATION
 #=================================================
-ynh_script_progression "Configuring PHP-FPM..."
+ynh_script_progression "Adding system configurations related to $app..."
 
-# Create a dedicated PHP-FPM config
 ynh_config_add_phpfpm
 
-# Create a dedicated NGINX config
 ynh_config_add_nginx
 
 #=================================================
-# ADD A CONFIGURATION
+# APP INITIAL CONFIGURATION
 #=================================================
-ynh_script_progression "Adding $app's configuration..."
+ynh_script_progression "Adding $app's configuration files..."
 
 if [ "$path" = "/" ]
 then
@@ -62,18 +45,12 @@ fi
 
 ynh_config_add --template="config.local.php" --destination="$install_dir/lib/config.local.php"
 
-#REMOVEME? Assuming the file is setup using ynh_config_add, the proper chmod/chowns are now already applied and it shouldn't be necessary to tweak perms | chmod 400 "$install_dir/lib/config.local.php"
-#REMOVEME? Assuming the file is setup using ynh_config_add, the proper chmod/chowns are now already applied and it shouldn't be necessary to tweak perms | chown $app:$app "$install_dir/lib/config.local.php"
-
 #=================================================
 # SET THE CRON FILE
 #=================================================
 ynh_script_progression "Configuring the cron file..."
 
 ynh_config_add --template="cron" --destination="/etc/cron.d/$app"
-
-#REMOVEME? Assuming the file is setup using ynh_config_add, the proper chmod/chowns are now already applied and it shouldn't be necessary to tweak perms | chown root: "/etc/cron.d/$app"
-#REMOVEME? Assuming the file is setup using ynh_config_add, the proper chmod/chowns are now already applied and it shouldn't be necessary to tweak perms | chmod 644 "/etc/cron.d/$app"
 
 #=================================================
 # END OF SCRIPT

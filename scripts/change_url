@@ -14,7 +14,6 @@ ynh_config_change_url_nginx
 # SPECIFIC MODIFICATIONS
 #=================================================
 
-# Change domain name in parameters.yml
 ynh_replace --match="\$cfg\['web_root'\] = .*" --replace="\$cfg['web_root'] = 'https://' . '$new_domain' . '${new_path%/}' . '/';" --file="$install_dir/lib/config.local.php"
 
 #=================================================

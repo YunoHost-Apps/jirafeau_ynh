@@ -16,7 +16,7 @@ demo = "https://demo.yunohost.org/jirafeau/"
 code = "https://gitlab.com/mojo42/Jirafeau"
 
 [integration]
-yunohost = ">= 11.2.18"
+yunohost = ">= 11.2.30"
 helpers_version = "2.1"
 architectures = "all"
 multi_instance = false
