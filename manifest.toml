@@ -5,7 +5,7 @@ name = "Jirafeau"
 description.en = "Upload a file in a simple way and give a unique link to it"
 description.fr = "Hébergez simplement un fichier et partagez-le avec un lien unique"
 
-version = "4.5.0~ynh2"
+version = "4.5.0~ynh3"
 
 maintainers = []
 
@@ -16,7 +16,8 @@ demo = "https://demo.yunohost.org/jirafeau/"
 code = "https://gitlab.com/mojo42/Jirafeau"
 
 [integration]
-yunohost = ">= 11.2"
+yunohost = ">= 11.2.30"
+helpers_version = "2.1"
 architectures = "all"
 multi_instance = false
 
@@ -60,6 +61,7 @@ ram.runtime = "50M"
     [resources.system_user]
 
     [resources.install_dir]
+    group = "www-data:r-x"
 
     [resources.data_dir]
     subdirs = ["files", "links", "async", "block"]

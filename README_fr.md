@@ -5,7 +5,7 @@ Il NE doit PAS être modifié à la main.
 
 # Jirafeau pour YunoHost
 
-[![Niveau d’intégration](https://dash.yunohost.org/integration/jirafeau.svg)](https://dash.yunohost.org/appci/app/jirafeau) ![Statut du fonctionnement](https://ci-apps.yunohost.org/ci/badges/jirafeau.status.svg) ![Statut de maintenance](https://ci-apps.yunohost.org/ci/badges/jirafeau.maintain.svg)
+[![Niveau d’intégration](https://dash.yunohost.org/integration/jirafeau.svg)](https://ci-apps.yunohost.org/ci/apps/jirafeau/) ![Statut du fonctionnement](https://ci-apps.yunohost.org/ci/badges/jirafeau.status.svg) ![Statut de maintenance](https://ci-apps.yunohost.org/ci/badges/jirafeau.maintain.svg)
 
 [![Installer Jirafeau avec YunoHost](https://install-app.yunohost.org/install-with-yunohost.svg)](https://install-app.yunohost.org/?app=jirafeau)
 
@@ -19,7 +19,7 @@ Il NE doit PAS être modifié à la main.
 Jirafeau offre la possibilité d'héberger et de partager vos fichiers, le tout en toute simplicité. Choisissez un fichier, Jirafeau vous fournira un lien avec beaucoup d'options. Il est possible de protéger vos liens avec mot de passe ainsi que de choisir la durée de rétention du fichier sur le serveur. Le fichier et le lien s'autodétruiront passé ce délai. Les téléchargements des fichiers transmis peuvent être limités à une certaine date, et chaque fichier peut s'autodétruire après le premier téléchargement. Jirafeau permet de configurer les temps maximum de rétention ainsi que la taille maximale par fichier. Le chiffrement est disponible en option.
 
 
-**Version incluse :** 4.5.0~ynh2
+**Version incluse :** 4.5.0~ynh3
 
 **Démo :** <https://demo.yunohost.org/jirafeau/>
 
