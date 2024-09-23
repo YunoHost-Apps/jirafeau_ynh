@@ -36,7 +36,7 @@ Jirafeau offers the possibility to host and share your files with ease. Choose a
 
 ## Información para desarrolladores
 
-Por favor enviar sus correcciones a la [`branch testing`](https://github.com/YunoHost-Apps/jirafeau_ynh/tree/testing
+Por favor enviar sus correcciones a la [rama `testing`](https://github.com/YunoHost-Apps/jirafeau_ynh/tree/testing).
 
 Para probar la rama `testing`, sigue asÍ:
 
