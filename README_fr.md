@@ -19,7 +19,7 @@ Il NE doit PAS être modifié à la main.
 Jirafeau offre la possibilité d'héberger et de partager vos fichiers, le tout en toute simplicité. Choisissez un fichier, Jirafeau vous fournira un lien avec beaucoup d'options. Il est possible de protéger vos liens avec mot de passe ainsi que de choisir la durée de rétention du fichier sur le serveur. Le fichier et le lien s'autodétruiront passé ce délai. Les téléchargements des fichiers transmis peuvent être limités à une certaine date, et chaque fichier peut s'autodétruire après le premier téléchargement. Jirafeau permet de configurer les temps maximum de rétention ainsi que la taille maximale par fichier. Le chiffrement est disponible en option.
 
 
-**Version incluse :** 4.5.0~ynh3
+**Version incluse :** 4.6.0~ynh1
 
 **Démo :** <https://demo.yunohost.org/jirafeau/>
 
@@ -29,8 +29,7 @@ Jirafeau offre la possibilité d'héberger et de partager vos fichiers, le tout 
 
 ## Documentations et ressources
 
-- Site officiel de l’app : <https://gitlab.com/mojo42/Jirafeau>
-- Dépôt de code officiel de l’app : <https://gitlab.com/mojo42/Jirafeau>
+- Dépôt de code officiel de l’app : <https://gitlab.com/jirafeau/Jirafeau>
 - YunoHost Store : <https://apps.yunohost.org/app/jirafeau>
 - Signaler un bug : <https://github.com/YunoHost-Apps/jirafeau_ynh/issues>
 
