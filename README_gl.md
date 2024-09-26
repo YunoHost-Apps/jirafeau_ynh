@@ -19,7 +19,7 @@ NON debe editarse manualmente.
 Jirafeau offers the possibility to host and share your files with ease. Choose a file, Jirafeau will provide you with a link with many options. It is possible to protect your links with a password as well as to choose how long the file will be kept on the server. The file and the link will self-destruct after this time. Downloads of transmitted files can be limited to a certain date, and each file can self-destruct after the first download. Jirafeau allows you to configure maximum retention times and maximum size per file. Encryption is available as an option.
 
 
-**Versión proporcionada:** 4.5.0~ynh3
+**Versión proporcionada:** 4.6.0~ynh1
 
 **Demo:** <https://demo.yunohost.org/jirafeau/>
 
@@ -29,8 +29,7 @@ Jirafeau offers the possibility to host and share your files with ease. Choose a
 
 ## Documentación e recursos
 
-- Web oficial da app: <https://gitlab.com/mojo42/Jirafeau>
-- Repositorio de orixe do código: <https://gitlab.com/mojo42/Jirafeau>
+- Repositorio de orixe do código: <https://gitlab.com/jirafeau/Jirafeau>
 - Tenda YunoHost: <https://apps.yunohost.org/app/jirafeau>
 - Informar dun problema: <https://github.com/YunoHost-Apps/jirafeau_ynh/issues>
 
