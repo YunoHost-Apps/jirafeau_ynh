@@ -5,15 +5,14 @@ name = "Jirafeau"
 description.en = "Upload a file in a simple way and give a unique link to it"
 description.fr = "Hébergez simplement un fichier et partagez-le avec un lien unique"
 
-version = "4.5.0~ynh3"
+version = "4.6.0~ynh1"
 
 maintainers = []
 
 [upstream]
 license = "AGPL-3.0-only"
-website = "https://gitlab.com/mojo42/Jirafeau"
 demo = "https://demo.yunohost.org/jirafeau/"
-code = "https://gitlab.com/mojo42/Jirafeau"
+code = "https://gitlab.com/jirafeau/Jirafeau"
 
 [integration]
 yunohost = ">= 11.2.30"
@@ -54,8 +53,8 @@ ram.runtime = "50M"
 
 [resources]
         [resources.sources.main]
-        url = "https://gitlab.com/mojo42/Jirafeau/-/archive/4.5.0/Jirafeau-4.5.0.tar.gz"
-        sha256 = "cc164f086b65c810cefc0eb26bffa6718a12a56ea94b7717d7eba8281d6c66ac"
+        url = "https://gitlab.com/jirafeau/Jirafeau/-/archive/4.6.0/Jirafeau-4.6.0.tar.gz"
+        sha256 = "e7a9839122dedc76c6045edf607bd9c971216daf9413f8c5cb039dad21d17364"
         autoupdate.strategy = "latest_gitlab_tag"
 
     [resources.system_user]
@@ -70,4 +69,4 @@ ram.runtime = "50M"
     main.url = "/"
 
     [resources.apt]
-    packages = "php8.2-fpm"
+    packages = "php8.3-fpm"
