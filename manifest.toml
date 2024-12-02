@@ -5,7 +5,7 @@ name = "Jirafeau"
 description.en = "Upload a file in a simple way and give a unique link to it"
 description.fr = "Hébergez simplement un fichier et partagez-le avec un lien unique"
 
-version = "4.6.0~ynh1"
+version = "4.6.1~ynh1"
 
 maintainers = []
 
@@ -21,7 +21,6 @@ architectures = "all"
 multi_instance = false
 
 ldap = false
-
 sso = false
 
 disk = "50M"
@@ -39,6 +38,7 @@ ram.runtime = "50M"
     [install.init_main_permission]
     type = "group"
     default = "visitors"
+    help.en = "⚠️ Beware that if this service is exposed to anonymous visitors, it *could* be used by robots for shady/illegal content hosting. However, you may need to expose this app publicly to be able to share links with people."
 
     [install.admin_user]
     ask.en = "Choose an admin user (will be able to access admin.php page)"
@@ -53,8 +53,8 @@ ram.runtime = "50M"
 
 [resources]
         [resources.sources.main]
-        url = "https://gitlab.com/jirafeau/Jirafeau/-/archive/4.6.0/Jirafeau-4.6.0.tar.gz"
-        sha256 = "e7a9839122dedc76c6045edf607bd9c971216daf9413f8c5cb039dad21d17364"
+        url = "https://gitlab.com/jirafeau/Jirafeau/-/archive/4.6.1/Jirafeau-4.6.1.tar.bz2"
+        sha256 = "25feffd5233730159072d0c6926cc29f489c05dcd24dddf7f57e689448f125e3"
         autoupdate.strategy = "latest_gitlab_tag"
 
     [resources.system_user]
