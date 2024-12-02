@@ -5,7 +5,9 @@ Ini TIDAK boleh diedit dengan tangan.
 
 # Jirafeau untuk YunoHost
 
-[![Tingkat integrasi](https://dash.yunohost.org/integration/jirafeau.svg)](https://ci-apps.yunohost.org/ci/apps/jirafeau/) ![Status kerja](https://ci-apps.yunohost.org/ci/badges/jirafeau.status.svg) ![Status pemeliharaan](https://ci-apps.yunohost.org/ci/badges/jirafeau.maintain.svg)
+[![Tingkat integrasi](https://apps.yunohost.org/badge/integration/jirafeau)](https://ci-apps.yunohost.org/ci/apps/jirafeau/)
+![Status kerja](https://apps.yunohost.org/badge/state/jirafeau)
+![Status pemeliharaan](https://apps.yunohost.org/badge/maintained/jirafeau)
 
 [![Pasang Jirafeau dengan YunoHost](https://install-app.yunohost.org/install-with-yunohost.svg)](https://install-app.yunohost.org/?app=jirafeau)
 

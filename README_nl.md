@@ -5,7 +5,9 @@ Hij mag NIET handmatig aangepast worden.
 
 # Jirafeau voor Yunohost
 
-[![Integratieniveau](https://dash.yunohost.org/integration/jirafeau.svg)](https://ci-apps.yunohost.org/ci/apps/jirafeau/) ![Mate van functioneren](https://ci-apps.yunohost.org/ci/badges/jirafeau.status.svg) ![Onderhoudsstatus](https://ci-apps.yunohost.org/ci/badges/jirafeau.maintain.svg)
+[![Integratieniveau](https://apps.yunohost.org/badge/integration/jirafeau)](https://ci-apps.yunohost.org/ci/apps/jirafeau/)
+![Mate van functioneren](https://apps.yunohost.org/badge/state/jirafeau)
+![Onderhoudsstatus](https://apps.yunohost.org/badge/maintained/jirafeau)
 
 [![Jirafeau met Yunohost installeren](https://install-app.yunohost.org/install-with-yunohost.svg)](https://install-app.yunohost.org/?app=jirafeau)
 

@@ -5,7 +5,9 @@
 
 # YunoHost 上的 Jirafeau
 
-[![集成程度](https://dash.yunohost.org/integration/jirafeau.svg)](https://ci-apps.yunohost.org/ci/apps/jirafeau/) ![工作状态](https://ci-apps.yunohost.org/ci/badges/jirafeau.status.svg) ![维护状态](https://ci-apps.yunohost.org/ci/badges/jirafeau.maintain.svg)
+[![集成程度](https://apps.yunohost.org/badge/integration/jirafeau)](https://ci-apps.yunohost.org/ci/apps/jirafeau/)
+![工作状态](https://apps.yunohost.org/badge/state/jirafeau)
+![维护状态](https://apps.yunohost.org/badge/maintained/jirafeau)
 
 [![使用 YunoHost 安装 Jirafeau](https://install-app.yunohost.org/install-with-yunohost.svg)](https://install-app.yunohost.org/?app=jirafeau)
 

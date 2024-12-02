@@ -5,7 +5,9 @@ EZ editatu eskuz.
 
 # Jirafeau YunoHost-erako
 
-[![Integrazio maila](https://dash.yunohost.org/integration/jirafeau.svg)](https://ci-apps.yunohost.org/ci/apps/jirafeau/) ![Funtzionamendu egoera](https://ci-apps.yunohost.org/ci/badges/jirafeau.status.svg) ![Mantentze egoera](https://ci-apps.yunohost.org/ci/badges/jirafeau.maintain.svg)
+[![Integrazio maila](https://apps.yunohost.org/badge/integration/jirafeau)](https://ci-apps.yunohost.org/ci/apps/jirafeau/)
+![Funtzionamendu egoera](https://apps.yunohost.org/badge/state/jirafeau)
+![Mantentze egoera](https://apps.yunohost.org/badge/maintained/jirafeau)
 
 [![Instalatu Jirafeau YunoHost-ekin](https://install-app.yunohost.org/install-with-yunohost.svg)](https://install-app.yunohost.org/?app=jirafeau)
 

@@ -5,7 +5,9 @@
 
 # Jirafeau для YunoHost
 
-[![Уровень интеграции](https://dash.yunohost.org/integration/jirafeau.svg)](https://ci-apps.yunohost.org/ci/apps/jirafeau/) ![Состояние работы](https://ci-apps.yunohost.org/ci/badges/jirafeau.status.svg) ![Состояние сопровождения](https://ci-apps.yunohost.org/ci/badges/jirafeau.maintain.svg)
+[![Уровень интеграции](https://apps.yunohost.org/badge/integration/jirafeau)](https://ci-apps.yunohost.org/ci/apps/jirafeau/)
+![Состояние работы](https://apps.yunohost.org/badge/state/jirafeau)
+![Состояние сопровождения](https://apps.yunohost.org/badge/maintained/jirafeau)
 
 [![Установите Jirafeau с YunoHost](https://install-app.yunohost.org/install-with-yunohost.svg)](https://install-app.yunohost.org/?app=jirafeau)
 
