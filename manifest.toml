@@ -15,7 +15,7 @@ demo = "https://demo.yunohost.org/jirafeau/"
 code = "https://gitlab.com/jirafeau/Jirafeau"
 
 [integration]
-yunohost = ">= 11.2.30"
+yunohost = ">= 12.0.9"
 helpers_version = "2.1"
 architectures = "all"
 multi_instance = false
@@ -39,7 +39,8 @@ ram.runtime = "50M"
     type = "group"
     default = "visitors"
     help.en = "⚠️ Beware that if this service is exposed to anonymous visitors, it *could* be used by robots for shady/illegal content hosting. However, you may need to expose this app publicly to be able to share links with people."
-
+    help.fr = "⚠️ Attention, si ce service est exposé à des visiteurs anonymes, il *pourrait* être utilisé par des robots pour l'hébergement de contenus louches/illégaux. Cependant, il se peut que vous deviez exposer cette application publiquement pour pouvoir partager des liens avec d'autres personnes."
+    
     [install.admin_user]
     ask.en = "Choose an admin user (will be able to access admin.php page)"
     ask.fr = "Choisissez l'administrateur (seul autorisé à accéder à la page admin.php)"
