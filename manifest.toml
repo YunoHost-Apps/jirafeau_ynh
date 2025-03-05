@@ -1,3 +1,5 @@
+#:schema https://raw.githubusercontent.com/YunoHost/apps/master/schemas/manifest.v2.schema.json
+
 packaging_format = 2
 
 id = "jirafeau"
@@ -21,6 +23,7 @@ architectures = "all"
 multi_instance = false
 
 ldap = false
+
 sso = false
 
 disk = "50M"
@@ -53,10 +56,10 @@ ram.runtime = "50M"
     optional = true
 
 [resources]
-        [resources.sources.main]
-        url = "https://gitlab.com/jirafeau/Jirafeau/-/archive/4.6.2/Jirafeau-4.6.2.tar.bz2"
-        sha256 = "acef9cb8d7f432257471dd9f4bc4ad8a78c454837114e70a618c8cf96035af66"
-        autoupdate.strategy = "latest_gitlab_tag"
+    [resources.sources.main]
+    url = "https://gitlab.com/jirafeau/Jirafeau/-/archive/4.6.2/Jirafeau-4.6.2.tar.bz2"
+    sha256 = "acef9cb8d7f432257471dd9f4bc4ad8a78c454837114e70a618c8cf96035af66"
+    autoupdate.strategy = "latest_gitlab_tag"
 
     [resources.system_user]
 
