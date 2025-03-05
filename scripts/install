@@ -3,14 +3,13 @@
 source _common.sh
 source /usr/share/yunohost/helpers
 
-ynh_app_setting_set --key=php_upload_max_filesize --value=10G
-
 #=================================================
 # RETRIEVE ARGUMENTS FROM THE MANIFEST
 #=================================================
 
-enable_crypt="false"
+ynh_app_setting_set --key=php_upload_max_filesize --value=10G
 
+enable_crypt="false"
 ynh_app_setting_set --key=enable_crypt --value=$enable_crypt
 
 #=================================================
