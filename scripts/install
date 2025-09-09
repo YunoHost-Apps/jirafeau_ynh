@@ -34,13 +34,6 @@ ynh_config_add_nginx
 #=================================================
 ynh_script_progression "Adding $app's configuration files..."
 
-if [ "$path" = "/" ]
-then
-	jirafeau_path=""
-else
-	jirafeau_path="$path"
-fi
-
 ynh_config_add --template="config.local.php" --destination="$install_dir/lib/config.local.php"
 
 #=================================================
