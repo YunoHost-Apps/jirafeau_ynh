@@ -18,6 +18,7 @@ Upload a file in a simple way and give a unique link to it
 <a href="https://github.com/YunoHost-Apps/jirafeau_ynh/issues"><img height="100px" src="https://github.com/YunoHost/yunohost-artwork/raw/refs/heads/main/badges/neopossum-badges/badge_report_an_issue.svg"/></a>
 </div>
 
+
 ## Screenshots
 ![Screenshot of Jirafeau](./doc/screenshots/TPjh48P.png)
 
