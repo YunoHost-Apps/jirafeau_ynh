@@ -11,7 +11,7 @@ It shall NOT be edited by hand.
 Upload a file in a simple way and give a unique link to it
 
 [![App Demo](https://img.shields.io/badge/App_Demo-blue?style=for-the-badge)](https://demo.yunohost.org/jirafeau/)
-[![Version: 4.7.0~ynh1](https://img.shields.io/badge/Version-4.7.0~ynh1-rgb(18,138,11)?style=for-the-badge)](https://ci-apps.yunohost.org/ci/apps/jirafeau/)
+[![Version: 4.7.1~ynh1](https://img.shields.io/badge/Version-4.7.1~ynh1-rgb(18,138,11)?style=for-the-badge)](https://ci-apps.yunohost.org/ci/apps/jirafeau/)
 
 <div align="center">
 <a href="https://apps.yunohost.org/app/jirafeau"><img height="100px" src="https://github.com/YunoHost/yunohost-artwork/raw/refs/heads/main/badges/neopossum-badges/badge_more_info_on_the_appstore.svg"/></a>
