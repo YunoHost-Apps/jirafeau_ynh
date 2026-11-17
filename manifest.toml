@@ -7,7 +7,7 @@ name = "Jirafeau"
 description.en = "Upload a file in a simple way and give a unique link to it"
 description.fr = "Hébergez simplement un fichier et partagez-le avec un lien unique"
 
-version = "4.7.2~ynh1"
+version = "4.8.0~ynh1"
 
 maintainers = []
 
@@ -56,8 +56,8 @@ ram.runtime = "50M"
 
 [resources]
     [resources.sources.main]
-    url = "https://gitlab.com/jirafeau/Jirafeau/-/archive/4.7.2/Jirafeau-4.7.2.tar.bz2"
-    sha256 = "1957845963d3428157c6e9ece368270e2f04af3031d3782d7e74055f237b81db"
+    url = "https://gitlab.com/jirafeau/Jirafeau/-/archive/4.8.0/Jirafeau-4.8.0.tar.bz2"
+    sha256 = "bbe878b1c2e3c04bff8f216cb6d589ead15aa7184f0f8369ed9b6f47f90c14f3"
     autoupdate.strategy = "latest_gitlab_tag"
 
     [resources.system_user]
